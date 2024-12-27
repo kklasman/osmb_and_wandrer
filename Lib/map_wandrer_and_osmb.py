@@ -197,7 +197,8 @@ def execute_query(query):
     cwd = os.getcwd()
     db_path = os.path.join(cwd, r'data', 'wandrer_2.0.db')
     print(f'db_path = {db_path}')
-    conn = sqlite3.connect(db_path)
+    # conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(r'C:\Users\kk4si\PycharmProjects\osmb_and_wandrer\Lib\data\wandrer_2.0.db')
     # state = 'South Carolina'
     wandrerer_df = pd.read_sql_query(query, conn)
     return wandrerer_df
