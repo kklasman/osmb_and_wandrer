@@ -197,13 +197,18 @@ def execute_query(query):
     cwd = os.getcwd()
     print(f'cwd = {cwd}')
     # db_path = os.path.join(cwd, r'data', 'wandrer_2.0.db')
-    db_path = os.path.join(r'data', 'wandrer_2.0.db')
+    db_path = os.path.join(cwd, 'data', 'wandrer_2.0.db')
     print(f'db_path = {db_path}')
-    conn = sqlite3.connect(db_path)
-    # conn = sqlite3.connect(r'C:\Users\kk4si\PycharmProjects\osmb_and_wandrer\Lib\data\wandrer_2.0.db')
-    # state = 'South Carolina'
-    wandrerer_df = pd.read_sql_query(query, conn)
-    return wandrerer_df
+
+    try:
+        conn = sqlite3.connect(db_path)
+        # conn = sqlite3.connect(r'C:\Users\kk4si\PycharmProjects\osmb_and_wandrer\Lib\data\wandrer_2.0.db')
+        # state = 'South Carolina'
+        wandrerer_df = pd.read_sql_query(query, conn)
+        return wandrerer_df
+    except:
+        print(f'Unable to open {db_path}')
+
 
 def update(key, ):
     # print(f'update: ss[{key}] = {ss.select_state}')
