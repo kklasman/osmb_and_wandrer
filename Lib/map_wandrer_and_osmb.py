@@ -198,7 +198,10 @@ def execute_query(query):
     print(f'cwd = {cwd}')
     # db_path = os.path.join(cwd, r'data', 'wandrer_2.0.db')
     db_path = os.path.join(cwd, 'data', 'wandrer_2.0.db')
+    filesize = os.path.getsize(db_path)
     print(f'db_path = {db_path}')
+    print(f'file size: {filesize}')
+    # print(f'db_path = {db_path}')
 
     try:
         conn = sqlite3.connect(db_path)
