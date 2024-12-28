@@ -198,8 +198,8 @@ def execute_query(query):
     print(f'cwd = {cwd}')
     # db_path = os.path.join(cwd, r'data', 'wandrer_2.0.db')
     db_path = os.path.join(cwd, 'Lib', 'data', 'wandrer_2.0.db')
-    filesize = os.path.getsize(db_path)
     print(f'db_path = {db_path}')
+    filesize = os.path.getsize(db_path)
     print(f'file size: {filesize}')
     # print(f'db_path = {db_path}')
 
@@ -260,8 +260,12 @@ if make_map:
     cwd = os.getcwd()
     file_name = geojson_files[state_selectbox]
     # file_path = os.path.join(cwd, r'data\10150\boundaries', file_name)
-    file_path = os.path.join(cwd, r'data\boundaries', file_name)
+    # file_path = os.path.join(cwd, r'data\boundaries', file_name)
+    # file_path = os.path.join(cwd, r'data\boundaries', file_name)
+    file_path = os.path.join(cwd, 'Lib', 'data', 'boundaries', file_name)
     print(f'filepath = {file_path}')
+    filesize = os.path.getsize(file_path)
+    print(f'file size: {filesize}')
     osm_gdf = gpd.read_file(f'{file_path}')
     print(f'maptype_selectbox: {maptype_selectbox}')
     print(osm_gdf)
