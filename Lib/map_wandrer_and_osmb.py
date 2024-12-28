@@ -197,7 +197,7 @@ def execute_query(query):
     cwd = os.getcwd()
     print(f'cwd = {cwd}')
     # db_path = os.path.join(cwd, r'data', 'wandrer_2.0.db')
-    db_path = os.path.join(cwd, 'data', 'wandrer_2.0.db')
+    db_path = os.path.join(cwd, 'Lib', 'data', 'wandrer_2.0.db')
     filesize = os.path.getsize(db_path)
     print(f'db_path = {db_path}')
     print(f'file size: {filesize}')
