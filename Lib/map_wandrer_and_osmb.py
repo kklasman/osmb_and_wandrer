@@ -51,7 +51,7 @@ def create_county_map(source_osm_df, state):
     final_df = merged_df.dropna()
     lat = final_df.dissolve().centroid.iloc[0].y
     lon = final_df.dissolve().centroid.iloc[0].x
-    print(f'lat: {lat} lon: {lon}')
+    # print(f'lat: {lat} lon: {lon}')
     location_json = json.loads(final_df.to_json())
     zoom = 6
     fig = go.Figure(go.Choroplethmapbox(
@@ -92,7 +92,7 @@ def create_town_map(source_osm_df, state):
                          ,'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'], axis=1, inplace=True, errors='ignore')
     lat = town_merged_df.dissolve().centroid.iloc[0].y
     lon = town_merged_df.dissolve().centroid.iloc[0].x
-    print(f'lat: {lat} lon: {lon}')
+    # print(f'lat: {lat} lon: {lon}')
     # location_json = json.loads(final_df.geometry.to_json())
     location_json = json.loads(town_merged_df.to_json())
     zoom = 6
@@ -201,13 +201,13 @@ def get_wandrer_totals_for_towns_for_state(state):
 
 def execute_query(query):
     cwd = os.getcwd()
-    print(f'cwd = {cwd}')
+    # print(f'cwd = {cwd}')
     db_path = os.path.join(cwd, 'Lib', 'data', 'wandrer_2.0.db')
-    print(f'db_path {db_path} exists {os.path.exists(db_path)}')
+    # print(f'db_path {db_path} exists {os.path.exists(db_path)}')
     if not os.path.exists(db_path):
         # file lives in different location in development
         db_path = os.path.join(cwd, r'data', 'wandrer_2.0.db')
-        print(f'db_path {db_path} exists {os.path.exists(db_path)}')
+        # print(f'db_path {db_path} exists {os.path.exists(db_path)}')
 
     # filesize = os.path.getsize(db_path)
     # print(f'file size: {filesize}')
@@ -235,7 +235,7 @@ def make_map_disable(b):
 
 def enable_make_map():
     if 'select_map' in st.session_state:
-        print(f"enable_make_map: {ss['select_map']}")
+        # print(f"enable_make_map: {ss['select_map']}")
         if ss['select_state'] != None and ss['select_map'] != None:
             make_map_disable(False)
         else:
@@ -248,16 +248,16 @@ def get_geojson_filename(selected_state):
     file_name = geojson_files[selected_state]
     # file_path = os.path.join(cwd, r'data\10150\boundaries', file_name)
     file_path = os.path.join(cwd, 'Lib', 'data', 'boundaries', file_name)
-    print(f'file_path {file_path} exists {os.path.exists(file_path)}')
+    # print(f'file_path {file_path} exists {os.path.exists(file_path)}')
     if not os.path.exists(file_path):
         # file lives in a different folder in development
         file_path = os.path.join(cwd, r'data\boundaries', file_name)
-        print(f'file_path {file_path} exists {os.path.exists(file_path)}')
+        # print(f'file_path {file_path} exists {os.path.exists(file_path)}')
 
     # file_path = os.path.join(cwd, r'data\boundaries', file_name)
-    print(f'filepath = {file_path}')
+    # print(f'filepath = {file_path}')
     filesize = os.path.getsize(file_path)
-    print(f'file size: {filesize}')
+    # print(f'file size: {filesize}')
     return file_path
 
 # ss
@@ -265,6 +265,10 @@ def get_geojson_filename(selected_state):
 options = ['State', 'Counties', 'Towns']
 geojson_files = get_geojson_filenames()
 # geojson_files = get_geojson_files()
+
+if 'gdfs' not in st.session_state:
+    # Initialize geopandas df dictionary in session state.
+    st.session_state.gdfs = {}
 
 # exit_app = st.button('Exit', key='exit_btn')
 # if exit_app:
@@ -281,15 +285,25 @@ preserve_map_selection = st.checkbox('Clear map type selection on state change',
 maptype_selectbox = st.selectbox('Select a map type:', options, key='select_map', index=None, on_change=enable_make_map())
 
 make_map = st.button('Generate map', key='make_map_btn', disabled=st.session_state.get("make_map_disable", True))
-print(f'state_selectbox: {state_selectbox}')
+# print(f'state_selectbox: {state_selectbox}')
 
+
+def get_geopandas_df_for_state(selected_state):
+    if selected_state not in st.session_state.gdfs.keys():
+        print(f'Creating geopandas df for {selected_state}')
+        file_path = get_geojson_filename(state_selectbox)
+        gdf = gpd.read_file(f'{file_path}')
+        # print(f'maptype_selectbox: {maptype_selectbox}')
+        # print(gdf)
+        st.session_state.gdfs[selected_state] = gdf
+        return gdf
+    else:
+        print(f'Getting geopandas df for {selected_state} from session state')
+        return st.session_state.gdfs[selected_state]
 
 if make_map:
     # print(f'os.getcwd = {os.getcwd()}')
-    file_path = get_geojson_filename(state_selectbox)
-    osm_gdf = gpd.read_file(f'{file_path}')
-    print(f'maptype_selectbox: {maptype_selectbox}')
-    print(osm_gdf)
+    osm_gdf = get_geopandas_df_for_state(state_selectbox)
 
     fig = {}
     match maptype_selectbox:
