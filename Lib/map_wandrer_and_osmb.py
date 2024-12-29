@@ -10,6 +10,13 @@ import sqlite3
 import plotly.express as px
 import streamlit as st
 from streamlit import session_state as ss
+import logging
+
+logging.basicConfig(level=logging.DEBUG,
+    format = "{asctime} - {levelname} - {message}",
+    style = "{",
+    datefmt = "%Y-%m-%d %H:%M",
+)
 
 def column_exists_case_insensitive(df, col_name):
     return col_name.lower() in [col.lower() for col in df.columns]
@@ -157,6 +164,7 @@ def create_state_map(source_osm_df, state):
 
 def get_geojson_files_from_db():
     if 'geojson_files_dict' not in st.session_state:
+        logging.debug("Getting geojson filename from db.")
         query = f'''select State, geojson_filename from vw_state_geo_data
         where geojson_filename is not NULL
         order by State'''
@@ -166,6 +174,7 @@ def get_geojson_files_from_db():
         st.session_state.geojson_files_dict = result
         return result
     else:
+        logging.debug("Getting geojson filename from session_state.")
         return st.session_state.geojson_files_dict
 
 def get_wandrer_totals_for_state(state):
