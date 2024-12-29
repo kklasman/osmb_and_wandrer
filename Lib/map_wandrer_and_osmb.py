@@ -196,11 +196,15 @@ def get_wandrer_totals_for_towns_for_state(state):
 def execute_query(query):
     cwd = os.getcwd()
     print(f'cwd = {cwd}')
-    # db_path = os.path.join(cwd, r'data', 'wandrer_2.0.db')
     db_path = os.path.join(cwd, 'Lib', 'data', 'wandrer_2.0.db')
-    print(f'db_path = {db_path}')
-    filesize = os.path.getsize(db_path)
-    print(f'file size: {filesize}')
+    print(f'db_path {db_path} exists {os.path.exists(db_path)}')
+    if not os.path.exists(db_path):
+        # file lives in different location in development
+        db_path = os.path.join(cwd, r'data', 'wandrer_2.0.db')
+        print(f'db_path {db_path} exists {os.path.exists(db_path)}')
+
+    # filesize = os.path.getsize(db_path)
+    # print(f'file size: {filesize}')
     # print(f'db_path = {db_path}')
 
     try:
@@ -260,9 +264,15 @@ if make_map:
     cwd = os.getcwd()
     file_name = geojson_files[state_selectbox]
     # file_path = os.path.join(cwd, r'data\10150\boundaries', file_name)
-    # file_path = os.path.join(cwd, r'data\boundaries', file_name)
-    # file_path = os.path.join(cwd, r'data\boundaries', file_name)
+
     file_path = os.path.join(cwd, 'Lib', 'data', 'boundaries', file_name)
+    print(f'file_path {file_path} exists {os.path.exists(file_path)}')
+    if not os.path.exists(file_path):
+        # file lives in a different folder in development
+        file_path = os.path.join(cwd, r'data\boundaries', file_name)
+        print(f'file_path {file_path} exists {os.path.exists(file_path)}')
+
+    # file_path = os.path.join(cwd, r'data\boundaries', file_name)
     print(f'filepath = {file_path}')
     filesize = os.path.getsize(file_path)
     print(f'file size: {filesize}')
