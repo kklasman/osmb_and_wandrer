@@ -156,13 +156,17 @@ def create_state_map(source_osm_df, state):
     return fig
 
 def get_geojson_files_from_db():
-    query = f'''select State, geojson_filename from vw_state_geo_data
-	where geojson_filename is not NULL
-	order by State'''
-    # print(query)
-    df = execute_query(query)
-    result = df.set_index('State')['geojson_filename'].to_dict()
-    return result
+    if 'geojson_files_dict' not in st.session_state:
+        query = f'''select State, geojson_filename from vw_state_geo_data
+        where geojson_filename is not NULL
+        order by State'''
+        # print(query)
+        df = execute_query(query)
+        result = df.set_index('State')['geojson_filename'].to_dict()
+        st.session_state.geojson_files_dict = result
+        return result
+    else:
+        return st.session_state.geojson_files_dict
 
 def get_wandrer_totals_for_state(state):
     query = f'''select Region, Country, State, sum(TotalMiles) as TotalMiles 
@@ -237,6 +241,23 @@ def enable_make_map():
             # st.session_state['make_map_disable'] = False
             # st.button('make_map_btn').disabled = Fale
 
+def get_geojson_filename(selected_state):
+    cwd = os.getcwd()
+    file_name = geojson_files[selected_state]
+    # file_path = os.path.join(cwd, r'data\10150\boundaries', file_name)
+    file_path = os.path.join(cwd, 'Lib', 'data', 'boundaries', file_name)
+    print(f'file_path {file_path} exists {os.path.exists(file_path)}')
+    if not os.path.exists(file_path):
+        # file lives in a different folder in development
+        file_path = os.path.join(cwd, r'data\boundaries', file_name)
+        print(f'file_path {file_path} exists {os.path.exists(file_path)}')
+
+    # file_path = os.path.join(cwd, r'data\boundaries', file_name)
+    print(f'filepath = {file_path}')
+    filesize = os.path.getsize(file_path)
+    print(f'file size: {filesize}')
+    return file_path
+
 # ss
 
 options = ['State', 'Counties', 'Towns']
@@ -259,23 +280,11 @@ maptype_selectbox = st.selectbox('Select a map type:', options, key='select_map'
 
 make_map = st.button('Generate map', key='make_map_btn', disabled=st.session_state.get("make_map_disable", True))
 print(f'state_selectbox: {state_selectbox}')
+
+
 if make_map:
     # print(f'os.getcwd = {os.getcwd()}')
-    cwd = os.getcwd()
-    file_name = geojson_files[state_selectbox]
-    # file_path = os.path.join(cwd, r'data\10150\boundaries', file_name)
-
-    file_path = os.path.join(cwd, 'Lib', 'data', 'boundaries', file_name)
-    print(f'file_path {file_path} exists {os.path.exists(file_path)}')
-    if not os.path.exists(file_path):
-        # file lives in a different folder in development
-        file_path = os.path.join(cwd, r'data\boundaries', file_name)
-        print(f'file_path {file_path} exists {os.path.exists(file_path)}')
-
-    # file_path = os.path.join(cwd, r'data\boundaries', file_name)
-    print(f'filepath = {file_path}')
-    filesize = os.path.getsize(file_path)
-    print(f'file size: {filesize}')
+    file_path = get_geojson_filename(state_selectbox)
     osm_gdf = gpd.read_file(f'{file_path}')
     print(f'maptype_selectbox: {maptype_selectbox}')
     print(osm_gdf)
