@@ -27,6 +27,7 @@ def rename_column_case_insensitive(df, old_col, new_col):
 def create_county_map(source_osm_df, state):
     renamed_gdf = {}
     counties_gdf = {}
+    data_value = ss['selected_datavalue_for_map']
 
     if column_exists_case_insensitive(source_osm_df, 'admin_level'):
         counties_gdf = source_osm_df[osm_gdf['admin_level'] == 6.0]
@@ -59,21 +60,27 @@ def create_county_map(source_osm_df, state):
         geojson=location_json,
         featureidkey='properties.County',
         locations=final_df['County'],
-        z=final_df['TotalMiles'],
+        z=final_df[data_value],
         colorscale='ylorrd',
         # zmin=0,
         # zmax=z_max,
         marker_opacity=0.5,
         visible=True,
+        colorbar_title=data_value
     ))
     fig.update_layout(mapbox_style="carto-positron",
                       mapbox_zoom=zoom, mapbox_center={"lat": lat, "lon": lon})
-    fig = fig.update_layout(margin={"r": 10, "t": 5, "l": 1, "b": 1})
+    fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
+                            , title=dict(text=f'{data_value} for Counties in {state}', x=0.5
+                            , xanchor="center")
+                            )
     fig.update_geos(fitbounds="locations", visible=True)
     return fig
 
 
 def create_town_map(source_osm_df, state):
+    data_value = ss['selected_datavalue_for_map']
+
     if column_exists_case_insensitive(source_osm_df, 'admin_level'):
         source_osm_df['admin_level'] = source_osm_df['admin_level'].astype(float)
         towns_gdf = source_osm_df[source_osm_df['admin_level'] > 6.0]
@@ -101,17 +108,21 @@ def create_town_map(source_osm_df, state):
         geojson=location_json,
         featureidkey='properties.Town',
         locations=town_merged_df['Town'],
-        z=town_merged_df['TotalMiles'],
+        z=town_merged_df[data_value],
         colorscale='ylorrd',
         # zmin=0,
         # zmax=z_max,
         marker_opacity=0.5,
         # marker_line_width=2,
         visible=True,
+        colorbar_title=data_value
     ))
     fig.update_layout(mapbox_style="carto-positron",
                       mapbox_zoom=zoom, mapbox_center={"lat": lat, "lon": lon})
-    fig = fig.update_layout(margin={"r": 10, "t": 5, "l": 1, "b": 1})
+    fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
+                            , title=dict(text=f'{data_value} for Counties in {state}', x=0.5
+                            , xanchor="center")
+                            )
     # fig.update_geos(fitbounds="locations", visible=True)
     # fig.update_geos(fitbounds="geojson", visible=True)
     # fig.show()
@@ -122,6 +133,7 @@ def create_town_map(source_osm_df, state):
 def create_state_map(source_osm_df, state):
     renamed_gdf = {}
     source_osm_df['State'] = state
+    data_value = ss['selected_datavalue_for_map']
     state_gdf = source_osm_df.dissolve(by='State')
     state_gdf.reset_index(inplace=True)
 
@@ -142,17 +154,21 @@ def create_state_map(source_osm_df, state):
         geojson=location_json,
         featureidkey='properties.State',
         locations=state_merged_df['State'],
-        z=state_merged_df['TotalMiles'],
+        z=state_merged_df[data_value],
         colorscale='ylorrd',
         # zmin=0,
         # zmax=z_max,
         marker_opacity=0.5,
         # marker_line_width=2,
         visible=True,
+        colorbar_title=data_value
     ))
     fig.update_layout(mapbox_style="carto-positron",
                       mapbox_zoom=zoom, mapbox_center={"lat": lat, "lon": lon})
-    fig = fig.update_layout(margin={"r": 10, "t": 5, "l": 1, "b": 1})
+    fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
+                            , title=dict(text=f'{data_value} for Counties in {state}', x=0.5
+                            , xanchor="center")
+                            )
     return fig
 
 def get_geojson_filenames():
@@ -234,9 +250,9 @@ def make_map_disable(b):
     st.session_state['make_map_disable'] = b
 
 def enable_make_map():
-    if 'select_map' in st.session_state:
+    if 'selected_map_type' in st.session_state:
         # print(f"enable_make_map: {ss['select_map']}")
-        if ss['select_state'] != None and ss['select_map'] != None:
+        if ss['selected_state'] != None and ss['selected_map_type'] != None and ss['selected_datavalue_for_map'] != None:
             make_map_disable(False)
         else:
             make_map_disable(True)
@@ -264,6 +280,7 @@ def get_geojson_filename(selected_state):
 
 options = ['State', 'Counties', 'Towns']
 geojson_files = get_geojson_filenames()
+data_values = ['TotalMiles', 'ActualMiles']
 # geojson_files = get_geojson_files()
 
 if 'gdfs' not in st.session_state:
@@ -279,10 +296,12 @@ if 'gdfs' not in st.session_state:
 #     p = psutil.Process(pid)
 #     p.terminate()
 
-state_selectbox = st.selectbox('Select a location (US State):', geojson_files.keys(), key='select_state', index=None
-                               , on_change=update, args=('select_map',))
-preserve_map_selection = st.checkbox('Clear map type selection on state change', key='preserve_map_selection')
-maptype_selectbox = st.selectbox('Select a map type:', options, key='select_map', index=None, on_change=enable_make_map())
+# state_selectbox = st.selectbox('Select a location (US State):', geojson_files.keys(), key='select_state', index=None
+#                                , on_change=update, args=('select_map',))
+state_selectbox = st.selectbox('Select a location (US State):', geojson_files.keys(), key='selected_state', index=None)
+# preserve_map_selection = st.checkbox('Clear map type selection on state change', key='preserve_map_selection')
+maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
+datavalue_selectbox = st.selectbox('Select a data value', data_values, key='selected_datavalue_for_map', index=None, on_change=enable_make_map())
 
 make_map = st.button('Generate map', key='make_map_btn', disabled=st.session_state.get("make_map_disable", True))
 # print(f'state_selectbox: {state_selectbox}')
