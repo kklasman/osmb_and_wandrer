@@ -79,15 +79,24 @@ def create_county_map(source_osm_df, state):
 
 
 def create_town_map(source_osm_df, state):
+    county_gdf = {}
     data_value = ss['selected_datavalue_for_map']
 
     if column_exists_case_insensitive(source_osm_df, 'admin_level'):
         source_osm_df['admin_level'] = source_osm_df['admin_level'].astype(float)
+        county_gdf = source_osm_df[source_osm_df['admin_level'] == 6.0]
+        county_gdf['TotalMiles'] = 0
+        county_gdf['ActualMiles'] = 0
+        rename_column_case_insensitive(county_gdf, 'name', 'County')
         towns_gdf = source_osm_df[source_osm_df['admin_level'] > 6.0]
         rename_column_case_insensitive(towns_gdf, 'name', 'Town')
     elif column_exists_case_insensitive(source_osm_df, 'town'):
         rename_column_case_insensitive(source_osm_df, 'town', 'Town')
         towns_gdf = source_osm_df.copy()
+        county_gdf = source_osm_df.dissolve(by='COUNTY')
+        county_gdf.reset_index(inplace=True)
+        county_gdf.rename(columns={'COUNTY': 'County'}, inplace=True)
+        county_gdf['County'] += ' County'
     else:
         print('Unexpected condition')
         print(towns_gdf.columns)
@@ -97,11 +106,14 @@ def create_town_map(source_osm_df, state):
     town_merged_df = towns_gdf.merge(wandrerer_df, on='Town')
     town_merged_df.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng'
                          ,'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'], axis=1, inplace=True, errors='ignore')
+    county_gdf.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng'
+                         ,'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'], axis=1, inplace=True, errors='ignore')
     lat = town_merged_df.dissolve().centroid.iloc[0].y
     lon = town_merged_df.dissolve().centroid.iloc[0].x
     # print(f'lat: {lat} lon: {lon}')
     # location_json = json.loads(final_df.geometry.to_json())
     location_json = json.loads(town_merged_df.to_json())
+    county_location_json = json.loads(county_gdf.to_json())
     zoom = 6
     fig = go.Figure(go.Choroplethmapbox(
         # customdata=final_df,
@@ -117,6 +129,13 @@ def create_town_map(source_osm_df, state):
         visible=True,
         colorbar_title=data_value
     ))
+    fig.update_layout(mapbox_layers=[dict(sourcetype='geojson',
+                                          source=county_location_json,
+                                          color='#303030',
+                                          type='line',
+                                          line=dict(width=1.5)
+                                          )]);
+
     fig.update_layout(mapbox_style="carto-positron",
                       mapbox_zoom=zoom, mapbox_center={"lat": lat, "lon": lon})
     fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
@@ -132,10 +151,24 @@ def create_town_map(source_osm_df, state):
 
 def create_state_map(source_osm_df, state):
     renamed_gdf = {}
+    county_gdf = {}
     source_osm_df['State'] = state
     data_value = ss['selected_datavalue_for_map']
     state_gdf = source_osm_df.dissolve(by='State')
     state_gdf.reset_index(inplace=True)
+    if not column_exists_case_insensitive(source_osm_df, 'admin_level'):
+        county_gdf = source_osm_df.dissolve(by='COUNTY')
+        county_gdf.reset_index(inplace=True)
+        county_gdf.rename(columns={'COUNTY': 'County'}, inplace=True)
+        county_gdf['County'] += ' County'
+    else:
+        county_gdf = source_osm_df[source_osm_df['admin_level'] == 6.0]
+        county_gdf.rename(columns={'name': 'County'}, inplace=True)
+
+    if not county_gdf.County.str.endswith(' County').all():
+        county_gdf['County'] += ' County'
+    # county_gdf = counties_gdf.dissolve(by='County')
+    # county_gdf.reset_index(inplace=True)
 
     wandrerer_df = get_wandrer_totals_for_state(state)
     # print(wandrerer_df)
@@ -148,6 +181,7 @@ def create_state_map(source_osm_df, state):
     lon = state_merged_df.dissolve().centroid.iloc[0].x
     # print(f'lat: {lat} lon: {lon}')
     location_json = json.loads(state_merged_df.to_json())
+    county_location_json = json.loads(county_gdf.to_json())
     zoom = 6
     fig = go.Figure(go.Choroplethmapbox(
         # customdata=final_df,
@@ -156,8 +190,8 @@ def create_state_map(source_osm_df, state):
         locations=state_merged_df['State'],
         z=state_merged_df[data_value],
         colorscale='ylorrd',
-        # zmin=0,
-        # zmax=z_max,
+        zmin=0,
+        zmax=100000,
         marker_opacity=0.5,
         # marker_line_width=2,
         visible=True,
@@ -165,6 +199,12 @@ def create_state_map(source_osm_df, state):
     ))
     fig.update_layout(mapbox_style="carto-positron",
                       mapbox_zoom=zoom, mapbox_center={"lat": lat, "lon": lon})
+    fig.update_layout(mapbox_layers=[dict(sourcetype='geojson',
+                                          source=county_location_json,
+                                          color='#303030',
+                                          type='line',
+                                          line=dict(width=1.5)
+                                          )]);
     fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
                             , title=dict(text=f'{data_value} for Counties in {state}', x=0.5
                             , xanchor="center")
@@ -187,7 +227,8 @@ def get_geojson_filenames():
         return st.session_state.geojson_files_dict
 
 def get_wandrer_totals_for_state(state):
-    query = f'''select Region, Country, State, sum(TotalMiles) as TotalMiles 
+    query = f'''select Region, Country, State, sum(TotalMiles) as TotalMiles, sum(ActualMiles) as 'ActualMiles'
+        , sum(Pct10Deficit) as 'Pct10Deficit', sum(Pct25Deficit) as 'Pct25Deficit'
     	from vw_county_aggregates
     	where State = "{state}"'''
     # print(query)
