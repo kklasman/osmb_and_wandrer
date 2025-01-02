@@ -182,7 +182,7 @@ def create_town_map(source_osm_df, state):
     fig.update_layout(mapbox_style="carto-positron",
                       mapbox_zoom=zoom, mapbox_center=center)
     fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
-                            , title=dict(text=f'{data_value} for Counties in {state}', x=0.5
+                            , title=dict(text=f'{data_value} for Towns in {state}', x=0.5
                             , xanchor="center")
                             )
     # fig.update_geos(fitbounds="locations", visible=True)
@@ -246,7 +246,7 @@ def create_state_map(source_osm_df, state):
                                           line=dict(width=1.5)
                                           )]);
     fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
-                            , title=dict(text=f'{data_value} for Counties in {state}', x=0.5
+                            , title=dict(text=f'{data_value} for State of {state}', x=0.5
                             , xanchor="center")
                             )
     return fig
@@ -403,13 +403,15 @@ if 'gdfs' not in st.session_state:
 
 # state_selectbox = st.selectbox('Select a location (US State):', geojson_files.keys(), key='select_state', index=None
 #                                , on_change=update, args=('select_map',))
-state_selectbox = st.selectbox('Select a location (US State):', geojson_files.keys(), key='selected_state', index=None)
-# preserve_map_selection = st.checkbox('Clear map type selection on state change', key='preserve_map_selection')
-maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
-datavalue_selectbox = st.selectbox('Select a data value', data_values, key='selected_datavalue_for_map', index=None, on_change=enable_make_map())
 
-make_map = st.button('Generate map', key='make_map_btn', disabled=st.session_state.get("make_map_disable", True))
-# print(f'state_selectbox: {state_selectbox}')
+with st.sidebar:
+    state_selectbox = st.selectbox('Select a location (US State):', geojson_files.keys(), key='selected_state', index=None)
+    # preserve_map_selection = st.checkbox('Clear map type selection on state change', key='preserve_map_selection')
+    maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
+    datavalue_selectbox = st.selectbox('Select a data value', data_values, key='selected_datavalue_for_map', index=None, on_change=enable_make_map())
+    make_map = st.button('Generate map', key='make_map_btn', disabled=st.session_state.get("make_map_disable", True))
+
+
 
 
 
