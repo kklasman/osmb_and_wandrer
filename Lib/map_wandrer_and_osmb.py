@@ -13,6 +13,8 @@ from streamlit import session_state as ss
 from geopy import distance
 import numpy as np
 
+max_50_pct_color_scale = ['white', 'gold', 'red']
+
 def column_exists_case_insensitive(df, col_name):
     return col_name.lower() in [col.lower() for col in df.columns]
 
@@ -101,8 +103,8 @@ def create_county_map(source_osm_df, state):
         featureidkey='properties.County',
         locations=final_df['County'],
         z=final_df[data_value],
-        colorscale='ylorrd',
-        # zmin=0,
+        colorscale=max_50_pct_color_scale,
+        zmin=0,
         # zmax=z_max,
         marker_opacity=0.5,
         visible=True,
@@ -154,14 +156,16 @@ def create_town_map(source_osm_df, state):
     location_json = json.loads(town_merged_df.to_json())
     county_location_json = json.loads(county_gdf.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
+
     fig = go.Figure(go.Choroplethmapbox(
         # customdata=final_df,
         geojson=location_json,
         featureidkey='properties.Town',
         locations=town_merged_df['Town'],
         z=town_merged_df[data_value],
-        colorscale='ylorrd',
-        # zmin=0,
+        # colorscale='ylorrd',
+        colorscale=max_50_pct_color_scale,
+        zmin=0,
         # zmax=z_max,
         marker_opacity=0.5,
         # marker_line_width=2,
@@ -225,9 +229,9 @@ def create_state_map(source_osm_df, state):
         featureidkey='properties.State',
         locations=state_merged_df['State'],
         z=state_merged_df[data_value],
-        colorscale='ylorrd',
+        colorscale=max_50_pct_color_scale,
         zmin=0,
-        zmax=100000,
+        zmax=int(state_merged_df.iloc[0].TotalMiles),
         marker_opacity=0.5,
         # marker_line_width=2,
         visible=True,
@@ -264,7 +268,8 @@ def get_geojson_filenames():
 
 def get_wandrer_totals_for_state(state):
     query = f'''select Region, Country, State, sum(TotalMiles) as TotalMiles, sum(ActualMiles) as 'ActualMiles'
-        , sum(Pct10Deficit) as 'Pct10Deficit', sum(Pct25Deficit) as 'Pct25Deficit'
+        , CASE WHEN sum(Pct10Deficit) < 0 THEN 0 ELSE sum(Pct10Deficit) END as 'Pct10Deficit'
+        , CASE WHEN sum(Pct25Deficit) < 0 THEN 0 ELSE sum(Pct25Deficit) END as 'Pct25Deficit'
     	from vw_county_aggregates
     	where State = "{state}"'''
     # print(query)
@@ -272,7 +277,14 @@ def get_wandrer_totals_for_state(state):
     return wandrerer_df
 
 def get_wandrer_totals_for_counties_for_state(state):
-    query = f'''select * from vw_county_aggregates 
+    query = f'''select Region, Country, State, County, StateArenaId, CountyArenaId
+        ,TotalMiles, ActualPct, ActualMiles, "Pct10", "Pct25", "Pct50"
+        , "Pct75", "Pct90", "awarded"
+        , CASE WHEN Pct10Deficit < 0 THEN 0 ELSE Pct10Deficit END as Pct10Deficit
+        , CASE WHEN Pct25Deficit < 0 THEN 0 ELSE Pct25Deficit END as Pct25Deficit
+        , "Pct50Deficit", "Pct75Deficit"
+        , "Pct90Deficit", "geometries_visible", "diagonal", "user_id"
+		from vw_county_aggregates 
     	where State = "{state}"
     	order by County'''
     # print(query)
@@ -282,7 +294,10 @@ def get_wandrer_totals_for_counties_for_state(state):
 def get_wandrer_totals_for_towns_for_state(state):
     query = f'''select fqtn.*
         , length as TotalMiles, "percentage" as ActualPct, "ActualLength" as ActualMiles, "Pct10", "Pct25", "Pct50"
-        , "Pct75", "Pct90", "awarded", "Pct10Deficit", "Pct25Deficit", "Pct50Deficit", "Pct75Deficit"
+        , "Pct75", "Pct90", "awarded"
+        , CASE WHEN Pct10Deficit < 0 THEN 0 ELSE Pct10Deficit END as Pct10Deficit
+        , CASE WHEN Pct25Deficit < 0 THEN 0 ELSE Pct25Deficit END as Pct25Deficit
+        , "Pct50Deficit", "Pct75Deficit"
         , "Pct90Deficit", "geometries_visible", "diagonal", "user_id"
         from arena_badge town
         inner join fq_town_name fqtn on fqtn.arena_id = town.id
@@ -370,7 +385,7 @@ def get_geopandas_df_for_state(selected_state):
 
 options = ['State', 'Counties', 'Towns']
 geojson_files = get_geojson_filenames()
-data_values = ['TotalMiles', 'ActualMiles']
+data_values = ['TotalMiles', 'ActualMiles', 'Pct10Deficit', 'Pct25Deficit']
 # geojson_files = get_geojson_files()
 
 if 'gdfs' not in st.session_state:
