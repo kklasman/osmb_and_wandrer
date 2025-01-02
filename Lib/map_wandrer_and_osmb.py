@@ -10,6 +10,8 @@ import sqlite3
 import plotly.express as px
 import streamlit as st
 from streamlit import session_state as ss
+from geopy import distance
+import numpy as np
 
 def column_exists_case_insensitive(df, col_name):
     return col_name.lower() in [col.lower() for col in df.columns]
@@ -24,12 +26,52 @@ def rename_column_case_insensitive(df, old_col, new_col):
             break
 
 
+def calculate_mapbox_zoom_center(bounds) -> (float, dict):
+    """calc zoom and center for plotly mapbox functions
+
+    Temporary solution awaiting official implementation, see:
+    https://github.com/plotly/plotly.js/issues/3434
+    """
+
+    # because we stick None to make separate lines...
+    lons = []
+    lats = []
+    lons.append(float(bounds.minx))
+    lons.append(float(bounds.maxx))
+    lats.append(float(bounds.miny))
+    lats.append(float(bounds.maxy))
+
+    min_lat = min([l for l in lats if l])
+    max_lat = max([l for l in lats if l])
+    min_lon = min([l for l in lons if l])
+    max_lon = max([l for l in lons if l])
+    y_range = distance.geodesic((min_lat, min_lon), (max_lat, min_lon)).kilometers
+    x_range = distance.geodesic((min_lat, min_lon), (min_lat, max_lon)).kilometers
+
+    # does this work across the international date line?
+    center = dict(lat=(min_lat + max_lat) / 2, lon=(min_lon + max_lon) / 2)
+
+    # figure out zoom
+    bound_by_y = y_range > x_range
+    if bound_by_y:
+        # in mercator the world's height is ~20,000 km
+        zoom = np.log2(20_000 / y_range)
+    else:
+        # in mercator the world's "width" is ~40,000km at the equator but shrinks as you near the poles
+        circumference_at_latitude = 40_000 * np.cos(np.abs(center['lat']) * np.pi / 180)
+        zoom = np.log2(circumference_at_latitude / x_range)
+
+    return zoom, center
+
 def create_county_map(source_osm_df, state):
     renamed_gdf = {}
     counties_gdf = {}
+    state_gdf = {}
     data_value = ss['selected_datavalue_for_map']
 
     if column_exists_case_insensitive(source_osm_df, 'admin_level'):
+        state_gdf = source_osm_df[osm_gdf['admin_level'] == 4.0]
+
         counties_gdf = source_osm_df[osm_gdf['admin_level'] == 6.0]
         counties_gdf.rename(columns={'name': 'County'}, inplace=True)
         if not counties_gdf.County.str.endswith(' County').all():
@@ -39,6 +81,7 @@ def create_county_map(source_osm_df, state):
         counties_gdf.reset_index(inplace=True)
         counties_gdf.rename(columns={'COUNTY': 'County'}, inplace=True)
         counties_gdf['County'] += ' County'
+        state_gdf = counties_gdf.dissolve()
 
     renamed_gdf = counties_gdf.copy()
 
@@ -50,11 +93,8 @@ def create_county_map(source_osm_df, state):
                    , axis=1, inplace=True, errors='ignore')
 
     final_df = merged_df.dropna()
-    lat = final_df.dissolve().centroid.iloc[0].y
-    lon = final_df.dissolve().centroid.iloc[0].x
-    # print(f'lat: {lat} lon: {lon}')
     location_json = json.loads(final_df.to_json())
-    zoom = 6
+    zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     fig = go.Figure(go.Choroplethmapbox(
         # customdata=final_df,
         geojson=location_json,
@@ -69,20 +109,22 @@ def create_county_map(source_osm_df, state):
         colorbar_title=data_value
     ))
     fig.update_layout(mapbox_style="carto-positron",
-                      mapbox_zoom=zoom, mapbox_center={"lat": lat, "lon": lon})
+                      mapbox_zoom=zoom, mapbox_center=center)
     fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
                             , title=dict(text=f'{data_value} for Counties in {state}', x=0.5
                             , xanchor="center")
                             )
-    fig.update_geos(fitbounds="locations", visible=True)
+    fig.update_geos(fitbounds="geojson", visible=True)
     return fig
 
 
 def create_town_map(source_osm_df, state):
     county_gdf = {}
+    state_gdf = {}
     data_value = ss['selected_datavalue_for_map']
 
     if column_exists_case_insensitive(source_osm_df, 'admin_level'):
+        state_gdf = source_osm_df[osm_gdf['admin_level'] == 4.0]
         source_osm_df['admin_level'] = source_osm_df['admin_level'].astype(float)
         county_gdf = source_osm_df[source_osm_df['admin_level'] == 6.0]
         county_gdf['TotalMiles'] = 0
@@ -97,6 +139,7 @@ def create_town_map(source_osm_df, state):
         county_gdf.reset_index(inplace=True)
         county_gdf.rename(columns={'COUNTY': 'County'}, inplace=True)
         county_gdf['County'] += ' County'
+        state_gdf = county_gdf.dissolve()
     else:
         print('Unexpected condition')
         print(towns_gdf.columns)
@@ -108,13 +151,9 @@ def create_town_map(source_osm_df, state):
                          ,'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'], axis=1, inplace=True, errors='ignore')
     county_gdf.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng'
                          ,'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'], axis=1, inplace=True, errors='ignore')
-    lat = town_merged_df.dissolve().centroid.iloc[0].y
-    lon = town_merged_df.dissolve().centroid.iloc[0].x
-    # print(f'lat: {lat} lon: {lon}')
-    # location_json = json.loads(final_df.geometry.to_json())
     location_json = json.loads(town_merged_df.to_json())
     county_location_json = json.loads(county_gdf.to_json())
-    zoom = 6
+    zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     fig = go.Figure(go.Choroplethmapbox(
         # customdata=final_df,
         geojson=location_json,
@@ -137,7 +176,7 @@ def create_town_map(source_osm_df, state):
                                           )]);
 
     fig.update_layout(mapbox_style="carto-positron",
-                      mapbox_zoom=zoom, mapbox_center={"lat": lat, "lon": lon})
+                      mapbox_zoom=zoom, mapbox_center=center)
     fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
                             , title=dict(text=f'{data_value} for Counties in {state}', x=0.5
                             , xanchor="center")
@@ -177,12 +216,9 @@ def create_state_map(source_osm_df, state):
                          , 'admin_centre_node_lat', 'admin_centre_node_lng'
                          , 'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng']
                          , axis=1, inplace=True, errors='ignore')
-    lat = state_merged_df.dissolve().centroid.iloc[0].y
-    lon = state_merged_df.dissolve().centroid.iloc[0].x
-    # print(f'lat: {lat} lon: {lon}')
     location_json = json.loads(state_merged_df.to_json())
     county_location_json = json.loads(county_gdf.to_json())
-    zoom = 6
+    zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     fig = go.Figure(go.Choroplethmapbox(
         # customdata=final_df,
         geojson=location_json,
@@ -198,7 +234,7 @@ def create_state_map(source_osm_df, state):
         colorbar_title=data_value
     ))
     fig.update_layout(mapbox_style="carto-positron",
-                      mapbox_zoom=zoom, mapbox_center={"lat": lat, "lon": lon})
+                      mapbox_zoom=zoom, mapbox_center=center)
     fig.update_layout(mapbox_layers=[dict(sourcetype='geojson',
                                           source=county_location_json,
                                           color='#303030',
@@ -317,6 +353,19 @@ def get_geojson_filename(selected_state):
     # print(f'file size: {filesize}')
     return file_path
 
+def get_geopandas_df_for_state(selected_state):
+    if selected_state not in st.session_state.gdfs.keys():
+        print(f'Creating geopandas df for {selected_state}')
+        file_path = get_geojson_filename(state_selectbox)
+        gdf = gpd.read_file(f'{file_path}')
+        # print(f'maptype_selectbox: {maptype_selectbox}')
+        # print(gdf)
+        st.session_state.gdfs[selected_state] = gdf
+        return gdf
+    else:
+        print(f'Getting geopandas df for {selected_state} from session state')
+        return st.session_state.gdfs[selected_state]
+
 # ss
 
 options = ['State', 'Counties', 'Towns']
@@ -348,18 +397,6 @@ make_map = st.button('Generate map', key='make_map_btn', disabled=st.session_sta
 # print(f'state_selectbox: {state_selectbox}')
 
 
-def get_geopandas_df_for_state(selected_state):
-    if selected_state not in st.session_state.gdfs.keys():
-        print(f'Creating geopandas df for {selected_state}')
-        file_path = get_geojson_filename(state_selectbox)
-        gdf = gpd.read_file(f'{file_path}')
-        # print(f'maptype_selectbox: {maptype_selectbox}')
-        # print(gdf)
-        st.session_state.gdfs[selected_state] = gdf
-        return gdf
-    else:
-        print(f'Getting geopandas df for {selected_state} from session state')
-        return st.session_state.gdfs[selected_state]
 
 if make_map:
     # print(f'os.getcwd = {os.getcwd()}')
