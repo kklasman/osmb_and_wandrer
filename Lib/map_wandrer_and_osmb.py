@@ -15,6 +15,72 @@ import numpy as np
 
 max_50_pct_color_scale = ['white', 'gold', 'red']
 
+
+def create_template(data, col_names):
+    template = ''
+    for idx, name in enumerate(col_names):
+        if name == 'State':
+            template += "<b>State:</b> %{" + f"customdata[{data.columns.get_loc('State')}]" + "}<br>"
+
+        elif name == 'County':
+            template += "<b>County:</b> %{" + f"customdata[{data.columns.get_loc('County')}]" + "}<br>"
+
+        elif name == 'ShortCounty':
+            template += "<b>County:</b> %{" + f"customdata[{data.columns.get_loc('ShortCounty')}]" + "}<br>"
+
+        elif name == 'Town':
+            template += "<b>Town:</b> %{" + f"customdata[{data.columns.get_loc('Town')}]" + "}<br>"
+
+        elif name == 'TotalMiles':
+            template += "<b>Total Miles:</b> %{" + f"customdata[{data.columns.get_loc('TotalMiles')}]:,.2f" + "}<br>"
+
+        elif name == 'ActualMiles':
+            template += "<b>Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('ActualMiles')}]:,.2f" + "}<br>"
+
+        elif name == 'MilesRidden':
+            template += "<b>Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('MilesRidden')}]:,.2f" + "}<br>"
+
+        elif name == 'ActualPct':
+            template += "<b>Pct Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('ActualPct')}]:.2%" + "}<br>"
+
+        elif name == 'Pct10':
+            template += "<b>10% Miles Target</b> %{" + f"customdata[{data.columns.get_loc('Pct10')}]:,.2f" + "}<br>"
+
+        elif name == 'Pct25':
+            template += "<b>25% Miles Target</b> %{" + f"customdata[{data.columns.get_loc('Pct25')}]:,.2f" + "}<br>"
+
+        elif name == 'Pct10Deficit':
+            template += "<b>10% Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct10Deficit')}]:,.2f" + "}<br>"
+
+        elif name == 'Pct25Deficit':
+            template += "<b>25% Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct25Deficit')}]:,.2f" + "}<br>"
+
+        elif name == 'TotalTowns':
+            template += "<b>Total Towns:</b> %{" + f"customdata[{data.columns.get_loc('TotalTowns')}]" + "}<br>"
+
+        elif name == 'TownsCycled':
+            template += "<b>Towns Cycled:</b> %{" + f"customdata[{data.columns.get_loc('TownsCycled')}]" + "}<br>"
+
+        elif name == 'TownsNotCycled':
+            template += "<b>Towns Not Cycled:</b> %{" + f"customdata[{data.columns.get_loc('TownsNotCycled')}]" + "}<br>"
+
+        elif name == 'PctTownsCycled':
+            template += "<b>Pct Towns Cycled:</b> %{" + f"customdata[{data.columns.get_loc('PctTownsCycled')}]:.2%" + "}"
+
+        elif name == 'TownsAwarded':
+            template += "<b>Towns Achieved:</b> %{" + f"customdata[{data.columns.get_loc('TownsAwarded')}]" + "}<br>"
+
+        elif name == 'PctTownsAwarded':
+            template += "<b>Pct Towns Achieved:</b> %{" + f"customdata[{data.columns.get_loc('PctTownsAwarded')}" + "]:.2%}"
+
+        else:
+            print(f'Column {name} not found')
+
+    template += "<extra></extra>"
+
+    return template
+
+
 def column_exists_case_insensitive(df, col_name):
     return col_name.lower() in [col.lower() for col in df.columns]
 
@@ -97,15 +163,24 @@ def create_county_map(source_osm_df, state):
     final_df = merged_df.dropna()
     location_json = json.loads(final_df.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
+    final_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
+    template = create_template(final_df, ['ShortCounty', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    z_max = float(final_df[data_value].max()) if float(final_df[data_value].max()) > 0 else float(final_df['TotalMiles'].max())
+
     fig = go.Figure(go.Choroplethmapbox(
-        # customdata=final_df,
+        customdata=final_df,
         geojson=location_json,
         featureidkey='properties.County',
         locations=final_df['County'],
         z=final_df[data_value],
         colorscale=max_50_pct_color_scale,
         zmin=0,
-        # zmax=z_max,
+        zmax=z_max,
+        hovertemplate=template,
+        # hoverlabel_bgcolor='white',
+        hoverlabel=dict(
+            bgcolor="black",
+            font_size=16),
         marker_opacity=0.5,
         visible=True,
         colorbar_title=data_value
@@ -156,9 +231,12 @@ def create_town_map(source_osm_df, state):
     location_json = json.loads(town_merged_df.to_json())
     county_location_json = json.loads(county_gdf.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
+    town_merged_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
+    template = create_template(town_merged_df, ['Town', 'ShortCounty', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    z_max = float(town_merged_df[data_value].max()) if float(town_merged_df[data_value].max()) > 0 else float(town_merged_df['TotalMiles'].max())
 
     fig = go.Figure(go.Choroplethmapbox(
-        # customdata=final_df,
+        customdata=town_merged_df,
         geojson=location_json,
         featureidkey='properties.Town',
         locations=town_merged_df['Town'],
@@ -166,7 +244,12 @@ def create_town_map(source_osm_df, state):
         # colorscale='ylorrd',
         colorscale=max_50_pct_color_scale,
         zmin=0,
-        # zmax=z_max,
+        zmax=z_max,
+        hovertemplate=template,
+        # hoverlabel_bgcolor='white',
+        hoverlabel=dict(
+            bgcolor="black",
+            font_size=16),
         marker_opacity=0.5,
         # marker_line_width=2,
         visible=True,
@@ -223,16 +306,25 @@ def create_state_map(source_osm_df, state):
     location_json = json.loads(state_merged_df.to_json())
     county_location_json = json.loads(county_gdf.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
+    state_merged_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
+    template = create_template(state_merged_df, ['State', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    z_max = float(state_merged_df[data_value].max()) if float(state_merged_df[data_value].max()) > 0 else float(state_merged_df['TotalMiles'].max())
+
     fig = go.Figure(go.Choroplethmapbox(
-        # customdata=final_df,
+        customdata=state_merged_df,
         geojson=location_json,
         featureidkey='properties.State',
         locations=state_merged_df['State'],
         z=state_merged_df[data_value],
         colorscale=max_50_pct_color_scale,
         zmin=0,
-        zmax=int(state_merged_df.iloc[0].TotalMiles),
+        zmax=z_max,
         marker_opacity=0.5,
+        hovertemplate=template,
+        # hoverlabel_bgcolor='white',
+        hoverlabel=dict(
+            bgcolor="black",
+            font_size=16),
         # marker_line_width=2,
         visible=True,
         colorbar_title=data_value
@@ -268,6 +360,7 @@ def get_geojson_filenames():
 
 def get_wandrer_totals_for_state(state):
     query = f'''select Region, Country, State, sum(TotalMiles) as TotalMiles, sum(ActualMiles) as 'ActualMiles'
+        , sum(ActualMiles)/sum(TotalMiles) as 'ActualPct'
         , CASE WHEN sum(Pct10Deficit) < 0 THEN 0 ELSE sum(Pct10Deficit) END as 'Pct10Deficit'
         , CASE WHEN sum(Pct25Deficit) < 0 THEN 0 ELSE sum(Pct25Deficit) END as 'Pct25Deficit'
     	from vw_county_aggregates
@@ -277,7 +370,8 @@ def get_wandrer_totals_for_state(state):
     return wandrerer_df
 
 def get_wandrer_totals_for_counties_for_state(state):
-    query = f'''select Region, Country, State, County, StateArenaId, CountyArenaId
+    query = f'''select Region, Country, State, County
+        , REPLACE(County, " County", "") as ShortCounty, StateArenaId, CountyArenaId
         ,TotalMiles, ActualPct, ActualMiles, "Pct10", "Pct25", "Pct50"
         , "Pct75", "Pct90", "awarded"
         , CASE WHEN Pct10Deficit < 0 THEN 0 ELSE Pct10Deficit END as Pct10Deficit
@@ -293,7 +387,8 @@ def get_wandrer_totals_for_counties_for_state(state):
 
 def get_wandrer_totals_for_towns_for_state(state):
     query = f'''select fqtn.*
-        , length as TotalMiles, "percentage" as ActualPct, "ActualLength" as ActualMiles, "Pct10", "Pct25", "Pct50"
+         , REPLACE(fqtn.County, " County", "") as ShortCounty
+       , length as TotalMiles, "percentage" as ActualPct, "ActualLength" as ActualMiles, "Pct10", "Pct25", "Pct50"
         , "Pct75", "Pct90", "awarded"
         , CASE WHEN Pct10Deficit < 0 THEN 0 ELSE Pct10Deficit END as Pct10Deficit
         , CASE WHEN Pct25Deficit < 0 THEN 0 ELSE Pct25Deficit END as Pct25Deficit
@@ -381,11 +476,12 @@ def get_geopandas_df_for_state(selected_state):
         print(f'Getting geopandas df for {selected_state} from session state')
         return st.session_state.gdfs[selected_state]
 
+
 # ss
 
 options = ['State', 'Counties', 'Towns']
 geojson_files = get_geojson_filenames()
-data_values = ['TotalMiles', 'ActualMiles', 'Pct10Deficit', 'Pct25Deficit']
+data_values = ['TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit']
 # geojson_files = get_geojson_files()
 
 if 'gdfs' not in st.session_state:
