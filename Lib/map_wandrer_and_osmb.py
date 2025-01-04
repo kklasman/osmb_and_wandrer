@@ -598,8 +598,6 @@ def get_geopandas_df_for_region(selected_region):
         # file_paths = wandrer_regions.geojson_filename.to_list()
         gdfs = gpd.GeoDataFrame()
         for index, row in wandrer_regions.iterrows():
-            if row.State == 'Connecticut':
-                continue
             file_path = get_geojson_filename(row.State)
             if gdfs.empty:
                 gdfs = gpd.read_file(f'{file_path}')
