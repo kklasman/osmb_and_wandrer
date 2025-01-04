@@ -13,8 +13,9 @@ from streamlit import session_state as ss
 from geopy import distance
 import numpy as np
 
-max_50_pct_color_scale = ['white', 'gold', 'red']
+st.set_page_config(layout='wide')
 
+max_50_pct_color_scale = ['white', 'gold', 'red']
 
 def create_template(data, col_names):
     template = ''
@@ -198,6 +199,7 @@ def create_county_map(source_osm_df, state):
                             , xanchor="center")
                             )
     fig.update_geos(fitbounds="geojson", visible=True)
+    # st.plotly_chart(fig, use_container_width=True)
     return fig
 
 
@@ -550,6 +552,9 @@ def update(key, ):
 def make_map_disable(b):
     st.session_state['make_map_disable'] = b
 
+def make_state_selectbox_disable(b):
+    st.session_state['state_selectbox'] = b
+
 def enable_make_map():
     if 'selected_map_type' in st.session_state:
         # print(f"enable_make_map: {ss['select_map']}")
@@ -560,6 +565,14 @@ def enable_make_map():
             make_map_disable(True)
             # st.session_state['make_map_disable'] = False
             # st.button('make_map_btn').disabled = Fale
+
+def region_selected():
+    if 'selected_region' not in st.session_state or ss['selected_region'] == 'All'  or ss['selected_region'] == None:
+        make_state_selectbox_disable(False)
+        return
+
+    print(f"region_selected: {ss['selected_region']}")
+    make_state_selectbox_disable(True)
 
 def get_geojson_filename(selected_state):
     cwd = os.getcwd()
@@ -644,7 +657,7 @@ if 'gdfs' not in st.session_state:
 #                                , on_change=update, args=('select_map',))
 
 with st.sidebar:
-    region_selectbox = st.selectbox('Select a region:', region_list, key='selected_region', index=None)
+    region_selectbox = st.selectbox('Select a region:', region_list, key='selected_region', index=None, on_change=region_selected())
     state_selectbox = st.selectbox('Select a location (US State):', geojson_files.keys(), key='selected_state', index=None)
     # preserve_map_selection = st.checkbox('Clear map type selection on state change', key='preserve_map_selection')
     maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
