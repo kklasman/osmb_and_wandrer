@@ -144,19 +144,29 @@ def create_county_map(source_osm_df, state):
     state_gdf = {}
     data_value = ss['selected_datavalue_for_map']
 
+    # if column_exists_case_insensitive(source_osm_df, 'admin_level'):
+    #     state_gdf = source_osm_df[osm_gdf['admin_level'] == 4.0]
+    #
+    #     counties_gdf = source_osm_df[osm_gdf['admin_level'] == 6.0]
+    #     counties_gdf.rename(columns={'name': 'County'}, inplace=True)
+    #     if not counties_gdf.County.str.endswith(' County').all():
+    #         counties_gdf['County'] += ' County'
+    # else:
+    #     counties_gdf = source_osm_df.dissolve(by='COUNTY')
+    #     counties_gdf.reset_index(inplace=True)
+    #     counties_gdf.rename(columns={'COUNTY': 'County'}, inplace=True)
+    #     counties_gdf['County'] += ' County'
+    #     state_gdf = counties_gdf.dissolve()
+
+    counties_gdf = create_county_gdf(source_osm_df)
+
     if column_exists_case_insensitive(source_osm_df, 'admin_level'):
         state_gdf = source_osm_df[osm_gdf['admin_level'] == 4.0]
-
-        counties_gdf = source_osm_df[osm_gdf['admin_level'] == 6.0]
-        counties_gdf.rename(columns={'name': 'County'}, inplace=True)
-        if not counties_gdf.County.str.endswith(' County').all():
-            counties_gdf['County'] += ' County'
     else:
-        counties_gdf = source_osm_df.dissolve(by='COUNTY')
-        counties_gdf.reset_index(inplace=True)
-        counties_gdf.rename(columns={'COUNTY': 'County'}, inplace=True)
-        counties_gdf['County'] += ' County'
         state_gdf = counties_gdf.dissolve()
+
+
+    zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
 
     renamed_gdf = counties_gdf.copy()
 
@@ -169,7 +179,6 @@ def create_county_map(source_osm_df, state):
 
     final_df = merged_df.dropna()
     location_json = json.loads(final_df.to_json())
-    zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     final_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
     template = create_template(final_df, ['ShortCounty', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     z_max = float(final_df[data_value].max()) if float(final_df[data_value].max()) > 0 else float(final_df['TotalMiles'].max())
@@ -285,22 +294,11 @@ def create_town_map(source_osm_df, state):
 
 def create_state_map(source_osm_df, state):
     renamed_gdf = {}
-    county_gdf = {}
     source_osm_df['State'] = state
     data_value = ss['selected_datavalue_for_map']
     state_gdf = source_osm_df.dissolve(by='State')
     state_gdf.reset_index(inplace=True)
-    if not column_exists_case_insensitive(source_osm_df, 'admin_level'):
-        county_gdf = source_osm_df.dissolve(by='COUNTY')
-        county_gdf.reset_index(inplace=True)
-        county_gdf.rename(columns={'COUNTY': 'County'}, inplace=True)
-        county_gdf['County'] += ' County'
-    else:
-        county_gdf = source_osm_df[source_osm_df['admin_level'] == 6.0]
-        county_gdf.rename(columns={'name': 'County'}, inplace=True)
-
-    if not county_gdf.County.str.endswith(' County').all():
-        county_gdf['County'] += ' County'
+    county_gdf = create_county_gdf(source_osm_df)
     # county_gdf = counties_gdf.dissolve(by='County')
     # county_gdf.reset_index(inplace=True)
 
@@ -350,6 +348,20 @@ def create_state_map(source_osm_df, state):
                             , xanchor="center")
                             )
     return fig
+
+
+def create_county_gdf(source_osm_df):
+    if not column_exists_case_insensitive(source_osm_df, 'admin_level'):
+        county_gdf = source_osm_df.dissolve(by='COUNTY')
+        county_gdf.reset_index(inplace=True)
+        county_gdf.rename(columns={'COUNTY': 'County'}, inplace=True)
+        county_gdf['County'] += ' County'
+    else:
+        county_gdf = source_osm_df[source_osm_df['admin_level'] == 6.0]
+        county_gdf.rename(columns={'name': 'County'}, inplace=True)
+    if not county_gdf.County.str.endswith(' County').all():
+        county_gdf['County'] += ' County'
+    return county_gdf
 
 def create_region_map(source_osm_df, region):
     renamed_gdf = {}
@@ -419,6 +431,75 @@ def create_region_map(source_osm_df, region):
                             )
     return fig
 
+def create_region_by_county_map(source_osm_df, region):
+    renamed_gdf = {}
+    county_gdf = {}
+    # source_osm_df['State'] = state
+    data_value = ss['selected_datavalue_for_map']
+    state_gdf = source_osm_df.dissolve(by='State')
+    state_gdf.reset_index(inplace=True)
+    # if not column_exists_case_insensitive(source_osm_df, 'admin_level'):
+    #     county_gdf = source_osm_df.dissolve(by='COUNTY')
+    #     county_gdf.reset_index(inplace=True)
+    #     county_gdf.rename(columns={'COUNTY': 'County'}, inplace=True)
+    #     county_gdf['County'] += ' County'
+    # else:
+    #     county_gdf = source_osm_df[source_osm_df['admin_level'] == 6.0]
+    #     county_gdf.rename(columns={'name': 'County'}, inplace=True)
+    #
+    # if not county_gdf.County.str.endswith(' County').all():
+    #     county_gdf['County'] += ' County'
+    # # county_gdf = counties_gdf.dissolve(by='County')
+    # # county_gdf.reset_index(inplace=True)
+
+    wandrerer_df = get_wandrer_totals_for_counties_for_states(state_gdf.State.to_list())
+
+    # print(wandrerer_df)
+    merged_df = source_osm_df.merge(wandrerer_df, on=['State', 'County'])
+    merged_df.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng', 'admin_centre_node_id'
+                         , 'admin_centre_node_lat', 'admin_centre_node_lng'
+                         , 'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng']
+                         , axis=1, inplace=True, errors='ignore')
+    state_location_json = json.loads(state_gdf.to_json())
+    location_json = json.loads(merged_df.to_json())
+    zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
+    merged_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
+    template = create_template(merged_df, ['State', 'ShortCounty', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    z_max = float(merged_df[data_value].max()) if float(merged_df[data_value].max()) > 0 else float(merged_df['TotalMiles'].max())
+    z_min =  1000 if data_value == 'TotalMiles' else 0
+    fig = go.Figure(go.Choroplethmapbox(
+        customdata=merged_df,
+        geojson=location_json,
+        featureidkey='properties.state_county',
+        locations=merged_df['state_county'],
+        z=merged_df[data_value],
+        colorscale=max_50_pct_color_scale,
+        zmin=z_min,
+        zmax=z_max,
+        marker_opacity=0.5,
+        hovertemplate=template,
+        # hoverlabel_bgcolor='white',
+        hoverlabel=dict(
+            bgcolor="black",
+            font_size=16),
+        # marker_line_width=2,
+        visible=True,
+        colorbar_title=data_value
+    ))
+    fig.update_layout(mapbox_style="carto-positron",
+                      mapbox_zoom=zoom, mapbox_center=center)
+    fig.update_layout(mapbox_layers=[dict(sourcetype='geojson',
+                                          source=state_location_json,
+                                          color='#303030',
+                                          type='line',
+                                          line=dict(width=1.5)
+                                          )]);
+    fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
+                            , title=dict(text=f'{data_value} by County for Region of {region}', x=0.5
+                            , xanchor="center")
+                            )
+    return fig
+
 def get_geojson_filenames():
     if 'geojson_files_dict' not in st.session_state:
         print("Getting geojson filenames from db.")
@@ -471,6 +552,23 @@ def get_wandrer_totals_for_state(state):
         , CASE WHEN sum(Pct25Deficit) < 0 THEN 0 ELSE sum(Pct25Deficit) END as 'Pct25Deficit'
     	from vw_county_aggregates
     	where State = "{state}"'''
+    # print(query)
+    wandrerer_df = execute_query(query)
+    return wandrerer_df
+
+def get_wandrer_totals_for_counties_for_states(states):
+    states_in_str = states.__str__().replace('[', '(').replace(']', ')')
+    query = f'''select Region, Country, State, County
+        , REPLACE(County, " County", "") as ShortCounty, StateArenaId, CountyArenaId
+        ,TotalMiles, ActualPct, ActualMiles, "Pct10", "Pct25", "Pct50"
+        , "Pct75", "Pct90", "awarded"
+        , CASE WHEN Pct10Deficit < 0 THEN 0 ELSE Pct10Deficit END as Pct10Deficit
+        , CASE WHEN Pct25Deficit < 0 THEN 0 ELSE Pct25Deficit END as Pct25Deficit
+        , "Pct50Deficit", "Pct75Deficit"
+        , "Pct90Deficit", "geometries_visible", "diagonal", "user_id"
+		from vw_county_aggregates 
+    	where State in {states_in_str}
+    	order by State, County'''
     # print(query)
     wandrerer_df = execute_query(query)
     return wandrerer_df
@@ -610,15 +708,23 @@ def get_geopandas_df_for_region(selected_region):
         # file_path = get_geojson_filename(state_selectbox)
         # file_paths = wandrer_regions.geojson_filename.to_list()
         gdfs = gpd.GeoDataFrame()
+        county_gdfs = gpd.GeoDataFrame()
         for index, row in wandrer_regions.iterrows():
             file_path = get_geojson_filename(row.State)
+            gdf = gpd.read_file(f'{file_path}')
+            gdf['State'] = row.State
+            county_gdf = create_county_gdf(gdf)
+            county_gdf['state_county'] = row.State + '_' + county_gdf['County'].str.replace(' County', '')
             if gdfs.empty:
-                gdfs = gpd.read_file(f'{file_path}')
-                gdfs['State'] = row.State
+                # gdfs = gpd.read_file(f'{file_path}')
+                gdfs = gdf
+                county_gdfs = county_gdf
+                # gdfs['State'] = row.State
             else:
-                gdf = gpd.read_file(f'{file_path}')
-                gdf['State'] = row.State
+                # gdf = gpd.read_file(f'{file_path}')
+                # gdf['State'] = row.State
                 gdfs = pd.concat([gdfs, gdf])
+                county_gdfs = pd.concat([county_gdfs, county_gdf])
 
         # print(f'maptype_selectbox: {maptype_selectbox}')
         # print(gdf)
@@ -626,7 +732,7 @@ def get_geopandas_df_for_region(selected_region):
         # state_gdf = source_osm_df[osm_gdf['admin_level'] == 4.0]
         # state_gdfs = gdfs[gdfs['admin_level'] == 4.0]
         # print(state_gdfs)
-        return gdfs
+        return gdfs, county_gdfs
     else:
         print(f'Getting geopandas df for {selected_state} from session state')
         return st.session_state.gdfs[selected_state]
@@ -674,8 +780,11 @@ if make_map:
     fig = {}
 
     if region_selectbox:
-        osm_gdf = get_geopandas_df_for_region(region_selectbox)
-        fig = create_region_map(osm_gdf.copy(), region_selectbox)
+        osm_state_gdf, osm_county_gdf = get_geopandas_df_for_region(region_selectbox)
+        if maptype_selectbox == 'State':
+            fig = create_region_map(osm_state_gdf.copy(), region_selectbox)
+        else:
+            fig = create_region_by_county_map(osm_county_gdf.copy(), region_selectbox)
     else:
         osm_gdf = get_geopandas_df_for_state(state_selectbox)
         match maptype_selectbox:
