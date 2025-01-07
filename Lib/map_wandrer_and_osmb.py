@@ -238,8 +238,18 @@ def create_town_map(source_osm_df, state):
         print('Unexpected condition')
         print(towns_gdf.columns)
 
+    # Temp code for saving simplified geojson files
+    # town_simplified_df = towns_gdf.dissolve(by='Town')
+    # town_simplified_df.reset_index(inplace=True)
+    # cwd = os.getcwd()
+    # # filepath = os.path.join(cwd, 'Lib', 'data', 'boundaries', '{state}_towns.geojson')
+    # filepath = os.path.join(cwd, 'data', 'boundaries', f'{state}_towns.geojson')
+    # town_simplified_df.to_file(filename=filepath, driver='GeoJSON')
+
+
     wandrerer_df = get_wandrer_totals_for_towns_for_state(state)
     # print(wandrerer_df)
+    # town_merged_df = town_simplified_df.merge(wandrerer_df, on='Town')
     town_merged_df = towns_gdf.merge(wandrerer_df, on='Town')
     town_merged_df.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng'
                          ,'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'], axis=1, inplace=True, errors='ignore')
