@@ -169,12 +169,16 @@ def create_county_map(source_osm_df, state):
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
 
     renamed_gdf = counties_gdf.copy()
+    renamed_gdf['County'] = renamed_gdf['County'].str.title() # required for merge with Wandrer data
 
     wandrerer_df = get_wandrer_totals_for_counties_for_state(state)
     # print(wandrerer_df)
     merged_df = renamed_gdf.merge(wandrerer_df, on='County')
     merged_df.drop(['name_en', 'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'
                     ,'label_node_id', 'label_node_lat','label_node_lng']
+                   , axis=1, inplace=True, errors='ignore')
+    # Drop non columns from Vermont geojson file
+    merged_df.drop(['FIPS6', 'Town', 'TOWNNAMEMC', 'TOWNGEOID','SqMi']
                    , axis=1, inplace=True, errors='ignore')
 
     final_df = merged_df.dropna()
@@ -247,12 +251,18 @@ def create_town_map(source_osm_df, state):
     # town_simplified_df.to_file(filename=filepath, driver='GeoJSON')
 
 
+    # Drop non columns from Vermont geojson file
+    towns_gdf.drop(['COUNTY', 'CNTYGEOID', 'FIPS6', 'TOWNNAMEMC', 'TOWNGEOID','SqMi']
+                   , axis=1, inplace=True, errors='ignore')
+    towns_gdf['Town'] = towns_gdf['Town'].str.title() # required for merge with Wandrer data
+
     wandrerer_df = get_wandrer_totals_for_towns_for_state(state)
     # print(wandrerer_df)
     # town_merged_df = town_simplified_df.merge(wandrerer_df, on='Town')
     town_merged_df = towns_gdf.merge(wandrerer_df, on='Town')
     town_merged_df.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng'
                          ,'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'], axis=1, inplace=True, errors='ignore')
+
     county_gdf.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng'
                          ,'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'], axis=1, inplace=True, errors='ignore')
     location_json = json.loads(town_merged_df.to_json())
@@ -371,6 +381,8 @@ def create_county_gdf(source_osm_df):
         county_gdf.rename(columns={'name': 'County'}, inplace=True)
     if not county_gdf.County.str.endswith(' County').all():
         county_gdf['County'] += ' County'
+
+    county_gdf['County'] = county_gdf['County'].str.title() # required for merge with Wandrer data
     return county_gdf
 
 def create_region_map(source_osm_df, region):
