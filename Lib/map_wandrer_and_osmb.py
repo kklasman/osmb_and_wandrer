@@ -1,3 +1,4 @@
+import string
 import sys
 # import streamlit.cli
 import geopandas as gpd
@@ -184,9 +185,10 @@ def create_county_map(source_osm_df, state):
     final_df = merged_df.dropna()
     location_json = json.loads(final_df.to_json())
     final_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
-    template = create_template(final_df, ['ShortCounty', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    template = create_template(final_df, ['ShortCounty', 'TotalTowns', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     z_max = float(final_df[data_value].max()) if float(final_df[data_value].max()) > 0 else float(final_df['TotalMiles'].max())
 
+    st.session_state['map_gdf'] = final_df
     fig = go.Figure(go.Choroplethmapbox(
         customdata=final_df,
         geojson=location_json,
@@ -240,7 +242,8 @@ def create_town_map(source_osm_df, state):
         state_gdf = county_gdf.dissolve()
     else:
         print('Unexpected condition')
-        print(towns_gdf.columns)
+        # print(towns_gdf.columns)
+        return
 
     # Temp code for saving simplified geojson files
     # town_simplified_df = towns_gdf.dissolve(by='Town')
@@ -254,12 +257,47 @@ def create_town_map(source_osm_df, state):
     # Drop non columns from Vermont geojson file
     towns_gdf.drop(['COUNTY', 'CNTYGEOID', 'FIPS6', 'TOWNNAMEMC', 'TOWNGEOID','SqMi']
                    , axis=1, inplace=True, errors='ignore')
-    towns_gdf['Town'] = towns_gdf['Town'].str.title() # required for merge with Wandrer data
+    towns_gdf['lcase_town'] = towns_gdf['Town'].str.lower() # required for merge with Wandrer data
+    # towns_gdf['Town'] = towns_gdf['Town'].apply(lambda x: string.capwords(x)) # required for merge with Wandrer data
 
     wandrerer_df = get_wandrer_totals_for_towns_for_state(state)
+    wandrerer_df['lcase_town'] = wandrerer_df['Town'].str.lower() # required for merge with Wandrer data
+
+    wandrer_diffs = wandrerer_df[~wandrerer_df['Town'].isin(towns_gdf['Town'])]
+    filter_list = ['State Park', 'Appalachian Trail', 'National Park']
+    search_str = '|'.join(filter_list)
+    wandrer_diffs_filtered = wandrer_diffs[~wandrer_diffs['Town'].str.contains(search_str)]
+    if len(wandrer_diffs_filtered) > 0:
+        wandrer_diffs_filtered['DataSource'] = 'Wandrer'
+        selected_columns = ['DataSource', 'County', 'Town']
+        wandrer_diffs_filtered[selected_columns].to_csv(f'{state}-Wandrer-Missing-Town.csv', index=False)
+
+    json_diffs = towns_gdf[~towns_gdf['Town'].isin(wandrerer_df['Town'])]
+    if len(json_diffs) > 0:
+        json_diffs['DataSource'] = 'json'
+        selected_columns = ['DataSource', 'Town']
+        json_diffs[selected_columns].to_csv(f'{state}-json-Missing-Town.csv', index=False)
+
     # print(wandrerer_df)
     # town_merged_df = town_simplified_df.merge(wandrerer_df, on='Town')
-    town_merged_df = towns_gdf.merge(wandrerer_df, on='Town')
+    town_merged_df = towns_gdf.merge(wandrerer_df, on='lcase_town')
+
+    if column_exists_case_insensitive(town_merged_df, 'Town_x'):
+        town_merged_df.rename(columns={'Town_x': 'Town'}, inplace=True)
+
+    # if len(town_merged_df) < len(wandrerer_df):
+    #     wandrerer_df['County-Town'] = wandrerer_df["County"] + '-' + wandrerer_df["Town"]
+    #     wandrerer_df['DataSource'] = 'Wandrer'
+    #     town_merged_df['County-Town'] = town_merged_df["County"] + '-' + town_merged_df["Town"]
+    #     town_merged_df['DataSource'] = 'Geojson'
+    #     missing_wandrer_towns_df = wandrerer_df[~wandrerer_df['County-Town'].isin(town_merged_df['County-Town'])]
+    #     missing_geojson_towns_df = town_merged_df[~town_merged_df['County-Town'].isin(wandrerer_df['County-Town'])]
+    #     selected_columns = ['DataSource', 'County-Town', 'County', 'Town']
+    #     wandrerer_df[selected_columns].to_csv(f'{state}-Wandrer-County-Town.csv', index=False)
+    #     town_merged_df[selected_columns].to_csv(f'{state}-Geojson-County-Town.csv', index=False)
+    #     missing_wandrer_towns_df[selected_columns].to_csv(f'{state}-Missing-Wandrer-County-Town.csv', index=False)
+    #     missing_geojson_towns_df[selected_columns].to_csv(f'{state}-Missing-geojson-County-Town.csv', index=False)
+
     town_merged_df.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng'
                          ,'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'], axis=1, inplace=True, errors='ignore')
 
@@ -272,6 +310,7 @@ def create_town_map(source_osm_df, state):
     template = create_template(town_merged_df, ['Town', 'ShortCounty', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     z_max = float(town_merged_df[data_value].max()) if float(town_merged_df[data_value].max()) > 0 else float(town_merged_df['TotalMiles'].max())
 
+    st.session_state['map_gdf'] = town_merged_df
     fig = go.Figure(go.Choroplethmapbox(
         customdata=town_merged_df,
         geojson=location_json,
@@ -333,9 +372,10 @@ def create_state_map(source_osm_df, state):
     county_location_json = json.loads(county_gdf.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     state_merged_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
-    template = create_template(state_merged_df, ['State', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    template = create_template(state_merged_df, ['State', 'TotalTowns', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     z_max = float(state_merged_df[data_value].max()) if float(state_merged_df[data_value].max()) > 0 else float(state_merged_df['TotalMiles'].max())
 
+    st.session_state['map_gdf'] = state_merged_df
     fig = go.Figure(go.Choroplethmapbox(
         customdata=state_merged_df,
         geojson=location_json,
@@ -417,8 +457,9 @@ def create_region_map(source_osm_df, region):
     # county_location_json = json.loads(county_gdf.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     state_merged_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
-    template = create_template(state_merged_df, ['State', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    template = create_template(state_merged_df, ['State', 'TotalTowns', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     z_max = float(state_merged_df[data_value].max()) if float(state_merged_df[data_value].max()) > 0 else float(state_merged_df['TotalMiles'].max())
+    st.session_state['map_gdf'] = state_merged_df
 
     fig = go.Figure(go.Choroplethmapbox(
         customdata=state_merged_df,
@@ -486,7 +527,7 @@ def create_region_by_county_map(source_osm_df, region):
     location_json = json.loads(merged_df.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     merged_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
-    template = create_template(merged_df, ['State', 'ShortCounty', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    template = create_template(merged_df, ['State', 'ShortCounty', 'TotalTowns', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     z_max = float(merged_df[data_value].max()) if float(merged_df[data_value].max()) > 0 else float(merged_df['TotalMiles'].max())
     z_min =  1000 if data_value == 'TotalMiles' else 0
     fig = go.Figure(go.Choroplethmapbox(
@@ -568,8 +609,8 @@ def get_wandrer_totals_for_states(states):
     return dfs
 
 def get_wandrer_totals_for_state(state):
-    query = f'''select Region, Country, State, sum(TotalMiles) as TotalMiles, sum(ActualMiles) as 'ActualMiles'
-        , sum(ActualMiles)/sum(TotalMiles) as 'ActualPct'
+    query = f'''select Region, Country, State, sum(TotalTowns) as TotalTowns, sum(TotalMiles) as TotalMiles
+        , sum(ActualMiles) as 'ActualMiles', sum(ActualMiles)/sum(TotalMiles) as 'ActualPct'
         , CASE WHEN sum(Pct10Deficit) < 0 THEN 0 ELSE sum(Pct10Deficit) END as 'Pct10Deficit'
         , CASE WHEN sum(Pct25Deficit) < 0 THEN 0 ELSE sum(Pct25Deficit) END as 'Pct25Deficit'
     	from vw_county_aggregates
@@ -582,7 +623,7 @@ def get_wandrer_totals_for_counties_for_states(states):
     states_in_str = states.__str__().replace('[', '(').replace(']', ')')
     query = f'''select Region, Country, State, County
         , REPLACE(County, " County", "") as ShortCounty, StateArenaId, CountyArenaId
-        ,TotalMiles, ActualPct, ActualMiles, "Pct10", "Pct25", "Pct50"
+        , TotalTowns,TotalMiles, ActualPct, ActualMiles, "Pct10", "Pct25", "Pct50"
         , "Pct75", "Pct90", "awarded"
         , CASE WHEN Pct10Deficit < 0 THEN 0 ELSE Pct10Deficit END as Pct10Deficit
         , CASE WHEN Pct25Deficit < 0 THEN 0 ELSE Pct25Deficit END as Pct25Deficit
@@ -598,7 +639,7 @@ def get_wandrer_totals_for_counties_for_states(states):
 def get_wandrer_totals_for_counties_for_state(state):
     query = f'''select Region, Country, State, County
         , REPLACE(County, " County", "") as ShortCounty, StateArenaId, CountyArenaId
-        ,TotalMiles, ActualPct, ActualMiles, "Pct10", "Pct25", "Pct50"
+        , TotalTowns,TotalMiles, ActualPct, ActualMiles, "Pct10", "Pct25", "Pct50"
         , "Pct75", "Pct90", "awarded"
         , CASE WHEN Pct10Deficit < 0 THEN 0 ELSE Pct10Deficit END as Pct10Deficit
         , CASE WHEN Pct25Deficit < 0 THEN 0 ELSE Pct25Deficit END as Pct25Deficit
@@ -821,6 +862,17 @@ if make_map:
 
     if fig:
         st.plotly_chart(fig)
+        # osm_gdf.drop(['tags', 'geometry'], axis=1, inplace=True)
+        st.write('Raw Data')
+        # st.dataframe(osm_gdf, use_container_width=True)
+        st.dataframe(st.session_state['map_gdf'], use_container_width=True)
+    else:
+        st.write(f'{maptype_selectbox} map unavailable for {state_selectbox}')
+
+    # # osm_gdf.drop(['tags', 'geometry'], axis=1, inplace=True)
+    # st.write('Raw Data')
+    # # st.dataframe(osm_gdf, use_container_width=True)
+    # st.dataframe(st.session_state['map_gdf'], use_container_width=True)
 
 # ss
 
