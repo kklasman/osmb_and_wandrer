@@ -27,6 +27,9 @@ def create_template(data, col_names):
         elif name == 'County':
             template += "<b>County:</b> %{" + f"customdata[{data.columns.get_loc('County')}]" + "}<br>"
 
+        elif name == 'COUNTY':
+            template += "<b>County:</b> %{" + f"customdata[{data.columns.get_loc('COUNTY')}]" + "}<br>"
+
         elif name == 'ShortCounty':
             template += "<b>County:</b> %{" + f"customdata[{data.columns.get_loc('ShortCounty')}]" + "}<br>"
 
@@ -175,23 +178,12 @@ def create_county_map(source_osm_df, state):
     wandrerer_df = get_wandrer_totals_for_counties_for_state(state)
     # print(wandrerer_df)
     merged_df = renamed_gdf.merge(wandrerer_df, on='County')
-    merged_df.drop(['name_en', 'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'
-                    ,'label_node_id', 'label_node_lat','label_node_lng'
-                    ,'FIPS6', 'Town', 'TOWNNAMEMC', 'TOWNGEOID','SqMi'
-                    ,'OBJECTID','CNTY','CNTYGEOID','LAND'
-                    ,'osm_id','boundary','NAME','MCD','KEY','DCF_OFFICE','DCF_REGION'
-                    ,'GEOCODE','GEOCODENUM','CNTYCODE','TAG','ISLAND','CIREG','LURC','BAXTER','ISLANDID','TYPE'
-                    ,'DOT_REGNUM','DOT_REGION','GlobalID','TOWN','admin_level','created_user'
-                       ,'created_date','last_edited_user', 'last_edited_date']
-                   , axis=1, inplace=True, errors='ignore')
-    # # Drop non columns from Vermont geojson file
-    # merged_df.drop(['FIPS6', 'Town', 'TOWNNAMEMC', 'TOWNGEOID','SqMi']
-    #                , axis=1, inplace=True, errors='ignore')
-
-    final_df = merged_df.dropna()
+    merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+    final_df = merged_df.drop(['County'], axis=1, errors='ignore')
+    final_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
     location_json = json.loads(final_df.to_json())
     final_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
-    template = create_template(final_df, ['ShortCounty', 'TotalTowns', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    template = create_template(final_df, ['County', 'TotalTowns', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     z_max = float(final_df[data_value].max()) if float(final_df[data_value].max()) > 0 else float(final_df['TotalMiles'].max())
 
     st.session_state['map_gdf'] = final_df
@@ -261,13 +253,8 @@ def create_town_map(source_osm_df, state):
 
 
     # Drop non columns from Vermont geojson file
-    towns_gdf.drop(['COUNTY', 'CNTYGEOID', 'FIPS6', 'TOWNNAMEMC', 'TOWNGEOID','SqMi',"OBJECTID","GEOCODE","GEOCODENUM"
-                       ,"CIREG","LURC","BAXTER","ISLANDID","TYPE","DOT_REGNUM","DOT_REGION","GlobalID","created_user"
-                       ,"created_date","last_edited_user", "last_edited_date","MCD","KEY", "DCF_OFFICE","DCF_REGION"
-                        ,"NAME","CNTYCODE","LAND","TAG","ISLAND","osm_id","boundary","CNTY"]
-                   , axis=1, inplace=True, errors='ignore')
     towns_gdf['lcase_town'] = towns_gdf['Town'].str.lower() # required for merge with Wandrer data
-    # towns_gdf['Town'] = towns_gdf['Town'].apply(lambda x: string.capwords(x)) # required for merge with Wandrer data
+    towns_gdf.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
 
     wandrerer_df = get_wandrer_totals_for_towns_for_state(state)
     wandrerer_df['lcase_town'] = wandrerer_df['Town'].str.lower() # required for merge with Wandrer data
@@ -318,8 +305,9 @@ def create_town_map(source_osm_df, state):
     location_json = json.loads(town_merged_df.to_json())
     county_location_json = json.loads(county_gdf.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
-    town_merged_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
-    template = create_template(town_merged_df, ['Town', 'ShortCounty', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    town_merged_df.drop(['tags', 'geometry','lcase_town','arena_id','County','COUNTY'], axis=1, inplace=True, errors='ignore')
+    town_merged_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
+    template = create_template(town_merged_df, ['Town', 'County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     z_max = float(town_merged_df[data_value].max()) if float(town_merged_df[data_value].max()) > 0 else float(town_merged_df['TotalMiles'].max())
 
     st.session_state['map_gdf'] = town_merged_df
@@ -376,16 +364,8 @@ def create_state_map(source_osm_df, state):
     wandrerer_df = get_wandrer_totals_for_state(state)
     # print(wandrerer_df)
     state_merged_df = state_gdf.merge(wandrerer_df, on='State')
-    state_merged_df.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng', 'admin_centre_node_id'
-                         , 'admin_centre_node_lat', 'admin_centre_node_lng'
-                         , 'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'
-                          ,'OBJECTID','FIPS6','TOWN','TOWNNAMEMC','CNTY','CNTYGEOID','TOWNGEOID','SqMi'
-                          ,'osm_id','name','boundary','admin_level','Town','COUNTY','LAND'
-                          ,'GEOCODE','GEOCODENUM','CNTYCODE','TAG','ISLAND','CIREG','LURC','BAXTER','ISLANDID'
-                          ,'TYPE','DOT_REGNUM','DOT_REGION','GlobalID','created_user'
-                          ,'created_date','last_edited_user', 'last_edited_date'
-                          ,'NAME','MCD','KEY','DCF_OFFICE','DCF_REGION']
-                          , axis=1, inplace=True, errors='ignore')
+    state_merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+    state_merged_df.drop(['COUNTY','name'], axis=1, inplace=True, errors='ignore')
     location_json = json.loads(state_merged_df.to_json())
     county_location_json = json.loads(county_gdf.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
@@ -467,15 +447,10 @@ def create_region_map(source_osm_df, region):
     wandrerer_df = get_wandrer_totals_for_states(state_gdf.State.to_list())
     # print(wandrerer_df)
     state_merged_df = state_gdf.merge(wandrerer_df, on='State')
-    state_merged_df.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng', 'admin_centre_node_id'
-                         , 'admin_centre_node_lat', 'admin_centre_node_lng'
-                         , 'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'
-                          'NAME','MCD','KEY','TOWN','COUNTY','DCF_OFFICE','DCF_REGION','Town','OBJECTID'
-                          ,'GEOCODE','GEOCODENUM','CNTYCODE','LAND','TAG','ISLAND','CIREG','LURC','BAXTER'
-                          ,'ISLANDID','TYPE','DOT_REGNUM','DOT_REGION','GlobalID','created_user'
-                            ,'created_date','last_edited_user', 'last_edited_date','osm_id','name','boundary','admin_level'
-                          ,'FIPS6','TOWNNAMEMC','CNTY','CNTYGEOID','TOWNGEOID','SqMi','NAME']
-                         , axis=1, inplace=True, errors='ignore')
+
+    state_merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+    state_merged_df.drop(['COUNTY','name'], axis=1, inplace=True, errors='ignore')
+
     location_json = json.loads(state_merged_df.to_json())
     # county_location_json = json.loads(county_gdf.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
@@ -542,17 +517,7 @@ def create_region_by_county_map(source_osm_df, region):
 
     # print(wandrerer_df)
     merged_df = source_osm_df.merge(wandrerer_df, on=['State', 'County'])
-    merged_df.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng', 'admin_centre_node_id'
-                         , 'admin_centre_node_lat', 'admin_centre_node_lng'
-                         , 'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'
-                        ,'NAME','MCD','KEY','TOWN','DCF_OFFICE','DCF_REGION'
-                       , 'FIPS6', 'Town', 'TOWNNAMEMC', 'TOWNGEOID', 'SqMi'
-                       , 'OBJECTID', 'CNTY', 'CNTYGEOID', 'LAND'
-                       , 'osm_id', 'boundary', 'NAME', 'MCD', 'KEY', 'DCF_OFFICE', 'DCF_REGION'
-                       , 'GEOCODE', 'GEOCODENUM', 'CNTYCODE', 'TAG', 'ISLAND', 'CIREG', 'LURC', 'BAXTER', 'ISLANDID', 'TYPE'
-                       , 'DOT_REGNUM', 'DOT_REGION', 'GlobalID', 'TOWN', 'admin_level', 'created_user'
-                       , 'created_date', 'last_edited_user', 'last_edited_date'
-                        ], axis=1, inplace=True, errors='ignore')
+    merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
     state_location_json = json.loads(state_gdf.to_json())
     location_json = json.loads(merged_df.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
@@ -595,6 +560,21 @@ def create_region_by_county_map(source_osm_df, region):
                             , xanchor="center")
                             )
     return fig
+
+
+def get_unneeded_column_names():
+    return ['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng', 'admin_centre_node_id'
+        , 'admin_centre_node_lat', 'admin_centre_node_lng'
+        , 'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'
+        , 'NAME', 'MCD', 'KEY', 'TOWN', 'DCF_OFFICE', 'DCF_REGION'
+        , 'FIPS6', 'TOWN', 'TOWNNAMEMC', 'TOWNGEOID', 'SqMi'
+        , 'OBJECTID', 'CNTY', 'CNTYGEOID', 'LAND'
+        , 'osm_id', 'boundary', 'NAME', 'MCD', 'KEY', 'DCF_OFFICE', 'DCF_REGION'
+        , 'GEOCODE', 'GEOCODENUM', 'CNTYCODE', 'TAG', 'ISLAND', 'CIREG', 'LURC', 'BAXTER', 'ISLANDID', 'TYPE'
+        , 'DOT_REGNUM', 'DOT_REGION', 'GlobalID', 'admin_level', 'created_user'
+        , 'created_date', 'last_edited_user', 'last_edited_date','CountyArenaId','StateArenaId'
+            ]
+
 
 def get_geojson_filenames():
     if 'geojson_files_dict' not in st.session_state:
