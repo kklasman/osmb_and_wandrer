@@ -131,7 +131,6 @@ def create_county_map(source_osm_df, state):
     renamed_gdf = {}
     counties_gdf = {}
     state_gdf = {}
-    data_value = ss['selected_datavalue_for_map']
 
     counties_gdf = create_county_gdf(source_osm_df)
 
@@ -140,12 +139,16 @@ def create_county_map(source_osm_df, state):
     else:
         state_gdf = counties_gdf.dissolve()
 
+    state_boundary_json = json.loads(state_gdf.to_json())
+
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
 
     renamed_gdf = counties_gdf.copy()
     renamed_gdf['County'] = renamed_gdf['County'].str.title() # required for merge with Wandrer data
 
     wandrerer_df = get_wandrer_totals_for_counties_for_state(state)
+    data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
+
     # print(wandrerer_df)
     merged_df = renamed_gdf.merge(wandrerer_df, on='County')
     merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
@@ -175,6 +178,14 @@ def create_county_map(source_osm_df, state):
         visible=True,
         colorbar_title=data_value
     ))
+
+    fig.update_layout(mapbox_layers=[dict(sourcetype='geojson',
+                                          source=state_boundary_json,
+                                          color='#303030',
+                                          type='line',
+                                          line=dict(width=1.5)
+                                          )])
+
     fig.update_layout(mapbox_style="carto-positron",
                       mapbox_zoom=zoom, mapbox_center=center)
     fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
@@ -408,11 +419,12 @@ def create_region_map(source_osm_df, region):
 def create_region_by_county_map(source_osm_df, region):
     renamed_gdf = {}
     county_gdf = {}
-    data_value = ss['selected_datavalue_for_map']
     state_gdf = source_osm_df.dissolve(by='State')
     state_gdf.reset_index(inplace=True)
 
     wandrerer_df = get_wandrer_totals_for_counties_for_states(state_gdf.State.to_list())
+
+    data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
 
     merged_df = source_osm_df.merge(wandrerer_df, on=['State', 'County'])
     merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
@@ -459,6 +471,18 @@ def create_region_by_county_map(source_osm_df, region):
                             , xanchor="center")
                             )
     return fig
+
+
+def filter_wandrerer_df(wandrerer_df):
+    selected_data_value = ss['selected_datavalue_for_map']
+    data_value = ''
+    if selected_data_value == 'ActualMiles > 1':
+        wandrerer_df = wandrerer_df.loc[wandrerer_df['ActualMiles'] > 1]
+        data_value = 'ActualMiles'
+    else:
+        data_value = selected_data_value
+
+    return data_value, wandrerer_df
 
 
 def get_unneeded_column_names():
@@ -693,7 +717,7 @@ options = ['State', 'Counties', 'Towns']
 geojson_files = get_geojson_filenames()
 wandrer_regions = get_wandrer_subregions()
 region_list = ['All'] + (wandrer_regions.subregion_name.unique().tolist())
-data_values = ['TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit']
+data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles > 1', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit']
 
 if 'gdfs' not in st.session_state:
     # Initialize geopandas df dictionary in session state.
