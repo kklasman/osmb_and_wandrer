@@ -449,12 +449,11 @@ def create_region_map(source_osm_df, region):
     state_merged_df = state_gdf.merge(wandrerer_df, on='State')
 
     state_merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
-    state_merged_df.drop(['COUNTY','name'], axis=1, inplace=True, errors='ignore')
 
     location_json = json.loads(state_merged_df.to_json())
     # county_location_json = json.loads(county_gdf.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
-    state_merged_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
+    state_merged_df.drop(['tags', 'geometry','COUNTY','name','Town'], axis=1, inplace=True, errors='ignore')
     template = create_template(state_merged_df, ['State', 'TotalTowns', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     z_max = float(state_merged_df[data_value].max()) if float(state_merged_df[data_value].max()) > 0 else float(state_merged_df['TotalMiles'].max())
     st.session_state['map_gdf'] = state_merged_df
@@ -521,8 +520,9 @@ def create_region_by_county_map(source_osm_df, region):
     state_location_json = json.loads(state_gdf.to_json())
     location_json = json.loads(merged_df.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
-    merged_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
-    template = create_template(merged_df, ['State', 'ShortCounty', 'TotalTowns', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    merged_df.drop(['tags', 'geometry','Town','County'], axis=1, inplace=True, errors='ignore')
+    merged_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
+    template = create_template(merged_df, ['State', 'County', 'TotalTowns', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     z_max = float(merged_df[data_value].max()) if float(merged_df[data_value].max()) > 0 else float(merged_df['TotalMiles'].max())
     z_min =  1000 if data_value == 'TotalMiles' else 0
 
