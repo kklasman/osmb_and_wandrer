@@ -15,7 +15,8 @@
 				"County": " ",
 				"State": "Maine",
 				"long_name": "maine_ _county__",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "  County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -52,7 +53,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_abbot",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -169,7 +171,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_acton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -990,7 +993,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_addison",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -2019,7 +2023,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_albion",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -2204,7 +2209,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_alexander",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -2377,7 +2383,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_alfred",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -3006,7 +3013,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_allagash",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -3315,7 +3323,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_alna",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -3692,7 +3701,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_alton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -4389,7 +4399,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_amherst",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -4506,7 +4517,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_amity",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -5111,7 +5123,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_andover",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -5308,7 +5321,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_anson",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -5905,7 +5919,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_appleton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -6058,7 +6073,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_argyle",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -7003,7 +7019,8 @@
 				"County": "Sagadahoc",
 				"State": "Maine",
 				"long_name": "maine_sagadahoc_county_arrowsic",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Sagadahoc County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -7488,7 +7505,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_arundel",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -8313,7 +8331,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_ashland",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -8538,7 +8557,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_athens",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -9187,7 +9207,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_atkinson",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -9608,7 +9629,8 @@
 				"County": "Androscoggin",
 				"State": "Maine",
 				"long_name": "maine_androscoggin_county_auburn",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Androscoggin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -10361,7 +10383,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_augusta",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -10598,7 +10621,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_aurora",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -10735,7 +10759,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_avon",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -10936,7 +10961,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_baileyville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -11461,7 +11487,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_baldwin",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -12226,7 +12253,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_bancroft",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -12503,7 +12531,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_bangor",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -12720,7 +12749,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_bar_harbor",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -13385,7 +13415,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_baring",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -13562,7 +13593,8 @@
 				"County": "Sagadahoc",
 				"State": "Maine",
 				"long_name": "maine_sagadahoc_county_bath",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Sagadahoc County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -14111,7 +14143,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_beals",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -14428,7 +14461,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_beaver_cove",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -15569,7 +15603,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_beddington",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -15722,7 +15757,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_belfast",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -15963,7 +15999,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_belgrade",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -16680,7 +16717,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_belmont",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -16817,7 +16855,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_benton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -17058,7 +17097,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_berwick",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -17751,7 +17791,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_bethel",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -18088,7 +18129,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_biddeford",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -18829,7 +18871,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_bingham",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -19086,7 +19129,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_blaine",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -19211,7 +19255,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_blanchard",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -19380,7 +19425,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_blue_hill",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -19777,7 +19823,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_boothbay",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -20498,7 +20545,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_boothbay_harbor",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -20807,7 +20855,8 @@
 				"County": "Sagadahoc",
 				"State": "Maine",
 				"long_name": "maine_sagadahoc_county_bowdoin",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Sagadahoc County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -21164,7 +21213,8 @@
 				"County": "Sagadahoc",
 				"State": "Maine",
 				"long_name": "maine_sagadahoc_county_bowdoinham",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Sagadahoc County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -21553,7 +21603,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_bowerbank",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -22142,7 +22193,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_bradford",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -22303,7 +22355,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_bradley",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -22576,7 +22629,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_bremen",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -23221,7 +23275,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_brewer",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -23446,7 +23501,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_bridgewater",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -23619,7 +23675,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_bridgton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -24180,7 +24237,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_brighton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -24389,7 +24447,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_bristol",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -25586,7 +25645,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_brooklin",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -26107,7 +26167,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_brooks",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -26268,7 +26329,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_brooksville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -27159,7 +27221,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_brownfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -27656,7 +27719,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_brownville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -27873,7 +27937,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_brunswick",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -28854,7 +28919,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_buckfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -29079,7 +29145,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_bucksport",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -29588,7 +29655,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_burlington",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -29785,7 +29853,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_burnham",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -30234,7 +30303,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_buxton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -30795,7 +30865,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_byron",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -31008,7 +31079,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_calais",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -31369,7 +31441,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_cambridge",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -32030,7 +32103,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_camden",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -32207,7 +32281,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_canaan",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -32744,7 +32819,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_canton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -32937,7 +33013,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_cape_elizabeth",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -33354,7 +33431,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_caratunk",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -33651,7 +33729,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_caribou",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -33872,7 +33951,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_carmel",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -34029,7 +34109,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_carrabassett_valley",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -34242,7 +34323,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_carroll",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -34419,7 +34501,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_carthage",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -34580,7 +34663,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_cary",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -34733,7 +34817,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_casco",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -35566,7 +35651,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_castine",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -35995,7 +36081,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_castle_hill",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -36132,7 +36219,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_caswell",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -36241,7 +36329,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_chapman",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -36366,7 +36455,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_charleston",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -36535,7 +36625,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_charlotte",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -36964,7 +37055,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_chebeague_island",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -37163,7 +37255,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_chelsea",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -37384,7 +37477,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_cherryfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -37645,7 +37739,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_chester",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -38194,7 +38289,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_chesterville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -38955,7 +39051,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_china",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -39252,7 +39349,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_clifton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -39369,7 +39467,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_clinton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -39766,7 +39865,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_columbia",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -40019,7 +40119,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_columbia_falls",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -40236,7 +40337,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_connor",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -40361,7 +40463,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_cooper",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -40650,7 +40753,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_coplin",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -40783,7 +40887,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_corinna",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -40976,7 +41081,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_corinth",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -41125,7 +41231,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_cornish",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -41530,7 +41637,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_cornville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -41735,7 +41843,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_cove_point_twp",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -41834,7 +41943,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_cranberry_isles",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -42183,7 +42293,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_crawford",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -42348,7 +42459,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_criehaven",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -42421,7 +42533,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_crystal",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -42618,7 +42731,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_cumberland",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -42955,7 +43069,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_cushing",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -43456,7 +43571,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_cutler",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -43897,7 +44013,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_cyr",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -44042,7 +44159,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_dallas",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -44211,7 +44329,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_damariscotta",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -44624,7 +44743,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_danforth",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -45265,7 +45385,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_dayton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -45798,7 +45919,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_deblois",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -45927,7 +46049,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_dedham",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -46064,7 +46187,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_deer_isle",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -49149,7 +49273,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_denmark",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -49666,7 +49791,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_dennistown",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -49843,7 +49969,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_dennysville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -50588,7 +50715,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_detroit",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -50777,7 +50905,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_dexter",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -50942,7 +51071,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_dixfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -51515,7 +51645,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_dixmont",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -51648,7 +51779,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_dover_foxcroft",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -52137,7 +52269,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_dresden",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -52506,7 +52639,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_drew",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -52743,7 +52877,8 @@
 				"County": "Androscoggin",
 				"State": "Maine",
 				"long_name": "maine_androscoggin_county_durham",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Androscoggin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -53176,7 +53311,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_dyer_brook",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -53325,7 +53461,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_eagle_lake",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -53454,7 +53591,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_east_machias",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -53819,7 +53957,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_east_millinocket",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -53948,7 +54087,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_eastbrook",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -54021,7 +54161,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_easton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -54130,7 +54271,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_eastport",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -54347,7 +54489,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_eddington",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -54652,7 +54795,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_edgecomb",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -55085,7 +55229,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_edinburg",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -55370,7 +55515,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_eliot",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -55727,7 +55873,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_ellsworth",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -56076,7 +56223,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_embden",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -56561,7 +56709,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_enfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -56938,7 +57087,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_etna",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -57075,7 +57225,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_eustis",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -57220,7 +57371,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_exeter",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -57385,7 +57537,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_fairfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -57790,7 +57943,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_falmouth",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -58239,7 +58393,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_farmingdale",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -58536,7 +58691,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_farmington",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -58893,7 +59049,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_fayette",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -59354,7 +59511,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_central_hancock",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -59431,7 +59589,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_fort_fairfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -59616,7 +59775,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_fort_kent_township",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -60049,7 +60209,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_frankfort",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -60646,7 +60807,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_franklin",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -60947,7 +61109,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_freedom",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -61188,7 +61351,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_freeport",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -61745,7 +61909,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_frenchboro",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -62498,7 +62663,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_frenchville_township",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -62867,7 +63033,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_friendship",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -63684,7 +63851,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_frye_island",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -64021,7 +64189,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_fryeburg",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -64374,7 +64543,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_gardiner",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -64771,7 +64941,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_garfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -64896,7 +65067,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_garland",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -65045,7 +65217,8 @@
 				"County": "Sagadahoc",
 				"State": "Maine",
 				"long_name": "maine_sagadahoc_county_georgetown",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Sagadahoc County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -65738,7 +65911,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_gilead",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -65883,7 +66057,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_glenburn",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -66092,7 +66267,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_glenwood",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -66217,7 +66393,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_gorham",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -66926,7 +67103,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_gouldsboro",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -67947,7 +68125,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_grand_isle",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -68184,7 +68363,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_grand_lake_stream",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -68413,7 +68593,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_gray",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -68614,7 +68795,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_great_pond",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -68755,7 +68937,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_greenbush",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -69140,7 +69323,8 @@
 				"County": "Androscoggin",
 				"State": "Maine",
 				"long_name": "maine_androscoggin_county_greene",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Androscoggin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -69449,7 +69633,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_greenville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -69972,7 +70157,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_greenwood",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -70165,7 +70351,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_grindstone_township",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -70358,7 +70545,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_guilford",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -70647,7 +70835,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_hallowell",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -70880,7 +71069,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_hamlin",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -71129,7 +71319,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_hammond",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -71294,7 +71485,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_hampden",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -71743,7 +71935,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_hancock",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -72312,7 +72505,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_hancock_county_island",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -74951,7 +75145,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_hanover",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -75200,7 +75395,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_harfords_point_twp",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -75465,7 +75661,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_harmony",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -75646,7 +75843,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_harpswell",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -76213,7 +76411,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_harrington",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -77050,7 +77249,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_harrison",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -77895,7 +78095,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_hartford",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -78620,7 +78821,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_hartland",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -79385,7 +79587,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_haynesville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -79606,7 +79809,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_hebron",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -79955,7 +80159,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_hermon",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -80256,7 +80461,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_hersey",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -80433,7 +80639,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_hibberts",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -80498,7 +80705,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_highland",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -80643,7 +80851,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_hiram",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -81384,7 +81593,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_hodgdon",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -81633,7 +81843,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_holden",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -81862,7 +82073,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_hollis",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -82543,7 +82755,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_hope",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -82672,7 +82885,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_hopkins_academy_grant_township",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -82829,7 +83043,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_houlton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -83026,7 +83241,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_howland",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -83323,7 +83539,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_hudson",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -83488,7 +83705,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_penobscot_indian_island",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -83871,7 +84089,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_passamaquoddy_indian_township",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -84344,7 +84563,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_industry",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -84557,7 +84777,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_island_falls",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -84710,7 +84931,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_isle_au_haut",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -85279,7 +85501,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_islesboro",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -85908,7 +86131,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_jackman",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -86157,7 +86381,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_jackson",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -86274,7 +86499,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_jay",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -86435,7 +86661,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_jefferson",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -86948,7 +87175,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_jonesboro",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -87469,7 +87697,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_jonesport",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -88322,7 +88551,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_kenduskeag",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -88435,7 +88665,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_kennebunk",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -89772,7 +90003,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_kennebunkport",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -90249,7 +90481,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_kineo_twp",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -90562,7 +90795,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_kingfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -90671,7 +90905,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_kingman",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -90824,7 +91059,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_kingsbury",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -91013,7 +91249,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_kittery",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -91558,7 +91795,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_knox",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -91707,7 +91945,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_lagrange",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -91904,7 +92143,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_lake_view",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -92089,7 +92329,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_lakeville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -92290,7 +92531,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_lamoine",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -92687,7 +92929,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_lebanon",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -93536,7 +93779,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_lee",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -93697,7 +93941,8 @@
 				"County": "Androscoggin",
 				"State": "Maine",
 				"long_name": "maine_androscoggin_county_leeds",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Androscoggin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -94234,7 +94479,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_levant",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -94395,7 +94641,8 @@
 				"County": "Androscoggin",
 				"State": "Maine",
 				"long_name": "maine_androscoggin_county_lewiston",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Androscoggin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -94880,7 +95127,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_liberty",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -95089,7 +95337,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_limerick",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -95658,7 +95907,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_limestone",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -95811,7 +96061,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_limington",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -96632,7 +96883,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_lincoln",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -97049,7 +97301,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_louds_island",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -97984,7 +98237,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_lincoln",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -98109,7 +98363,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_lincolnville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -98330,7 +98585,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_linneus",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -98527,7 +98783,8 @@
 				"County": "Androscoggin",
 				"State": "Maine",
 				"long_name": "maine_androscoggin_county_lisbon",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Androscoggin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -99136,7 +99393,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_litchfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -99697,7 +99955,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_littleton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -99894,7 +100153,8 @@
 				"County": "Androscoggin",
 				"State": "Maine",
 				"long_name": "maine_androscoggin_county_livermore",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Androscoggin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -100355,7 +100615,8 @@
 				"County": "Androscoggin",
 				"State": "Maine",
 				"long_name": "maine_androscoggin_county_livermore_falls",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Androscoggin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -100692,7 +100953,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_long_a_township",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -100921,7 +101183,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_long_island",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -101014,7 +101277,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_lovell",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -101235,7 +101499,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_lowell",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -101488,7 +101753,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_lubec",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -102037,7 +102303,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_ludlow",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -102234,7 +102501,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_lyman",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -102395,7 +102663,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_machias",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -102608,7 +102877,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_machiasport",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -103149,7 +103419,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_macwahoc",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -103310,7 +103581,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_madawaska_township",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -103843,7 +104115,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_madison",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -104384,7 +104657,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_magalloway",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -104601,7 +104875,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_manchester",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -104974,7 +105249,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_mapleton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -105111,7 +105387,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_mariaville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -105792,7 +106069,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_mars_hill",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -105865,7 +106143,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_marshfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -106114,7 +106393,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_masardis",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -106267,7 +106547,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_mattawamkeag",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -106544,7 +106825,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_maxfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -106693,7 +106975,8 @@
 				"County": "Androscoggin",
 				"State": "Maine",
 				"long_name": "maine_androscoggin_county_mechanic_falls",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Androscoggin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -107218,7 +107501,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_meddybemps",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -107331,7 +107615,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_medford",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -107504,7 +107789,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_medway",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -107689,7 +107975,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_mercer",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -108186,7 +108473,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_merrill",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -108327,7 +108615,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_mexico",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -108804,7 +109093,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_milbridge",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -109645,7 +109935,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_milford",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -109990,7 +110281,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_millinocket",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -110419,7 +110711,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_milo",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -110588,7 +110881,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_milton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -110701,7 +110995,8 @@
 				"County": "Androscoggin",
 				"State": "Maine",
 				"long_name": "maine_androscoggin_county_minot",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Androscoggin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -111434,7 +111729,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_monhegan",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -111667,7 +111963,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_monmouth",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -111916,7 +112213,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_monroe",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -112289,7 +112587,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_monson",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -112454,7 +112753,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_monticello",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -112635,7 +112935,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_montville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -112960,7 +113261,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_moose_river",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -113169,7 +113471,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_moro",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -113326,7 +113629,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_morrill",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -113467,7 +113771,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_moscow",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -113788,7 +114093,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_mount_chase",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -113957,7 +114263,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_mount_desert",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -114494,7 +114801,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_mount_vernon",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -115347,7 +115655,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_muscle_ridge_islands",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -115504,7 +115813,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_naples",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -116481,7 +116791,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_nashville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -116622,7 +116933,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_new_canada",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -116747,7 +117059,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_new_gloucester",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -117020,7 +117333,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_new_limerick",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -117161,7 +117475,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_new_portland",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -117354,7 +117669,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_new_sharon",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -117803,7 +118119,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_new_sweden",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -117944,7 +118261,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_new_vineyard",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -118153,7 +118471,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_newburgh",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -118302,7 +118621,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_newcastle",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -118951,7 +119271,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_newfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -119508,7 +119829,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_newport",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -119649,7 +119971,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_newry",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -119878,7 +120201,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_nobleboro",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -120503,7 +120827,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_norridgewock",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -121012,7 +121337,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_north_berwick",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -121325,7 +121651,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_north_haven",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -121886,7 +122213,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_north_yarmouth",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -122223,7 +122551,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_northfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -122396,7 +122725,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_northport",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -122705,7 +123035,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_norway",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -122942,7 +123273,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_oakfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -123079,7 +123411,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_oakland",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -123368,7 +123701,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_ogunquit",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -123717,7 +124051,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_old_orchard_beach",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -124078,7 +124413,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_old_town",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -124891,7 +125227,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_orient",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -125228,7 +125565,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_orland",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -125609,7 +125947,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_southeast_piscataquis",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -125770,7 +126109,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_orono",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -126131,7 +126471,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_orrington",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -126492,7 +126833,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_osborn",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -126617,7 +126959,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_otis",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -126714,7 +127057,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_otisfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -127623,7 +127967,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_owls_head",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -127788,7 +128133,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_oxbow",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -127909,7 +128255,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_oxford",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -128346,7 +128693,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_palermo",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -128587,7 +128935,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_palmyra",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -128768,7 +129117,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_paris",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -129005,7 +129355,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_parkman",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -129190,7 +129541,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_parsonsfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -129679,7 +130031,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_passadumkeag",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -129968,7 +130321,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_patten",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -130125,7 +130479,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_pembroke",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -130570,7 +130925,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_penobscot",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -131039,7 +131395,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_perham",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -131212,7 +131569,8 @@
 				"County": "Sagadahoc",
 				"State": "Maine",
 				"long_name": "maine_sagadahoc_county_perkins_twp_swan_island",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Sagadahoc County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -131529,7 +131887,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_perry",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -132062,7 +132421,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_peru",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -132471,7 +132831,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_phillips",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -132644,7 +133005,8 @@
 				"County": "Sagadahoc",
 				"State": "Maine",
 				"long_name": "maine_sagadahoc_county_phippsburg",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Sagadahoc County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -133193,7 +133555,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_pittsfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -133766,7 +134129,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_pittston",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -134183,7 +134547,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_passamaquoddy_pleasant_point",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -134456,7 +134821,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_pleasant_ridge",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -134737,7 +135103,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_plymouth",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -134878,7 +135245,8 @@
 				"County": "Androscoggin",
 				"State": "Maine",
 				"long_name": "maine_androscoggin_county_poland",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Androscoggin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -135623,7 +135991,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_portage_lake",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -135796,7 +136165,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_porter",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -136157,7 +136527,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_portland",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -136844,7 +137215,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_pownal",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -137065,7 +137437,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_prentiss",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -137286,7 +137659,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_presque_isle",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -137451,7 +137825,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_princeton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -137796,7 +138171,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_prospect",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -138133,7 +138509,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_whitney",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -138262,7 +138639,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_randolph",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -138491,7 +138869,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_rangeley",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -138688,7 +139067,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_rangeley",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -138857,7 +139237,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_raymond",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -139194,7 +139575,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_readfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -139491,7 +139873,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_reed",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -139688,7 +140071,8 @@
 				"County": "Sagadahoc",
 				"State": "Maine",
 				"long_name": "maine_sagadahoc_county_richmond",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Sagadahoc County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -140073,7 +140457,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_ripley",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -140722,7 +141107,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_robbinston",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -140835,7 +141221,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_rockland",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -141100,7 +141487,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_rockport",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -141297,7 +141685,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_rome",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -141886,7 +142275,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_roque_bluffs",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -142251,7 +142641,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_roxbury",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -142440,7 +142831,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_rumford",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -142753,7 +143145,8 @@
 				"County": "Androscoggin",
 				"State": "Maine",
 				"long_name": "maine_androscoggin_county_sabattus",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Androscoggin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -142910,7 +143303,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_saco",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -143841,7 +144235,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_st._agatha",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -144306,7 +144701,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_st._albans",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -144635,7 +145031,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_st._francis",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -144932,7 +145329,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_st._george",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -145473,7 +145871,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_st._john",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -145698,7 +146097,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_sandy_river",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -145835,7 +146235,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_sanford",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -146536,7 +146937,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_sangerville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -146857,7 +147259,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_scarborough",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -147330,7 +147733,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_searsmont",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -147507,7 +147911,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_searsport",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -147872,7 +148277,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_sebago",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -148421,7 +148827,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_sebec",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -148986,7 +149393,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_seboeis",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -149171,7 +149579,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_sedgwick",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -149808,7 +150217,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_shapleigh",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -150325,7 +150735,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_sherman",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -150518,7 +150929,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_shirley",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -150683,7 +151095,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_sidney",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -151048,7 +151461,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_skowhegan",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -151581,7 +151995,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_smithfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -151954,7 +152369,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_smyrna",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -152095,7 +152511,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_solon",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -152492,7 +152909,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_somerville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -152665,7 +153083,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_sorrento",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -153034,7 +153453,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_south_berwick",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -153427,7 +153847,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_south_bristol",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -154004,7 +154425,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_south_portland",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -154353,7 +154775,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_south_thomaston",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -154750,7 +155173,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_southport",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -155047,7 +155471,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_southwest_harbor",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -155412,7 +155837,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_springfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -155585,7 +156011,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_stacyville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -155738,7 +156165,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_standish",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -156849,7 +157277,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_starks",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -157498,7 +157927,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_stetson",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -157639,7 +158069,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_steuben",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -158268,7 +158699,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_stockholm",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -158409,7 +158841,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_stockton_springs",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -158794,7 +159227,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_stoneham",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -158975,7 +159409,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_stonington",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -159512,7 +159947,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_stow",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -159749,7 +160185,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_strong",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -159946,7 +160383,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_sullivan",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -160243,7 +160681,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_sumner",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -161008,7 +161447,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_surry",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -161629,7 +162069,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_swans_island",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -162538,7 +162979,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_swanville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -162747,7 +163189,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_sweden",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -162876,7 +163319,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_t1_r8_wels_township",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -163001,7 +163445,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_t2_r8_wels_township",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -163122,7 +163567,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_t3_indian_purchase_township",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -163543,7 +163989,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_twombly_ridge",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -163708,7 +164155,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_northwest_hancock",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -163821,7 +164269,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_t4_indian_purchase_township",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -163994,7 +164443,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_ta_r7_wels_township",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -164323,7 +164773,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_talmadge",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -164488,7 +164939,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_temple",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -164669,7 +165121,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_the_forks",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -165178,7 +165631,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_thomaston",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -165663,7 +166117,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_thorndike",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -165792,7 +166247,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_topsfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -165997,7 +166453,8 @@
 				"County": "Sagadahoc",
 				"State": "Maine",
 				"long_name": "maine_sagadahoc_county_topsham",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Sagadahoc County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -166746,7 +167203,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_tremont",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -167311,7 +167769,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_trenton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -167764,7 +168223,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_troy",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -167909,7 +168369,8 @@
 				"County": "Androscoggin",
 				"State": "Maine",
 				"long_name": "maine_androscoggin_county_turner",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Androscoggin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -168386,7 +168847,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_union",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -169103,7 +169565,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_unity",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -169252,7 +169715,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_unity",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -169369,7 +169833,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_upton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -169518,7 +169983,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_van_buren_township",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -169755,7 +170221,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_vanceboro",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -170128,7 +170595,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_vassalboro",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -170569,7 +171037,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_veazie",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -170702,7 +171171,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_veazie_gore",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -170771,7 +171241,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_verona_island",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -171052,7 +171523,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_vienna",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -171653,7 +172125,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_vinalhaven",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -172388,7 +172861,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_wade",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -172521,7 +172995,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_waite",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -172706,7 +173181,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_waldo",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -172843,7 +173319,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_waldo_county_island",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -173078,7 +173555,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_waldoboro",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -173999,7 +174477,8 @@
 				"County": "Androscoggin",
 				"State": "Maine",
 				"long_name": "maine_androscoggin_county_wales",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Androscoggin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -174204,7 +174683,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_wallagrass",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -174349,7 +174829,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_waltham",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -174982,7 +175463,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_warren",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -175375,7 +175857,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_washburn",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -175508,7 +175991,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_washington",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -176241,7 +176725,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_washington_county_island",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -176748,7 +177233,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_waterboro",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -177417,7 +177903,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_waterford",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -177590,7 +178077,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_waterville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -177887,7 +178375,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_wayne",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -178180,7 +178669,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_webster",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -178345,7 +178835,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_weld",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -178562,7 +179053,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_wellington",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -178783,7 +179275,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_wells",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -179704,7 +180197,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_wesley",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -179901,7 +180395,8 @@
 				"County": "Sagadahoc",
 				"State": "Maine",
 				"long_name": "maine_sagadahoc_county_west_bath",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Sagadahoc County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -180422,7 +180917,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_west_forks",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -181131,7 +181627,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_west_gardiner",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -181688,7 +182185,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_west_paris",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -181897,7 +182395,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_westbrook",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -182314,7 +182813,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_westfield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -182423,7 +182923,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_westmanland",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -182588,7 +183089,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_weston",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -182885,7 +183387,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_westport_island",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -183402,7 +183905,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_whitefield",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -183615,7 +184119,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_whiting",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -183772,7 +184277,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_whitneyville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -183957,7 +184463,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_willimantic",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -184134,7 +184641,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_wilton",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -184367,7 +184875,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_windham",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -185140,7 +185649,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_windsor",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -185341,7 +185851,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_winn",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -185642,7 +186153,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_winslow",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -185931,7 +186443,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_winter_harbor",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -186320,7 +186833,8 @@
 				"County": "Waldo",
 				"State": "Maine",
 				"long_name": "maine_waldo_county_winterport",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Waldo County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -186965,7 +187479,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_winterville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -187130,7 +187645,8 @@
 				"County": "Kennebec",
 				"State": "Maine",
 				"long_name": "maine_kennebec_county_winthrop",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Kennebec County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -187427,7 +187943,8 @@
 				"County": "Lincoln",
 				"State": "Maine",
 				"long_name": "maine_lincoln_county_wiscasset",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Lincoln County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -187980,7 +188497,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_woodland",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -188129,7 +188647,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_woodstock",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -188410,7 +188929,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_woodville",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -188691,7 +189211,8 @@
 				"County": "Sagadahoc",
 				"State": "Maine",
 				"long_name": "maine_sagadahoc_county_woolwich",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Sagadahoc County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -189352,7 +189873,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_wyman",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -189473,7 +189995,8 @@
 				"County": "Cumberland",
 				"State": "Maine",
 				"long_name": "maine_cumberland_county_yarmouth",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Cumberland County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -190030,7 +190553,8 @@
 				"County": "York",
 				"State": "Maine",
 				"long_name": "maine_york_county_york",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "York County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -190633,7 +191157,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_south_aroostook",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -191266,7 +191791,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_north_penobscot",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -192649,7 +193175,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_central_aroostook",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -193234,7 +193761,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_square_lake",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -193839,7 +194367,8 @@
 				"County": "Aroostook",
 				"State": "Maine",
 				"long_name": "maine_aroostook_county_northwest_aroostook",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Aroostook County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -196916,7 +197445,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_northeast_piscataquis",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -200363,7 +200893,8 @@
 				"County": "Piscataquis",
 				"State": "Maine",
 				"long_name": "maine_piscataquis_county_northwest_piscataquis",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Piscataquis County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -205834,7 +206365,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_seboomook_lake",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -212863,7 +213395,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_northwest_somerset",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -214440,7 +214973,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_northeast_somerset",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -216565,7 +217099,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_north_franklin",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -219018,7 +219553,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_north_oxford",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -220831,7 +221367,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_west_central_franklin",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -221140,7 +221677,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_east_central_franklin",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -221497,7 +222035,8 @@
 				"County": "Somerset",
 				"State": "Maine",
 				"long_name": "maine_somerset_county_central_somerset",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Somerset County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -221834,7 +222373,8 @@
 				"County": "Oxford",
 				"State": "Maine",
 				"long_name": "maine_oxford_county_south_oxford",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Oxford County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -222143,7 +222683,8 @@
 				"County": "Penobscot",
 				"State": "Maine",
 				"long_name": "maine_penobscot_county_east_central_penobscot",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Penobscot County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -222400,7 +222941,8 @@
 				"County": "Hancock",
 				"State": "Maine",
 				"long_name": "maine_hancock_county_east_hancock",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Hancock County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -223225,7 +223767,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_north_washington",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -226330,7 +226873,8 @@
 				"County": "Washington",
 				"State": "Maine",
 				"long_name": "maine_washington_county_east_central_washington",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Washington County"
 			},
 			"geometry": {
 				"type": "Polygon",
@@ -228215,7 +228759,8 @@
 				"County": "Knox",
 				"State": "Maine",
 				"long_name": "maine_knox_county_matinicus_isle",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Knox County"
 			},
 			"geometry": {
 				"type": "MultiPolygon",
@@ -228880,7 +229425,8 @@
 				"County": "Franklin",
 				"State": "Maine",
 				"long_name": "maine_franklin_county_south_franklin",
-				"normalized": "Y"
+				"normalized": "Y",
+				"long_county": "Franklin County"
 			},
 			"geometry": {
 				"type": "Polygon",
