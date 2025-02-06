@@ -579,6 +579,7 @@ def create_region_by_county_map(source_osm_df, region):
                             , title=dict(text=f'{data_value} by County for Region of {region}', x=0.5
                             , xanchor="center")
                             )
+
     return fig
 
 
@@ -847,6 +848,12 @@ def get_geopandas_df_for_region(selected_region):
         print(f'Getting geopandas df for {selected_region} from session state')
         return st.session_state.gdfs[selected_region]
 
+def to_jaden_case(sentence):
+    if sentence is None:
+        return sentence
+
+    return " ".join(word.capitalize() for word in sentence.split())
+
 
 def normalize_geojson(state, gdf):
     print(f'{state=}')
@@ -861,20 +868,41 @@ def normalize_geojson(state, gdf):
     if not column_exists_case_insensitive(gdf, 'admin_level'):
         rename_column_case_insensitive(gdf, 'COUNTY', 'County')
         rename_column_case_insensitive(gdf, 'TOWN', 'Town')
+        gdf['Town'] = gdf.apply(lambda x: to_jaden_case(x['Town']), axis=1)
+        gdf['County'] = gdf.apply(lambda x: to_jaden_case(x['County']), axis=1)
+        # gdf['Town'] = gdf['Town'].apply(to_jaden_case(gdf['Town']))
+        # gdf['County'] = gdf['County'].apply(to_jaden_case(gdf['County']))
 
         gdf_none = gdf[gdf['County'].isnull()]
         gdf_not_none = gdf[~gdf['County'].isnull()]
+
         gdf.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
-        if not column_exists_case_insensitive(gdf, 'long_name'):
+        # if not column_exists_case_insensitive(gdf, 'long_name'):
+        # It's OK ot overwrite long_name as we've changed the inputs to it.
+
+        if len(gdf_none) > 0:
+            wandrer_df = get_wandrer_data_for_county_merge(state)
+            wandrer_df_merged = gdf_none.merge(wandrer_df, on=['State','Town'])
+            wandrer_df_merged.drop(['County_x', 'long_name_x', 'long_county_x', 'long_county_y'], axis=1, inplace=True,
+                                   errors='ignore')
+            rename_column_case_insensitive(wandrer_df_merged, 'County_y', 'County')
+            rename_column_case_insensitive(wandrer_df_merged, 'long_name_y', 'long_name')
+            wandrer_df_merged['long_county'] = wandrer_df_merged['County'] + ' County'
+            gdf = wandrer_df_merged
+        else:
             gdf['long_name'] = (
-                    gdf['State'] + '_' + gdf['County'] + '_County_' + gdf['Town'].str.replace(' ', '_')).str.lower()
+                gdf['State'] + '_' + gdf['County'] + '_County_' + gdf['Town'].str.replace(' ', '_')).str.lower()
+            gdf['long_county'] = gdf['County'] + ' County'
+
         # else:
         #     gdf['long_name'] = (gdf['State'] + '_' + gdf['County'] + '_County').str.lower()
 
-        if not column_exists_case_insensitive(gdf, 'long_county'):
-            # county_gdf['County'] += ' County'
-            gdf['long_county'] = gdf['County'] + ' County'
-            # state = gdf['State'].unique()[0]
+        # if not column_exists_case_insensitive(gdf, 'long_county'):
+        # It's OK ot overwrite long_name as we've changed the inputs to it.
+        # county_gdf['County'] += ' County'
+        # gdf['long_county'] = gdf['County'] + ' County'
+        # state = gdf['State'].unique()[0]
+
 
         if not column_exists_case_insensitive(gdf, 'normalized'):
             gdf['normalized'] = 'Y'
@@ -899,10 +927,7 @@ def normalize_geojson(state, gdf):
             print('Now what...')
         else:
             # need wandrer data to determine county for towns. Ex: Massachusetts
-            wandrer_df = get_fq_town_name_for_state(state)
-            if len(wandrer_df['County'].str.contains(' County')):
-                rename_column_case_insensitive(wandrer_df, 'County', 'long_county')
-                wandrer_df['County'] = wandrer_df['long_county'].str.replace(' County', '')
+            wandrer_df = get_wandrer_data_for_county_merge(state)
 
             rename_column_case_insensitive(df_dict[8], 'name', 'Town')
             # wandrer_df = get_fq_town_name_for_state(state)
@@ -942,6 +967,14 @@ def normalize_geojson(state, gdf):
         county_gdf.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
         county_gdf.drop(['admin_level'], axis=1, inplace=True, errors='ignore')
     return county_gdf, gdf
+
+
+def get_wandrer_data_for_county_merge(state):
+    wandrer_df = get_fq_town_name_for_state(state)
+    if len(wandrer_df['County'].str.contains(' County')):
+        rename_column_case_insensitive(wandrer_df, 'County', 'long_county')
+        wandrer_df['County'] = wandrer_df['long_county'].str.replace(' County', '')
+    return wandrer_df
 
 
 # ss
@@ -988,7 +1021,8 @@ if make_map:
                 fig = create_town_map(osm_gdf.copy(), state_selectbox)
 
     if fig:
-        st.plotly_chart(fig)
+        config = {"scrollZoom": True}
+        st.plotly_chart(fig, config=config)
         st.write('Raw Data')
         # st.dataframe(osm_gdf, use_container_width=True)
         st.dataframe(st.session_state['map_gdf'], use_container_width=True)
