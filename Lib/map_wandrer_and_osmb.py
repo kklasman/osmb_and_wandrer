@@ -64,6 +64,9 @@ def create_template(data, col_names):
         elif name == 'TownsCycled':
             template += "<b>Towns Cycled:</b> %{" + f"customdata[{data.columns.get_loc('TownsCycled')}]" + "}<br>"
 
+        elif name == 'CycledTowns':
+            template += "<b>Towns Cycled:</b> %{" + f"customdata[{data.columns.get_loc('CycledTowns')}]" + "}<br>"
+
         elif name == 'TownsNotCycled':
             template += "<b>Towns Not Cycled:</b> %{" + f"customdata[{data.columns.get_loc('TownsNotCycled')}]" + "}<br>"
 
@@ -203,6 +206,20 @@ def create_town_map(town_gdf, state):
 
     state_list = []
     state_list.append(state)
+    wandrerer_county_df = get_wandrer_totals_for_counties_for_states(state_list)
+    data_value, wandrerer_county_df = filter_wandrerer_df(wandrerer_county_df)
+    merged_county_df = county_gdf.merge(wandrerer_county_df, on=['State','County'])
+    merged_county_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+    county_location_json = json.loads(merged_county_df.to_json())
+    merged_county_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+    merged_county_df['always_zero'] = 0
+    # county_template = create_template(merged_county_df, ['County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    # county_template = create_template(merged_county_df, ['County', 'TotalMiles', 'ActualMiles', 'ActualPct','CycledTowns'])
+    county_template = create_template(merged_county_df, ['County', 'TotalMiles', 'ActualMiles', 'ActualPct'])
+    # merged_county_df['TotalMiles'] = 0
+
+    # print(wandrerer_df)
+    # merged_df = county_gdf.merge(wandrerer_df, on=['State','County'])
     wandrerer_df = get_wandrer_totals_for_towns_for_state(state_list)
     data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
     # wandrerer_df['lcase_town'] = wandrerer_df['Town'].str.lower() # required for merge with Wandrer data
@@ -229,39 +246,70 @@ def create_town_map(town_gdf, state):
     town_merged_df = town_gdf.merge(wandrerer_df, on=['State','County','Town','long_name'])
 
     location_json = json.loads(town_merged_df.to_json())
-    county_location_json = json.loads(county_gdf.to_json())
+    # county_location_json = json.loads(county_gdf.to_json())
+    # county_gdf.drop(['geometry'], axis=1, inplace=True, errors='ignore')
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     town_merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
     # town_merged_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
-    template = create_template(town_merged_df, ['Town', 'County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    # county_template = create_template(county_gdf, ['County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    # county_gdf['TotalMiles'] = 0
+    # county_template = create_template(county_gdf, ['County', 'TotalMiles'])
     z_max = float(town_merged_df[data_value].max()) if float(town_merged_df[data_value].max()) > 0 else float(town_merged_df['TotalMiles'].max())
 
     st.session_state['map_gdf'] = town_merged_df
-    fig = go.Figure(go.Choroplethmapbox(
-        customdata=town_merged_df,
-        geojson=location_json,
-        featureidkey='properties.Town',
-        locations=town_merged_df['Town'],
-        z=town_merged_df[data_value],
+    fig = go.Figure()
+    # fig = go.Figure(go.Choroplethmapbox(
+    fig.add_trace(
+        go.Choroplethmapbox(
+            customdata=merged_county_df,
+        geojson=county_location_json,
+        featureidkey='properties.County',
+        locations=merged_county_df['County'],
+        z=merged_county_df['always_zero'],
+        # z=1,
         # colorscale='ylorrd',
         colorscale=max_50_pct_color_scale,
         zmin=0,
         zmax=z_max,
-        hovertemplate=template,
+        hovertemplate=county_template,
         # hoverlabel_bgcolor='white',
         hoverlabel=dict(
             bgcolor="black",
             font_size=16),
         marker_opacity=0.5,
-        # marker_line_width=2,
-        visible=True,
-        colorbar_title=data_value
+        marker_line_width=1.5,
+        visible=True
+        # colorbar_title=data_value
     ))
+
+    town_template = create_template(town_merged_df, ['Town', 'County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    fig.add_trace(
+        go.Choroplethmapbox(
+            customdata=town_merged_df,
+            geojson=location_json,
+            featureidkey='properties.Town',
+            locations=town_merged_df['Town'],
+            # z=filtered_df[z_col_name] * 100,
+            z=town_merged_df[data_value],
+            colorscale=max_50_pct_color_scale,
+            # hovertemplate="County: %{customdata[2]}<br>Actual Pct: %{customdata[4]}<extra></extra>",
+            hovertemplate=town_template,
+            # hoverlabel_bgcolor='white',
+            hoverlabel=dict(
+                bgcolor="black",
+                font_size=16),
+            marker_opacity=0.5,
+            name='Town Data Values',
+            # visible=map_feature_selected == 'Town Boundaries',
+            zmin=0,
+            zmax=z_max))
+
     fig.update_layout(mapbox_layers=[dict(sourcetype='geojson',
                                           source=county_location_json,
                                           color='#303030',
                                           type='line',
                                           line=dict(width=1.5)
+                                          # hovertemplate=template
                                           )]);
 
     fig.update_layout(mapbox_style="carto-positron",
