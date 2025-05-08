@@ -35,16 +35,43 @@ def create_template(data, col_names):
             template += "<b>Town:</b> %{" + f"customdata[{data.columns.get_loc('Town')}]" + "}<br>"
 
         elif name == 'TotalMiles':
-            template += "<b>Total Miles:</b> %{" + f"customdata[{data.columns.get_loc('TotalMiles')}]:,.2f" + "}<br>"
+            template += "<b>Total Town Miles:</b> %{" + f"customdata[{data.columns.get_loc('TotalMiles')}]:,.2f" + "}<br>"
+
+        elif name == 'TotalCountyMiles':
+            template += "<b>Total County Miles:</b> %{" + f"customdata[{data.columns.get_loc('TotalCountyMiles')}]:,.2f" + "}<br>"
+
+        elif name == 'TotalCountyMilesCycled':
+            template += "<b>Total County Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('TotalCountyMilesCycled')}]:,.2f" + "}<br>"
+
+        elif name == 'PctCountyMilesCycled':
+            template += "<b>Pct County Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('PctCountyMilesCycled')}]:,.2%" + "}<br>"
+
+        elif name == 'TotalTownMiles':
+            template += "<b>Total Town Miles:</b> %{" + f"customdata[{data.columns.get_loc('TotalTownMiles')}]:,.2f" + "}<br>"
+
+        elif name == 'UnincorporatedMiles':
+            template += "<b>Unincorporated Miles:</b> %{" + f"customdata[{data.columns.get_loc('UnincorporatedMiles')}]:,.2f" + "}<br>"
+
+        elif name == 'UnincorporatedMilesCycled':
+            template += "<b>Unincorporated Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('UnincorporatedMilesCycled')}]:,.2f" + "}<br>"
+
+        elif name == 'PctUnincorporatedMilesCycled':
+            template += "<b>Pct Unincorporated Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('PctUnincorporatedMilesCycled')}]:.2%" + "}<br>"
+
+        elif name == 'Pct10Unincorporated':
+            template += "<b>10% Unincorporated Miles Target</b> %{" + f"customdata[{data.columns.get_loc('Pct10Unincorporated')}]:,.2f" + "}<br>"
+
+        elif name == 'Pct25Unincorporated':
+            template += "<b>25% Unincorporated Miles Target</b> %{" + f"customdata[{data.columns.get_loc('Pct25Unincorporated')}]:,.2f" + "}<br>"
 
         elif name == 'ActualMiles':
-            template += "<b>Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('ActualMiles')}]:,.2f" + "}<br>"
+            template += "<b>Town Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('ActualMiles')}]:,.2f" + "}<br>"
 
         elif name == 'MilesRidden':
             template += "<b>Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('MilesRidden')}]:,.2f" + "}<br>"
 
         elif name == 'ActualPct':
-            template += "<b>Pct Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('ActualPct')}]:.2%" + "}<br>"
+            template += "<b>Pct Town Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('ActualPct')}]:.2%" + "}<br>"
 
         elif name == 'Pct10':
             template += "<b>10% Miles Target</b> %{" + f"customdata[{data.columns.get_loc('Pct10')}]:,.2f" + "}<br>"
@@ -54,6 +81,12 @@ def create_template(data, col_names):
 
         elif name == 'Pct10Deficit':
             template += "<b>10% Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct10Deficit')}]:,.2f" + "}<br>"
+
+        elif name == 'Pct25UnincorporatedDeficit':
+            template += "<b>25% Unincorporated Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct25UnincorporatedDeficit')}]:,.2f" + "}<br>"
+
+        elif name == 'Pct10UnincorporatedDeficit':
+            template += "<b>10% Unincorporated Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct10UnincorporatedDeficit')}]:,.2f" + "}<br>"
 
         elif name == 'Pct25Deficit':
             template += "<b>25% Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct25Deficit')}]:,.2f" + "}<br>"
@@ -71,13 +104,13 @@ def create_template(data, col_names):
             template += "<b>Towns Not Cycled:</b> %{" + f"customdata[{data.columns.get_loc('TownsNotCycled')}]" + "}<br>"
 
         elif name == 'PctTownsCycled':
-            template += "<b>Pct Towns Cycled:</b> %{" + f"customdata[{data.columns.get_loc('PctTownsCycled')}]:.2%" + "}"
+            template += "<b>Pct Towns Cycled:</b> %{" + f"customdata[{data.columns.get_loc('PctTownsCycled')}]:.2%" + "}<br>"
 
-        elif name == 'TownsAwarded':
-            template += "<b>Towns Achieved:</b> %{" + f"customdata[{data.columns.get_loc('TownsAwarded')}]" + "}<br>"
+        elif name == 'AchievedTowns':
+            template += "<b>Towns Achieved:</b> %{" + f"customdata[{data.columns.get_loc('AchievedTowns')}]" + "}<br>"
 
-        elif name == 'PctTownsAwarded':
-            template += "<b>Pct Towns Achieved:</b> %{" + f"customdata[{data.columns.get_loc('PctTownsAwarded')}" + "]:.2%}"
+        elif name == 'PctTownsAchieved':
+            template += "<b>Pct Towns Achieved:</b> %{" + f"customdata[{data.columns.get_loc('PctTownsAchieved')}" + "]:.2%}<br>"
 
         else:
             print(f'Column {name} not found')
@@ -130,6 +163,46 @@ def calculate_mapbox_zoom_center(bounds) -> (float, dict):
 
     return zoom, center
 
+def calculate_mapbox_zoom_center_from_diagonal(diagonal) -> (float, dict):
+    """calc zoom and center for plotly mapbox functions
+
+    Temporary solution awaiting official implementation, see:
+    https://github.com/plotly/plotly.js/issues/3434
+    """
+
+    diagonal_json = json.loads(diagonal)
+    point1 = diagonal_json['coordinates'][0]
+    point2 = diagonal_json['coordinates'][1]
+    x1, y1 = point1
+    x2, y2 = point2
+    x_center = (x1 + x2) / 2
+    y_center = (y1 + y2) / 2
+    center = dict(lat=y_center, lon=x_center)
+
+    min_lon = min(x1, x2)
+    max_lon = max(x1, x2)
+    min_lat = min(y1, y2)
+    max_lat = max(y1, y2)
+
+    # zoom = 10
+    y_range = distance.geodesic((min_lat, min_lon), (max_lat, min_lon)).kilometers
+    x_range = distance.geodesic((min_lat, min_lon), (min_lat, max_lon)).kilometers
+    #
+    # # does this work across the international date line?
+    # center = dict(lat=(min_lat + max_lat) / 2, lon=(min_lon + max_lon) / 2)
+    #
+    # figure out zoom
+    bound_by_y = y_range > x_range
+    if bound_by_y:
+        # in mercator the world's height is ~20,000 km
+        zoom = np.log2(20_000 / y_range)
+    else:
+        # in mercator the world's "width" is ~40,000km at the equator but shrinks as you near the poles
+        circumference_at_latitude = 40_000 * np.cos(np.abs(center['lat']) * np.pi / 180)
+        zoom = np.log2(circumference_at_latitude / x_range)
+
+    return zoom, center
+
 def create_county_map(source_osm_df, state):
     renamed_gdf = {}
     counties_gdf = {}
@@ -149,15 +222,40 @@ def create_county_map(source_osm_df, state):
     wandrerer_df = get_wandrer_totals_for_counties_for_states(state_list)
     data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
 
+    # unincorporated_df = get_wandrer_unincorporated_totals_for_counties_for_states(state_list)
+    unincorporated_df = get_wandrer_unincorporated_aggregates_for_counties_for_states(state_list)
+    unincorporated_df['County'] = unincorporated_df['County'].str.replace(' County', '')
+
+    # wandrerer_and_uninc_df = wandrerer_df.merge(unincorporated_df, on=['Region', 'Country', 'State', 'County'])
+
     # print(wandrerer_df)
-    merged_df = county_gdf.merge(wandrerer_df, on=['State','County'])
+    merged_df = county_gdf.merge(unincorporated_df, on=['State','County'])
     merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
     final_df = merged_df.drop(['County'], axis=1, errors='ignore')
     final_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
     location_json = json.loads(merged_df.to_json())
     merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
-    template = create_template(merged_df, ['County', 'TotalTowns', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
-    z_max = float(merged_df[data_value].max()) if float(merged_df[data_value].max()) > 0 else float(merged_df['TotalMiles'].max())
+    # template = create_template(merged_df, ['County', 'TotalTowns', 'TotalCountyMiles', 'TotalTownMiles', 'CountyUnincorporatedMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    template_fields = ['County', 'TotalTowns', 'CycledTowns', 'PctTownsCycled', 'AchievedTowns', 'PctTownsAchieved',
+                            'TotalTownMiles', 'ActualMiles', 'ActualPct']
+
+    # if any(merged_df['UnincorporatedMiles'] > 0):
+    #     template_fields.extend(['TotalCountyMiles', 'TotalCountyMilesCycled', 'PctCountyMilesCycled'])
+
+    # template_fields.extend(['TotalTowns', 'CycledTowns', 'PctTownsCycled', 'AchievedTowns', 'PctTownsAchieved',
+    #                         'TotalTownMiles', 'ActualMiles', 'ActualPct'])
+
+    if any(merged_df['UnincorporatedMiles'] > 0):
+        template_fields.extend(['TotalCountyMiles', 'TotalCountyMilesCycled', 'PctCountyMilesCycled',
+                'UnincorporatedMiles', 'UnincorporatedMilesCycled', 'PctUnincorporatedMilesCycled'])
+
+    template = create_template(merged_df, template_fields)
+
+    if data_value == 'TotalMiles':
+        data_value = 'TotalTownMiles'
+
+    z_max = float(merged_df[data_value].max()) if float(merged_df[data_value].max()) > 0 else float(merged_df[data_value].max())
+    z_data_value = 'TotalCountyMilesCycled' if data_value.startswith('ActualMiles') else 'TotalCountyMiles'
 
     st.session_state['map_gdf'] = merged_df
     fig = go.Figure(go.Choroplethmapbox(
@@ -165,10 +263,10 @@ def create_county_map(source_osm_df, state):
         geojson=location_json,
         featureidkey='properties.County',
         locations=merged_df['County'],
-        z=merged_df[data_value],
-        colorscale=max_50_pct_color_scale,
+        z=merged_df[z_data_value],
         zmin=0,
         zmax=z_max,
+        colorscale=max_50_pct_color_scale,
         hovertemplate=template,
         # hoverlabel_bgcolor='white',
         hoverlabel=dict(
@@ -176,7 +274,7 @@ def create_county_map(source_osm_df, state):
             font_size=16),
         marker_opacity=0.5,
         visible=True,
-        colorbar_title=data_value
+        colorbar_title=z_data_value
     ))
 
     fig.update_layout(mapbox_layers=[dict(sourcetype='geojson',
@@ -203,6 +301,162 @@ def create_town_map(town_gdf, state):
     state_gdf.reset_index(inplace=True)
     data_value = ss['selected_datavalue_for_map']
 
+    dissolved_town_gdf = town_gdf.dissolve('Town')
+    dissolved_town_gdf.reset_index(inplace=True)
+
+    state_list = []
+    state_list.append(state)
+    wandrerer_county_df = get_wandrer_totals_for_counties_for_states(state_list)
+    data_value, wandrerer_county_df = filter_wandrerer_df(wandrerer_county_df)
+    merged_county_df = county_gdf.merge(wandrerer_county_df, on=['State','County'])
+    merged_county_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+    county_location_json = json.loads(merged_county_df.to_json())
+    merged_county_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+    merged_county_df['always_zero'] = 0
+    template_fields = ['County', 'TotalTownMiles', 'ActualMiles', 'ActualPct']
+    if any(merged_county_df['UnincorporatedMiles'] > 0):
+        template_fields.extend(['UnincorporatedMiles', 'UnincorporatedMilesCycled', 'PctUnincorporatedMilesCycled'])
+        if data_value == 'Pct10Deficit':
+            template_fields.extend(['Pct10Unincorporated', 'Pct10UnincorporatedDeficit'])
+
+        if data_value == 'Pct25Deficit':
+            template_fields.extend(['Pct25Unincorporated', 'Pct25UnincorporatedDeficit'])
+
+    county_template = create_template(merged_county_df, template_fields)
+
+    # else:
+    #     county_template = create_template(merged_county_df, ['County', 'TotalTownMiles', 'ActualMiles', 'ActualPct'])
+    # if any(merged_county_df['UnincorporatedMiles'] > 0):
+    #     unincorporated_fields = ['County', 'UnincorporatedMiles', 'PctUnincorporatedMilesCycled',
+    #    'UnincorporatedMilesCycled']
+    #     if data_value == 'Pct10Deficit':
+    #         unincorporated_fields.extend(['Pct10Unincorporated', 'Pct10UnincorporatedDeficit'])
+    #
+    #     if data_value == 'Pct25Deficit':
+    #         unincorporated_fields.extend(['Pct25Unincorporated', 'Pct25UnincorporatedDeficit'])
+    #
+    #     county_template = create_template(merged_county_df, unincorporated_fields)
+    #
+    # else:
+    #     county_template = create_template(merged_county_df, ['County', 'TotalTownMiles', 'ActualMiles', 'ActualPct'])
+
+    wandrerer_df = get_wandrer_totals_for_towns_for_state(state_list)
+    data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
+
+    # json_diffs = town_gdf[~town_gdf['Town'].isin(wandrerer_df['Town'])]
+    json_diffs = wandrerer_df[~wandrerer_df['Town'].isin(town_gdf['Town'])]
+    if len(json_diffs) > 0:
+        json_diffs['DataSource'] = 'json'
+        json_diffs_no_dupes = json_diffs.drop_duplicates()
+        selected_columns = ['DataSource', 'County', 'Town']
+        json_diffs_no_dupes[selected_columns].to_csv(f'{state}-json-Missing-Town.csv', index=False)
+
+    # town_merged_df = town_gdf.merge(wandrerer_df, on=['State','County','Town','long_name'])
+    # town_merged_df = dissolved_town_gdf.merge(wandrerer_df, on=['State','County','Town','long_name'])
+    town_merged_df = dissolved_town_gdf.merge(wandrerer_df, on=['State','County','long_name'])
+    rename_column_case_insensitive(town_merged_df, 'Town_x', 'Town')
+
+    # unincorporated_df = wandrerer_df[wandrerer_df['Town'] == 'Unincorporated']
+    unincorporated_df = wandrerer_df[wandrerer_df['Town'].str.startswith('Unincorporated')]
+    county_filtered_gdf = county_gdf.copy()
+    county_filtered_gdf.drop(['Town', 'long_name'], axis=1, inplace=True, errors='ignore')
+
+    # town_unincorporated_merged_df = town_merged_df.merge(unincorporated_merged_df, on=['State','County'])
+    unincorporated_merged_df = unincorporated_df.merge(county_filtered_gdf, on=['State','County'])
+    town_unincorporated_appended_df = pd.concat([town_merged_df, unincorporated_merged_df])
+    county_z_max = float(town_merged_df[data_value].max()) if float(town_merged_df[data_value].max()) > 0 else float(town_merged_df['TotalMiles'].max())
+    # if len(unincorporated_merged_df) > 0:
+    #     county_location_json = json.loads(unincorporated_merged_df.to_json())
+    #     unincorporated_merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+    #     unincorporated_merged_df['always_zero'] = 0
+    #     merged_county_df = unincorporated_merged_df
+    #     county_template = create_template(merged_county_df, ['County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+
+    fig = go.Figure()
+    fig.add_trace(
+        go.Choroplethmapbox(
+            customdata=merged_county_df,
+        geojson=county_location_json,
+        featureidkey='properties.County',
+        locations=merged_county_df['County'],
+        z=merged_county_df['always_zero'],
+        # z=1,
+        # colorscale='ylorrd',
+        colorscale=max_50_pct_color_scale,
+        zmin=0,
+        # zmax=z_max,
+        zmax=county_z_max,
+        hovertemplate=county_template,
+        # hoverlabel_bgcolor='white',
+        hoverlabel=dict(
+            bgcolor="black",
+            font_size=16),
+        marker_opacity=0.5,
+        marker_line_width=1.5,
+        visible=True
+        # colorbar_title=data_value
+    ))
+
+    # location_json = json.loads(town_merged_df.to_json())
+    location_json = json.loads(town_unincorporated_appended_df.to_json())
+    zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
+    town_merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+    town_unincorporated_appended_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+    # z_max = float(town_merged_df[data_value].max()) if float(town_merged_df[data_value].max()) > 0 else float(town_merged_df['TotalMiles'].max())
+    z_max = float(town_unincorporated_appended_df[data_value].max()) \
+        if float(town_unincorporated_appended_df[data_value].max()) > 0 \
+        else float(town_unincorporated_appended_df['TotalMiles'].max())
+
+    # st.session_state['map_gdf'] = town_merged_df
+    st.session_state['map_gdf'] = town_unincorporated_appended_df
+
+    # town_template = create_template(town_merged_df, ['Town', 'County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    town_template = create_template(town_unincorporated_appended_df, ['Town', 'County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    fig.add_trace(
+        go.Choroplethmapbox(
+            customdata=town_unincorporated_appended_df,
+            geojson=location_json,
+            featureidkey='properties.Town',
+            locations=town_unincorporated_appended_df['Town'],
+            # locations=town_unincorporated_appended_df['long_name'],
+            # z=filtered_df[z_col_name] * 100,
+            z=town_unincorporated_appended_df[data_value],
+            colorscale=max_50_pct_color_scale,
+            # hovertemplate="County: %{customdata[2]}<br>Actual Pct: %{customdata[4]}<extra></extra>",
+            hovertemplate=town_template,
+            # hoverlabel_bgcolor='white',
+            hoverlabel=dict(
+                bgcolor="black",
+                font_size=16),
+            marker_opacity=0.5,
+            name='Town Data Values',
+            # visible=map_feature_selected == 'Town Boundaries',
+            zmin=0,
+            zmax=z_max))
+
+    fig.update_layout(mapbox_layers=[dict(sourcetype='geojson',
+                                          source=county_location_json,
+                                          color='#303030',
+                                          type='line',
+                                          line=dict(width=1.5)
+                                          # hovertemplate=template
+                                          )]);
+
+    fig.update_layout(mapbox_style="carto-positron",
+                      mapbox_zoom=zoom, mapbox_center=center)
+    fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
+                            , title=dict(text=f'{data_value} for Towns in {state}', x=0.5
+                            , xanchor="center")
+                            )
+
+    return fig
+def create_town_map_old(town_gdf, state):
+    county_gdf = town_gdf.dissolve('County')
+    county_gdf.reset_index(inplace=True)
+    state_gdf = county_gdf.dissolve('State')
+    state_gdf.reset_index(inplace=True)
+    data_value = ss['selected_datavalue_for_map']
+
 
     state_list = []
     state_list.append(state)
@@ -214,27 +468,36 @@ def create_town_map(town_gdf, state):
     merged_county_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
     merged_county_df['always_zero'] = 0
     # county_template = create_template(merged_county_df, ['County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
-    # county_template = create_template(merged_county_df, ['County', 'TotalMiles', 'ActualMiles', 'ActualPct','CycledTowns'])
-    county_template = create_template(merged_county_df, ['County', 'TotalMiles', 'ActualMiles', 'ActualPct'])
+    if any(merged_county_df['UnincorporatedMiles'] > 0):
+        county_template = create_template(merged_county_df, ['County', 'UnincorporatedMiles', 'PctUnincorporatedMilesCycled',
+       'UnincorporatedMilesCycled'])
+    else:
+        county_template = create_template(merged_county_df, ['County', 'TotalMiles', 'ActualMiles', 'ActualPct'])
+
+    # if (merged_county_df['CountyUnincorporatedMiles'] > 0).any():
+    #     county_template = create_template(merged_county_df, ['County', 'CountyUnincorporatedMiles', 'ActualMiles', 'ActualPct'])
+    # else:
+    #     county_template = create_template(merged_county_df, ['County', 'TotalCountyMiles', 'ActualMiles', 'ActualPct'])
     # merged_county_df['TotalMiles'] = 0
 
     # print(wandrerer_df)
     # merged_df = county_gdf.merge(wandrerer_df, on=['State','County'])
     wandrerer_df = get_wandrer_totals_for_towns_for_state(state_list)
     data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
-    # wandrerer_df['lcase_town'] = wandrerer_df['Town'].str.lower() # required for merge with Wandrer data
-    #
-    # wandrer_diffs = wandrerer_df[~wandrerer_df['Town'].isin(town_gdf['Town'])]
-    # wandrer_diffs_no_dupes = wandrer_diffs.drop_duplicates()
-    # # wandrer_diffs_no_dupes_2 = wandrer_diffs.drop_duplicates(subset=['arena_id'])
-    #
+    wandrerer_df['lcase_town'] = wandrerer_df['Town'].str.lower() # required for merge with Wandrer data
+
+    wandrer_diffs = wandrerer_df[~wandrerer_df['Town'].isin(town_gdf['Town'])]
+    wandrer_diffs_no_dupes = wandrer_diffs.drop_duplicates()
+    # wandrer_diffs_no_dupes_2 = wandrer_diffs.drop_duplicates(subset=['arena_id'])
+
     # filter_list = ['State Park', 'Appalachian Trail', 'National Park']
-    # search_str = '|'.join(filter_list)
-    # wandrer_diffs_filtered = wandrer_diffs[~wandrer_diffs['Town'].str.contains(search_str)]
-    # if len(wandrer_diffs_filtered) > 0:
-    #     wandrer_diffs_filtered['DataSource'] = 'Wandrer'
-    #     selected_columns = ['DataSource', 'County', 'Town']
-    #     wandrer_diffs_filtered[selected_columns].to_csv(f'{state}-Wandrer-Missing-Town.csv', index=False)
+    filter_list = ['Appalachian Trail']
+    search_str = '|'.join(filter_list)
+    wandrer_diffs_filtered = wandrer_diffs[~wandrer_diffs['Town'].str.contains(search_str)]
+    if len(wandrer_diffs_filtered) > 0:
+        wandrer_diffs_filtered['DataSource'] = 'Wandrer'
+        selected_columns = ['DataSource', 'County', 'Town']
+        wandrer_diffs_filtered[selected_columns].to_csv(f'{state}-Wandrer-Missing-Town.csv', index=False)
     # #
     # json_diffs = town_gdf[~town_gdf['Town'].isin(wandrerer_df['Town'])]
     # if len(json_diffs) > 0:
@@ -244,6 +507,23 @@ def create_town_map(town_gdf, state):
 
     # print(wandrerer_df)
     town_merged_df = town_gdf.merge(wandrerer_df, on=['State','County','Town','long_name'])
+
+    # wandrerer_df['state_county'] = wandrerer_df['State'].str.replace(' ', '_').str.lower() + '_' + wandrerer_df['County'].str.lower()
+    # unincorporated_df = county_gdf.merge(wandrerer_df, on={'State', 'County'})
+    unincorporated_df = wandrerer_df[wandrerer_df['Town'] == 'Unincorporated']
+    # county_filtered_gdf = county_gdf[county_gdf['state_county'] == 'south_carolina_georgetown']
+    county_filtered_gdf = county_gdf.copy()
+    county_filtered_gdf.drop(['Town', 'long_name'], axis=1, inplace=True, errors='ignore')
+    # county_filtered_gdf.reset_index(inplace=True)
+    # unincorporated_df.reset_index(inplace=True)
+    # unincorporated_merged_df = county_filtered_gdf.merge(unincorporated_df, on=['State','County','Town','long_name'])
+    unincorporated_merged_df = county_filtered_gdf.merge(unincorporated_df, on=['State','County'])
+    if len(unincorporated_merged_df) > 0:
+        county_location_json = json.loads(unincorporated_merged_df.to_json())
+        unincorporated_merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+        unincorporated_merged_df['always_zero'] = 0
+        merged_county_df = unincorporated_merged_df
+        county_template = create_template(merged_county_df, ['County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
 
     location_json = json.loads(town_merged_df.to_json())
     # county_location_json = json.loads(county_gdf.to_json())
@@ -471,6 +751,7 @@ def create_state_map(source_osm_df, state):
     # county_location_json = json.loads(county_gdf.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     state_merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+    # template = create_template(state_merged_df, ['State', 'TotalTowns', 'TotalTownMiles', 'ActualTownMiles', 'ActualTownPct', 'Pct10Deficit', 'Pct25Deficit'])
     template = create_template(state_merged_df, ['State', 'TotalTowns', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     data_value = data_value.replace(' > 1', '')
     z_max = float(state_merged_df[data_value].max()) if float(state_merged_df[data_value].max()) > 0 else float(state_merged_df['TotalMiles'].max())
@@ -635,7 +916,8 @@ def filter_wandrerer_df(wandrerer_df):
     selected_data_value = ss['selected_datavalue_for_map']
     data_value = ''
     if selected_data_value == 'ActualMiles > 1':
-        wandrerer_df = wandrerer_df.loc[wandrerer_df['ActualMiles'] > 1]
+        miles_cycled_column_name = 'ActualMiles' if wandrerer_df.columns.__contains__('ActualMiles') else 'TotalCountyMilesCycled'
+        wandrerer_df = wandrerer_df.loc[wandrerer_df[miles_cycled_column_name] > 1]
         data_value = 'ActualMiles'
     else:
         data_value = selected_data_value
@@ -703,8 +985,8 @@ def get_wandrer_totals_for_states(states):
     return dfs
 
 def get_wandrer_totals_for_state(state):
-    query = f'''select Region, Country, State, sum(TotalTowns) as TotalTowns, sum(TotalMiles) as TotalMiles
-        , sum(ActualMiles) as 'ActualMiles', sum(ActualMiles)/sum(TotalMiles) as 'ActualPct'
+    query = f'''select Region, Country, State, sum(TotalTowns) as TotalTowns, sum(TotalTownMiles) as TotalMiles
+        , sum(ActualMiles) as 'ActualMiles', sum(ActualMiles)/sum(TotalTownMiles) as 'ActualPct'
         , CASE WHEN sum(Pct10Deficit) < 0 THEN 0 ELSE sum(Pct10Deficit) END as 'Pct10Deficit'
         , CASE WHEN sum(Pct25Deficit) < 0 THEN 0 ELSE sum(Pct25Deficit) END as 'Pct25Deficit'
     	from vw_county_aggregates
@@ -717,13 +999,50 @@ def get_wandrer_totals_for_counties_for_states(states):
     states_in_str = states.__str__().replace('[', '(').replace(']', ')')
     query = f'''select Region, Country, State, County as LongCounty
         , REPLACE(County, " County", "") as County, StateArenaId, CountyArenaId
-        , TotalTowns,TotalMiles, ActualPct, ActualMiles, Pct10, Pct25, Pct50, Pct75
+        , TotalTowns, TotalTownMiles, ActualPct, ActualMiles, Pct10, Pct25, Pct50, Pct75
         , CASE WHEN Pct10Deficit < 0 THEN 0 ELSE Pct10Deficit END as Pct10Deficit
         , CASE WHEN Pct25Deficit < 0 THEN 0 ELSE Pct25Deficit END as Pct25Deficit
         , Pct50Deficit, Pct75Deficit, Pct90Deficit
-		from vw_county_aggregates 
+        , UnincorporatedMiles, PctUnincorporatedMilesCycled, UnincorporatedMilesCycled
+        , Pct10Unincorporated, Pct25Unincorporated
+        , CASE WHEN Pct10UnincorporatedDeficit < 0 THEN 0 ELSE Pct10UnincorporatedDeficit END as Pct10UnincorporatedDeficit
+        , CASE WHEN Pct25UnincorporatedDeficit < 0 THEN 0 ELSE Pct25UnincorporatedDeficit END as Pct25UnincorporatedDeficit
+        , TotalCountyMiles, TotalCountyMilesCycled, PctCountyMilesCycled, 'diagonal'
+		from vw_unincorporated_aggregates 
     	where State in {states_in_str}
-    	order by State, County'''
+    	order by region, country, State, County'''
+    # print(query)
+    wandrerer_df = execute_query(query)
+    return wandrerer_df
+
+def get_wandrer_unincorporated_totals_for_counties_for_states(states):
+    states_in_str = states.__str__().replace('[', '(').replace(']', ')')
+    query = f'''select Region, Country, State, County
+	, length as 'UnincorporatedMiles'
+	, percentage as 'PctUnincorporatedMilesCycled'
+	, ActualLength as 'UnincorporatedMilesCycled'
+	from vw_current_town_data
+	where name = 'Unincorporated'
+	and State in {states_in_str}
+	order by region, country, State, County'''
+    # print(query)
+    wandrerer_df = execute_query(query)
+    return wandrerer_df
+
+def get_wandrer_unincorporated_aggregates_for_counties_for_states(states):
+    states_in_str = states.__str__().replace('[', '(').replace(']', ')')
+    query = f'''select Region, Country, State, County as LongCounty
+	, REPLACE(County, " County", "") as County, StateArenaId, CountyArenaId
+	, TotalTowns, CycledTowns, AchievedTowns, TotalTownMiles, PctTownsCycled, PctTownsAchieved
+	, ActualPct, ActualMiles, Pct10, Pct25, Pct50, Pct75
+	, CASE WHEN Pct10Deficit < 0 THEN 0 ELSE Pct10Deficit END as Pct10Deficit
+	, CASE WHEN Pct25Deficit < 0 THEN 0 ELSE Pct25Deficit END as Pct25Deficit
+	, Pct50Deficit, Pct75Deficit, Pct90Deficit
+    , UnincorporatedMiles, PctUnincorporatedMilesCycled, UnincorporatedMilesCycled
+    , TotalCountyMiles, TotalCountyMilesCycled, PctCountyMilesCycled
+	from vw_unincorporated_aggregates
+	where State in {states_in_str}
+	order by region, country, State, County'''
     # print(query)
     wandrerer_df = execute_query(query)
     return wandrerer_df
@@ -747,19 +1066,22 @@ def parameterize_SQL_in_statement(items):
 
 def get_wandrer_totals_for_towns_for_state(states):
     in_statement = parameterize_SQL_in_statement(states)
-    query = f'''select distinct fqtn.Region, fqtn.Country, fqtn.State, fqtn.County as LongCounty
-         , REPLACE(fqtn.County, " County", "") as County, fqtn.Town, fqtn.long_name
-       , round(length, 7) as TotalMiles, round(percentage, 7) as ActualPct, round(ActualLength, 7) as ActualMiles
-	   , round(Pct10, 7) as Pct10, round(Pct25, 7) as Pct25, round(Pct50, 7) as Pct50
-        , round(Pct75, 7) as Pct75, round(Pct90, 7) as Pct90, "awarded"
-        , CASE WHEN Pct10Deficit < 0 THEN 0 ELSE round(Pct10Deficit, 7) END as Pct10Deficit
-        , CASE WHEN Pct25Deficit < 0 THEN 0 ELSE round(Pct25Deficit, 7) END as Pct25Deficit
-        , round(Pct50Deficit, 7) as Pct50Deficit, round(Pct75Deficit, 7) as Pct75Deficit
-        , round(Pct90Deficit, 7) as Pct90Deficit, "geometries_visible", "diagonal", "user_id"
+    query = f'''select distinct fqtn.Region, fqtn.Country, fqtn.State, REPLACE(fqtn.County, ' County', '') as County
+        , CASE WHEN fqtn.name = "Unincorporated" THEN fqtn.name || " " || fqtn.County ELSE fqtn.name END as Town
+		, fqtn.County as LongCounty, fqtn.long_name
+		, round(fqtn.length, 7) as TotalMiles
+		, round(fqtn.percentage, 7) as ActualPct, round(fqtn.ActualLength, 7) as ActualMiles
+		, round(fqtn.Pct10, 7) as Pct10, round(fqtn.Pct25, 7) as Pct25, round(fqtn.Pct50, 7) as Pct50
+        , round(fqtn.Pct75, 7) as Pct75, round(fqtn.Pct90, 7) as Pct90, fqtn.awarded
+        , CASE WHEN fqtn.Pct10Deficit < 0 THEN 0 ELSE round(fqtn.Pct10Deficit, 7) END as Pct10Deficit
+        , CASE WHEN fqtn.Pct25Deficit < 0 THEN 0 ELSE round(fqtn.Pct25Deficit, 7) END as Pct25Deficit
+        , round(fqtn.Pct50Deficit, 7) as Pct50Deficit, round(fqtn.Pct75Deficit, 7) as Pct75Deficit
+        , round(fqtn.Pct90Deficit, 7) as Pct90Deficit
+		, fqtn.geometries_visible, fqtn.diagonal, fqtn.user_id
         from arena_badge town
-        inner join fq_town_name fqtn on fqtn.arena_id = town.id
+		inner join vw_current_town_data fqtn on fqtn.id = town.id 
         where fqtn.state in {in_statement}
-        order by fqtn.region, fqtn.country, fqtn.state, fqtn.county, fqtn.town'''
+        order by fqtn.region, fqtn.country, fqtn.state, fqtn.county, fqtn.name'''
     # print(query)
     wandrerer_df = execute_query(query)
     return wandrerer_df
@@ -1024,6 +1346,59 @@ def get_wandrer_data_for_county_merge(state):
         wandrer_df['County'] = wandrer_df['long_county'].str.replace(' County', '')
     return wandrer_df
 
+def center_point_diagonal(diagonal):
+    """
+    Calculates the center point of a line segment defined by two points.
+
+    Args:
+        point1: A tuple representing the coordinates of the first point (x1, y1).
+        point2: A tuple representing the coordinates of the second point (x2, y2).
+
+    Returns:
+        A tuple representing the coordinates of the center point (x_center, y_center).
+    """
+    diagonal_json = json.loads(diagonal)
+    point1 = diagonal_json['coordinates'][0]
+    point2 = diagonal_json['coordinates'][1]
+    x1, y1 = point1
+    x2, y2 = point2
+    x_center = (x1 + x2) / 2
+    y_center = (y1 + y2) / 2
+    return (x_center, y_center)
+
+
+def town_selected():
+    # st.plotly_chart(st.session_state.current_fig, config=config)
+    fig = st.session_state.current_fig
+    if len(st.session_state.map_data['selection']['rows']) == 0:
+        st.plotly_chart(fig)
+        st.dataframe(st.session_state['map_gdf'], use_container_width=True, selection_mode='single-row'
+                     , key='map_data', on_select=town_selected)
+        return
+
+    diagonal = st.session_state['map_gdf'].iloc[st.session_state.map_data['selection']['rows'][0]]['diagonal']
+    # x_center, y_center = center_point_diagonal(diagonal)
+    zoom, center = calculate_mapbox_zoom_center_from_diagonal(diagonal)
+    st.write(f'{diagonal=}')
+    st.write(f'{zoom=}')
+    st.write(f'{center=}')
+    # center = dict(lat=(min_lat + max_lat) / 2, lon=(min_lon + max_lon) / 2)
+    fig.update_layout(mapbox_style="carto-positron",
+                      mapbox_zoom=zoom, mapbox_center=center)
+
+    # fig.update_layout(mapbox_style="carto-positron",
+    #                   mapbox_zoom=zoom, mapbox_center=center,
+    #                   config={'mapbox_scrollZoom':True})
+
+    fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1})
+    # fig.conf = dict(scrollZoom=True)
+
+    st.plotly_chart(fig)
+    st.dataframe(st.session_state['map_gdf'], use_container_width=True, selection_mode='single-row'
+                 , key='map_data', on_select=town_selected)
+    town = st.session_state['map_gdf'].iloc[st.session_state.map_data['selection']['rows'][0]]['Town']
+    st.write(f'{town=}')
+    # st.write(st.session_state.map_data)
 
 # ss
 
@@ -1036,6 +1411,9 @@ data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles > 1', 'ActualPct', 'Pct
 if 'gdfs' not in st.session_state:
     # Initialize geopandas df dictionary in session state.
     st.session_state.gdfs = {}
+
+if 'current_fig' not in st.session_state:
+    st.session_state.current_fig = {}
 
 with st.sidebar:
     region_selectbox = st.selectbox('Select a region:', region_list, key='selected_region', index=None, on_change=region_selected())
@@ -1070,10 +1448,12 @@ if make_map:
 
     if fig:
         config = {"scrollZoom": True}
+        st.session_state.current_fig = fig
         st.plotly_chart(fig, config=config)
         st.write('Raw Data')
         # st.dataframe(osm_gdf, use_container_width=True)
-        st.dataframe(st.session_state['map_gdf'], use_container_width=True)
+        st.dataframe(st.session_state['map_gdf'], use_container_width=True, selection_mode='single-row'
+                     ,key='map_data', on_select=town_selected)
     else:
         st.write(f'{maptype_selectbox} map unavailable for {state_selectbox}')
 
