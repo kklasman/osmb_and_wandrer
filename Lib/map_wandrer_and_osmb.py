@@ -809,7 +809,8 @@ def create_region_map(source_osm_df, region):
     renamed_gdf = {}
     county_gdf = {}
     # source_osm_df['State'] = state
-    data_value = ss['selected_datavalue_for_map']
+    data_value_raw = ss['selected_datavalue_for_map']
+    data_value = data_value_raw.removesuffix(' > 1')
     state_gdf = source_osm_df.dissolve(by='State')
     state_gdf.reset_index(inplace=True)
 
@@ -871,7 +872,7 @@ def create_region_by_county_map(source_osm_df, region):
     # merged_df.drop(['tags', 'geometry','Town','County'], axis=1, inplace=True, errors='ignore')
     merged_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
     # merged_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
-    template = create_template(merged_df, ['State', 'County', 'TotalTowns', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    template = create_template(merged_df, ['State', 'County', 'TotalTowns', 'TotalTownMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     z_max = float(merged_df[data_value].max()) if float(merged_df[data_value].max()) > 0 else float(merged_df['TotalMiles'].max())
     z_min =  1000 if data_value == 'TotalMiles' else 0
 
