@@ -11,6 +11,7 @@ import streamlit as st
 from streamlit import session_state as ss
 from geopy import distance
 import numpy as np
+from shapely.geometry import LineString
 
 st.set_page_config(layout='wide')
 
@@ -203,6 +204,27 @@ def calculate_mapbox_zoom_center_from_diagonal(diagonal) -> (float, dict):
 
     return zoom, center
 
+def bounds_to_linestrings(gdf):
+    """
+    Converts the bounds of each geometry in a GeoDataFrame to a LineString.
+
+    Args:
+        gdf: A GeoDataFrame.
+
+    Returns:
+        A GeoDataFrame with LineString geometries representing the bounds.
+    """
+
+    lines = []
+    for index, row in gdf.iterrows():
+        minx, miny, maxx, maxy = row.geometry.bounds
+        # line = LineString([(minx, miny), (maxx, miny), (maxx, maxy), (minx, maxy), (minx, miny)])
+        line = LineString([(maxx, miny), (minx, maxy)])
+        lines.append(line)
+
+    return gpd.GeoDataFrame(geometry=lines, crs=gdf.crs)
+
+
 def create_county_map(source_osm_df, state):
     renamed_gdf = {}
     counties_gdf = {}
@@ -211,6 +233,8 @@ def create_county_map(source_osm_df, state):
     county_gdf = source_osm_df.dissolve(by='County')
     county_gdf.reset_index(inplace=True)
     county_gdf['County'] = county_gdf['County'].str.title()
+
+    convert_bounds_to_linestrings(county_gdf)
 
     state_gdf = source_osm_df.dissolve(by='State')
     state_boundary_json = json.loads(state_gdf.to_json())
@@ -292,6 +316,21 @@ def create_county_map(source_osm_df, state):
                             )
     fig.update_geos(fitbounds="geojson", visible=True)
     return fig
+
+
+def convert_bounds_to_linestrings(source_gdf):
+    # Convert bounds to LineStrings
+    line_gdf = bounds_to_linestrings(source_gdf)
+    # data = line_gdf.to_json()
+    data = json.loads(line_gdf.to_json())
+    # create empty new column
+    source_gdf['diagonal'] = ''
+    for index, item in enumerate(data['features']):
+        # print(f"Index: {index}, geometry: {item['geometry']}")
+        s = str(item['geometry']).replace("\'", "\"")
+        source_gdf.at[index, 'diagonal'] = str(s)
+    # for item in data['features']:
+    #     print(item['geometry'])
 
 
 def create_town_map(town_gdf, state):
@@ -674,8 +713,10 @@ def create_region_by_town_map(source_osm_df, region):
         town_merged_df.rename(columns={'County_x': 'County'}, inplace=True)
     if column_exists_case_insensitive(town_merged_df, 'State_x'):
         town_merged_df.rename(columns={'State_x': 'State'}, inplace=True)
+    if column_exists_case_insensitive(town_merged_df, 'diagonal_x'):
+        town_merged_df.rename(columns={'diagonal_x': 'diagonal'}, inplace=True)
 
-    town_merged_df.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng', 'Town_y'
+    town_merged_df.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng', 'Town_y', 'diagonal_y'
                             ,'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'], axis=1, inplace=True, errors='ignore')
 
     county_gdf.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng'
@@ -802,6 +843,8 @@ def create_county_gdf(source_osm_df):
     #     outfile = f'{state}_location.json'
     #     gdf.to_file(outfile, driver="GeoJSON")
 
+    convert_bounds_to_linestrings(county_gdf)
+
     county_gdf['County'] = county_gdf['County'].str.title() # required for merge with Wandrer data
     return county_gdf
 
@@ -813,6 +856,7 @@ def create_region_map(source_osm_df, region):
     data_value = data_value_raw.removesuffix(' > 1')
     state_gdf = source_osm_df.dissolve(by='State')
     state_gdf.reset_index(inplace=True)
+    convert_bounds_to_linestrings(state_gdf)
 
     wandrerer_df = get_wandrer_totals_for_states(state_gdf.State.to_list())
     state_merged_df = state_gdf.merge(wandrerer_df, on='State')
@@ -1174,6 +1218,7 @@ def get_geopandas_df_for_state(selected_state):
         print(f'Creating geopandas df for {selected_state}')
         file_path = get_geojson_filename(selected_state)
         gdf = gpd.read_file(f'{file_path}')
+        convert_bounds_to_linestrings(gdf)
         st.session_state.gdfs[selected_state] = gdf
         if not column_exists_case_insensitive(gdf, 'normalized'):
             county_gdf, gdf = normalize_geojson(selected_state, gdf)
@@ -1397,8 +1442,8 @@ def town_selected():
     st.plotly_chart(fig)
     st.dataframe(st.session_state['map_gdf'], use_container_width=True, selection_mode='single-row'
                  , key='map_data', on_select=town_selected)
-    town = st.session_state['map_gdf'].iloc[st.session_state.map_data['selection']['rows'][0]]['Town']
-    st.write(f'{town=}')
+    # town = st.session_state['map_gdf'].iloc[st.session_state.map_data['selection']['rows'][0]]['Town']
+    # st.write(f'{town=}')
     # st.write(st.session_state.map_data)
 
 # ss
