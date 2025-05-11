@@ -346,7 +346,8 @@ def create_town_map(town_gdf, state):
     state_list = []
     state_list.append(state)
     wandrerer_county_df = get_wandrer_totals_for_counties_for_states(state_list)
-    data_value, wandrerer_county_df = filter_wandrerer_df(wandrerer_county_df)
+    if data_value == 'ActualMiles > 1':
+        data_value =  'ActualMiles'
     merged_county_df = county_gdf.merge(wandrerer_county_df, on=['State','County'])
     merged_county_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
     county_location_json = json.loads(merged_county_df.to_json())
