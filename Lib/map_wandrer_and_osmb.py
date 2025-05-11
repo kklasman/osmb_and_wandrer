@@ -917,6 +917,9 @@ def create_region_by_county_map(source_osm_df, region):
     merged_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
     # merged_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
     template = create_template(merged_df, ['State', 'County', 'TotalTowns', 'TotalTownMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    if data_value == 'TotalMiles':
+        data_value = 'TotalCountyMiles'
+
     z_max = float(merged_df[data_value].max()) if float(merged_df[data_value].max()) > 0 else float(merged_df['TotalMiles'].max())
     z_min =  1000 if data_value == 'TotalMiles' else 0
 
@@ -985,38 +988,40 @@ def get_unneeded_column_names():
 
 
 def get_geojson_filenames():
-    if 'geojson_files_dict' not in st.session_state:
-        print("Getting geojson filenames from db.")
-        query = f'''select State, geojson_filename from vw_state_geo_data
-        where geojson_filename is not NULL
-        order by State'''
-        # print(query)
-        df = execute_query(query)
-        result = df.set_index('State')['geojson_filename'].to_dict()
-        st.session_state.geojson_files_dict = result
-        return result
-    else:
-        print("Getting geojson filenames from session_state.")
-        return st.session_state.geojson_files_dict
+    filter = ''
+    if st.session_state.selected_region != 'All':
+        filter = f'''and subregion_name = "{st.session_state.selected_region}"'''
 
-def get_geojson_filenames_for_region(selected_region):
-    if 'geojson_files_dict' not in st.session_state:
-        print("Getting geojson filenames from db.")
-        query = f'''select sm.subregion_name, st.arena_name as State, agd.geojson_filename 
-            from subregion_mapping sm
-            inner join arena st on st.arena_id = sm.child_arena_id
-            inner join arena_geo_data agd on agd.arena_id = st.arena_id
-            where agd.geojson_filename is not null
-            and sm.subregion_name = {selected_region}
-            order by State'''
-        # print(query)
-        df = execute_query(query)
-        result = df.set_index('State')['geojson_filename'].to_dict()
-        st.session_state.geojson_files_dict = result
-        return result
-    else:
-        print("Getting geojson filenames from session_state.")
-        return st.session_state.geojson_files_dict
+    query = f'''select State, geojson_filename from vw_state_geo_data
+    where geojson_filename is not NULL
+    {filter}
+    order by State'''
+    # print(query)
+    df = execute_query(query)
+    result = df.set_index('State')['geojson_filename'].to_dict()
+    st.session_state.geojson_files_dict = result
+    return result
+
+def get_geojson_filenames_for_region():
+    # if 'geojson_files_dict' not in st.session_state:
+    filter = ''
+    if st.session_state.selected_region != 'All':
+        filter = f'''and subregion_name = "{st.session_state.selected_region}"'''
+
+    print("Getting geojson filenames from db.")
+    query = f'''select sm.subregion_name, st.arena_name as State, agd.geojson_filename 
+        from subregion_mapping sm
+        inner join arena st on st.arena_id = sm.child_arena_id
+        inner join arena_geo_data agd on agd.arena_id = st.arena_id
+        where agd.geojson_filename is not null
+        {filter}
+        order by State'''
+
+    #print(query)
+    df = execute_query(query)
+    result =  df.set_index('State')['geojson_filename'].to_dict()
+    st.session_state.geojson_files_dict = result
+    return result
 
 def get_wandrer_totals_for_states(states):
     dfs = pd.DataFrame()
@@ -1141,7 +1146,7 @@ def get_fq_town_name_for_state(state):
     return wandrerer_df
 
 
-def get_wandrer_subregions():
+def get_wandrer_regions():
     query = f'''select sm.subregion_name, st.arena_name as State, agd.geojson_filename 
 	from subregion_mapping sm
 	inner join arena st on st.arena_id = sm.child_arena_id
@@ -1235,8 +1240,7 @@ def get_geopandas_df_for_region(selected_region):
         # file_paths = wandrer_regions.geojson_filename.to_list()
         gdfs = gpd.GeoDataFrame()
         county_gdfs = gpd.GeoDataFrame()
-        for index, row in wandrer_regions.iterrows():
-            state = row.State
+        for state in st.session_state.geojson_files_dict.keys():
             gdf = get_geopandas_df_for_state(state)
             if not column_exists_case_insensitive(gdf, 'normalized'):
                 county_gdf, gdf = normalize_geojson(state, gdf)
@@ -1448,10 +1452,23 @@ def town_selected():
 
 # ss
 
+if 'gdfs' not in st.session_state:
+    # Initialize geopandas df dictionary in session state.
+    st.session_state.gdfs = {}
+
+if 'current_fig' not in st.session_state:
+    st.session_state.current_fig = {}
+
 options = ['State', 'Counties', 'Towns']
-geojson_files = get_geojson_filenames()
-wandrer_regions = get_wandrer_subregions()
-region_list = ['All'] + (wandrer_regions.subregion_name.unique().tolist())
+
+if 'selected_region' not in st.session_state:
+    st.session_state.selected_region = 'All'
+
+if 'wandrer_regions' not in st.session_state:
+    st.session_state.wandrer_regions = get_wandrer_regions()
+
+region_list = ['All'] + (st.session_state.wandrer_regions.subregion_name.unique().tolist())
+geojson_files = get_geojson_filenames_for_region()
 data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles > 1', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit']
 
 if 'gdfs' not in st.session_state:
@@ -1461,9 +1478,12 @@ if 'gdfs' not in st.session_state:
 if 'current_fig' not in st.session_state:
     st.session_state.current_fig = {}
 
+if 'selected_region' not in st.session_state:
+    st.session_state.selected_region = 'All'
+
 with st.sidebar:
-    region_selectbox = st.selectbox('Select a region:', region_list, key='selected_region', index=None, on_change=region_selected())
-    state_selectbox = st.selectbox('Select a location (US State):', geojson_files.keys(), key='selected_state', index=None)
+    region_selectbox = st.selectbox('Select a region:', region_list, key='selected_region', index=0, on_change=region_selected())
+    state_selectbox = st.selectbox('Select a location (US State):', get_geojson_filenames_for_region().keys(), key='selected_state', index=None)
     # preserve_map_selection = st.checkbox('Clear map type selection on state change', key='preserve_map_selection')
     maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
     datavalue_selectbox = st.selectbox('Select a data value', data_values, key='selected_datavalue_for_map', index=None, on_change=enable_make_map())
@@ -1473,16 +1493,7 @@ if make_map:
     osm_gdf = {}
     fig = {}
 
-    if region_selectbox:
-        osm_state_gdf, osm_county_gdf = get_geopandas_df_for_region(region_selectbox)
-        match maptype_selectbox:
-            case 'State':
-                fig = create_region_map(osm_state_gdf.copy(), region_selectbox)
-            case 'Counties':
-                fig = create_region_by_county_map(osm_county_gdf.copy(), region_selectbox)
-            case 'Towns':
-                fig = create_region_by_town_map(osm_state_gdf.copy(), region_selectbox)
-    else:
+    if state_selectbox:
         osm_gdf = get_geopandas_df_for_state(state_selectbox)
         match maptype_selectbox:
             case 'State':
@@ -1491,6 +1502,15 @@ if make_map:
                 fig = create_county_map(osm_gdf.copy(), state_selectbox)
             case 'Towns':
                 fig = create_town_map(osm_gdf.copy(), state_selectbox)
+    else:
+        osm_state_gdf, osm_county_gdf = get_geopandas_df_for_region(region_selectbox)
+        match maptype_selectbox:
+            case 'State':
+                fig = create_region_map(osm_state_gdf.copy(), region_selectbox)
+            case 'Counties':
+                fig = create_region_by_county_map(osm_county_gdf.copy(), region_selectbox)
+            case 'Towns':
+                fig = create_region_by_town_map(osm_state_gdf.copy(), region_selectbox)
 
     if fig:
         config = {"scrollZoom": True}
