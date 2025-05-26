@@ -334,8 +334,10 @@ def convert_bounds_to_linestrings(source_gdf):
 
 
 def create_town_map(town_gdf, state):
-    county_gdf = town_gdf.dissolve('County')
+    county_gdf = town_gdf.dissolve(by='County')
     county_gdf.reset_index(inplace=True)
+    county_gdf.drop('diagonal', axis=1, inplace=True, errors='ignore')
+    convert_bounds_to_linestrings(county_gdf)
     state_gdf = county_gdf.dissolve('State')
     state_gdf.reset_index(inplace=True)
     data_value = ss['selected_datavalue_for_map']
@@ -395,6 +397,7 @@ def create_town_map(town_gdf, state):
     # town_merged_df = dissolved_town_gdf.merge(wandrerer_df, on=['State','County','Town','long_name'])
     town_merged_df = dissolved_town_gdf.merge(wandrerer_df, on=['State','County','long_name'])
     rename_column_case_insensitive(town_merged_df, 'Town_x', 'Town')
+    rename_column_case_insensitive(town_merged_df, 'diagonal_x', 'diagonal')
 
     # unincorporated_df = wandrerer_df[wandrerer_df['Town'] == 'Unincorporated']
     unincorporated_df = wandrerer_df[wandrerer_df['Town'].str.startswith('Unincorporated')]
@@ -403,6 +406,9 @@ def create_town_map(town_gdf, state):
 
     # town_unincorporated_merged_df = town_merged_df.merge(unincorporated_merged_df, on=['State','County'])
     unincorporated_merged_df = unincorporated_df.merge(county_filtered_gdf, on=['State','County'])
+    unincorporated_merged_df.drop(['diagonal_x'], axis=1, inplace=True, errors='ignore')
+    rename_column_case_insensitive(unincorporated_merged_df, 'diagonal_y', 'diagonal')
+
     town_unincorporated_appended_df = pd.concat([town_merged_df, unincorporated_merged_df])
     county_z_max = float(town_merged_df[data_value].max()) if float(town_merged_df[data_value].max()) > 0 else float(town_merged_df['TotalMiles'].max())
     # if len(unincorporated_merged_df) > 0:
@@ -962,11 +968,12 @@ def create_region_by_county_map(source_osm_df, region):
 
 
 def filter_wandrerer_df(wandrerer_df):
+    threshold = 1
     selected_data_value = ss['selected_datavalue_for_map']
     data_value = ''
     if selected_data_value == 'ActualMiles > 1':
         miles_cycled_column_name = 'ActualMiles' if wandrerer_df.columns.__contains__('ActualMiles') else 'TotalCountyMilesCycled'
-        wandrerer_df = wandrerer_df.loc[wandrerer_df[miles_cycled_column_name] > 1]
+        wandrerer_df = wandrerer_df.loc[wandrerer_df[miles_cycled_column_name] > threshold]
         data_value = 'ActualMiles'
     else:
         data_value = selected_data_value
