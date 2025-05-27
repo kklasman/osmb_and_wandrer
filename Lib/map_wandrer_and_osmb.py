@@ -260,18 +260,7 @@ def create_county_map(source_osm_df, state):
     location_json = json.loads(merged_df.to_json())
     merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
     # template = create_template(merged_df, ['County', 'TotalTowns', 'TotalCountyMiles', 'TotalTownMiles', 'CountyUnincorporatedMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
-    template_fields = ['County', 'TotalTowns', 'CycledTowns', 'PctTownsCycled', 'AchievedTowns', 'PctTownsAchieved',
-                            'TotalTownMiles', 'ActualMiles', 'ActualPct']
-
-    # if any(merged_df['UnincorporatedMiles'] > 0):
-    #     template_fields.extend(['TotalCountyMiles', 'TotalCountyMilesCycled', 'PctCountyMilesCycled'])
-
-    # template_fields.extend(['TotalTowns', 'CycledTowns', 'PctTownsCycled', 'AchievedTowns', 'PctTownsAchieved',
-    #                         'TotalTownMiles', 'ActualMiles', 'ActualPct'])
-
-    if any(merged_df['UnincorporatedMiles'] > 0):
-        template_fields.extend(['TotalCountyMiles', 'TotalCountyMilesCycled', 'PctCountyMilesCycled',
-                'UnincorporatedMiles', 'UnincorporatedMilesCycled', 'PctUnincorporatedMilesCycled'])
+    template_fields = get_template_field_list_for_county_scope_map(merged_df)
 
     template = create_template(merged_df, template_fields)
 
@@ -316,6 +305,19 @@ def create_county_map(source_osm_df, state):
                             )
     fig.update_geos(fitbounds="geojson", visible=True)
     return fig
+
+
+def get_template_field_list_for_county_scope_map(merged_df):
+    template_fields = ['County', 'TotalTowns', 'CycledTowns', 'PctTownsCycled', 'AchievedTowns', 'PctTownsAchieved',
+                       'TotalTownMiles', 'ActualMiles', 'ActualPct']
+    # if any(merged_df['UnincorporatedMiles'] > 0):
+    #     template_fields.extend(['TotalCountyMiles', 'TotalCountyMilesCycled', 'PctCountyMilesCycled'])
+    # template_fields.extend(['TotalTowns', 'CycledTowns', 'PctTownsCycled', 'AchievedTowns', 'PctTownsAchieved',
+    #                         'TotalTownMiles', 'ActualMiles', 'ActualPct'])
+    if any(merged_df['UnincorporatedMiles'] > 0):
+        template_fields.extend(['TotalCountyMiles', 'TotalCountyMilesCycled', 'PctCountyMilesCycled',
+                                'UnincorporatedMiles', 'UnincorporatedMilesCycled', 'PctUnincorporatedMilesCycled'])
+    return template_fields
 
 
 def convert_bounds_to_linestrings(source_gdf):
@@ -923,7 +925,10 @@ def create_region_by_county_map(source_osm_df, region):
     # merged_df.drop(['tags', 'geometry','Town','County'], axis=1, inplace=True, errors='ignore')
     merged_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
     # merged_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
-    template = create_template(merged_df, ['State', 'County', 'TotalTowns', 'TotalTownMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    template_fields = get_template_field_list_for_county_scope_map(merged_df)
+
+    template = create_template(merged_df, template_fields)
+    # template = create_template(merged_df, ['State', 'County', 'TotalTowns', 'TotalTownMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     if data_value == 'TotalMiles':
         data_value = 'TotalCountyMiles'
 
@@ -972,7 +977,7 @@ def filter_wandrerer_df(wandrerer_df):
     selected_data_value = ss['selected_datavalue_for_map']
     data_value = ''
     if selected_data_value == 'ActualMiles > 1':
-        miles_cycled_column_name = 'ActualMiles' if wandrerer_df.columns.__contains__('ActualMiles') else 'TotalCountyMilesCycled'
+        miles_cycled_column_name = 'TotalCountyMilesCycled' if wandrerer_df.columns.__contains__('TotalCountyMilesCycled') else 'ActualMiles'
         wandrerer_df = wandrerer_df.loc[wandrerer_df[miles_cycled_column_name] > threshold]
         data_value = 'ActualMiles'
     else:
@@ -1057,7 +1062,8 @@ def get_wandrer_totals_for_counties_for_states(states):
     states_in_str = states.__str__().replace('[', '(').replace(']', ')')
     query = f'''select Region, Country, State, County as LongCounty
         , REPLACE(County, " County", "") as County, StateArenaId, CountyArenaId
-        , TotalTowns, TotalTownMiles, ActualPct, ActualMiles, Pct10, Pct25, Pct50, Pct75
+        , TotalTowns, CycledTowns, PctTownsCycled, TotalTownMiles, ActualPct, ActualMiles, AchievedTowns
+        , PctTownsAchieved, Pct10, Pct25, Pct50, Pct75
         , CASE WHEN Pct10Deficit < 0 THEN 0 ELSE Pct10Deficit END as Pct10Deficit
         , CASE WHEN Pct25Deficit < 0 THEN 0 ELSE Pct25Deficit END as Pct25Deficit
         , Pct50Deficit, Pct75Deficit, Pct90Deficit
