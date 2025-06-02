@@ -336,9 +336,8 @@ def convert_bounds_to_linestrings(source_gdf):
 
 
 def create_town_map(town_gdf, state):
+    town_gdf = clean_gdf(town_gdf)
     county_gdf = town_gdf.dissolve(by='County')
-    county_gdf.reset_index(inplace=True)
-    county_gdf.drop('diagonal', axis=1, inplace=True, errors='ignore')
     convert_bounds_to_linestrings(county_gdf)
     state_gdf = county_gdf.dissolve('State')
     state_gdf.reset_index(inplace=True)
@@ -346,6 +345,8 @@ def create_town_map(town_gdf, state):
 
     dissolved_town_gdf = town_gdf.dissolve('Town')
     dissolved_town_gdf.reset_index(inplace=True)
+    dissolved_town_gdf = dissolved_town_gdf.dropna(axis=1, how='all')
+    dissolved_town_gdf = dissolved_town_gdf[dissolved_town_gdf.columns.drop(list(dissolved_town_gdf.filter(regex='name:')))]
 
     state_list = []
     state_list.append(state)
@@ -387,13 +388,8 @@ def create_town_map(town_gdf, state):
     wandrerer_df = get_wandrer_totals_for_towns_for_state(state_list)
     data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
 
-    # json_diffs = town_gdf[~town_gdf['Town'].isin(wandrerer_df['Town'])]
-    json_diffs = wandrerer_df[~wandrerer_df['Town'].isin(town_gdf['Town'])]
-    if len(json_diffs) > 0:
-        json_diffs['DataSource'] = 'json'
-        json_diffs_no_dupes = json_diffs.drop_duplicates()
-        selected_columns = ['DataSource', 'County', 'Town']
-        json_diffs_no_dupes[selected_columns].to_csv(f'{state}-json-Missing-Town.csv', index=False)
+    if sys.gettrace() is not None:
+        dump_town_misses_and_matches(state, town_gdf, wandrerer_df)
 
     # town_merged_df = town_gdf.merge(wandrerer_df, on=['State','County','Town','long_name'])
     # town_merged_df = dissolved_town_gdf.merge(wandrerer_df, on=['State','County','Town','long_name'])
@@ -498,6 +494,32 @@ def create_town_map(town_gdf, state):
                             )
 
     return fig
+
+
+def clean_gdf(town_gdf):
+    town_gdf = town_gdf.dropna(axis=1, how='all')
+    town_gdf = town_gdf[town_gdf.columns.drop(list(town_gdf.filter(regex='name:')))]
+    town_gdf.drop(['diagonal', 'landuse', 'military', 'military_service', 'population',
+                   'population:date', 'source:population', 'start_date'], axis=1, inplace=True, errors='ignore')
+    town_gdf.reset_index(inplace=True)
+    return town_gdf
+
+
+def dump_town_misses_and_matches(state, town_gdf, wandrerer_df):
+    json_matches = town_gdf[town_gdf['Town'].isin(wandrerer_df['Town'])]
+    if len(json_matches) > 0:
+        json_matches['DataSource'] = 'json'
+        json_matches_no_dupes = json_matches.drop_duplicates()
+        selected_columns = ['DataSource', 'County', 'Town']
+        json_matches_no_dupes[selected_columns].to_csv(f'{state}-Matching-Towns.csv', index=False)
+    json_diffs = wandrerer_df[~wandrerer_df['Town'].isin(town_gdf['Town'])]
+    if len(json_diffs) > 0:
+        json_diffs['DataSource'] = 'json'
+        json_diffs_no_dupes = json_diffs.drop_duplicates()
+        selected_columns = ['DataSource', 'County', 'Town']
+        json_diffs_no_dupes[selected_columns].to_csv(f'{state}-Missing-Towns.csv', index=False)
+
+
 def create_town_map_old(town_gdf, state):
     county_gdf = town_gdf.dissolve('County')
     county_gdf.reset_index(inplace=True)
@@ -836,6 +858,7 @@ def create_state_map(source_osm_df, state):
 
 
 def create_county_gdf(source_osm_df):
+    source_osm_df = source_osm_df.dropna(axis=1, how='all')
     if not column_exists_case_insensitive(source_osm_df, 'admin_level'):
         county_gdf = source_osm_df.dissolve(by='County')
         county_gdf.reset_index(inplace=True)
@@ -1256,6 +1279,7 @@ def get_geopandas_df_for_region(selected_region):
         county_gdfs = gpd.GeoDataFrame()
         for state in st.session_state.geojson_files_dict.keys():
             gdf = get_geopandas_df_for_state(state)
+            gdf = clean_gdf(gdf)
             if not column_exists_case_insensitive(gdf, 'normalized'):
                 county_gdf, gdf = normalize_geojson(state, gdf)
             else:
