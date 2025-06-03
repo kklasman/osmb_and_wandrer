@@ -308,7 +308,7 @@ def create_county_map(source_osm_df, state):
 
 
 def get_template_field_list_for_county_scope_map(merged_df):
-    template_fields = ['County', 'TotalTowns', 'CycledTowns', 'PctTownsCycled', 'AchievedTowns', 'PctTownsAchieved',
+    template_fields = ['State','County', 'TotalTowns', 'CycledTowns', 'PctTownsCycled', 'AchievedTowns', 'PctTownsAchieved',
                        'TotalTownMiles', 'ActualMiles', 'ActualPct']
     # if any(merged_df['UnincorporatedMiles'] > 0):
     #     template_fields.extend(['TotalCountyMiles', 'TotalCountyMilesCycled', 'PctCountyMilesCycled'])
@@ -898,7 +898,7 @@ def create_region_map(source_osm_df, region):
     location_json = json.loads(state_merged_df.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     state_merged_df.drop(['tags', 'geometry','COUNTY','name','Town'], axis=1, inplace=True, errors='ignore')
-    template = create_template(state_merged_df, ['State', 'TotalTowns', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    template = create_template(state_merged_df, ['State', 'TotalTowns', 'CycledTowns', 'PctTownsCycled', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     z_max = float(state_merged_df[data_value].max()) if float(state_merged_df[data_value].max()) > 0 else float(state_merged_df['TotalMiles'].max())
     st.session_state['map_gdf'] = state_merged_df
 
@@ -1071,7 +1071,9 @@ def get_wandrer_totals_for_states(states):
     return dfs
 
 def get_wandrer_totals_for_state(state):
-    query = f'''select Region, Country, State, sum(TotalTowns) as TotalTowns, sum(TotalTownMiles) as TotalMiles
+    query = f'''select Region, Country, State, sum(TotalTowns) as TotalTowns, sum(CycledTowns) as 'CycledTowns'
+		, sum(cast(CycledTowns as real))/sum(cast(TotalTowns as real)) as 'PctTownsCycled'
+		, sum(TotalTownMiles) as TotalMiles
         , sum(ActualMiles) as 'ActualMiles', sum(ActualMiles)/sum(TotalTownMiles) as 'ActualPct'
         , CASE WHEN sum(Pct10Deficit) < 0 THEN 0 ELSE sum(Pct10Deficit) END as 'Pct10Deficit'
         , CASE WHEN sum(Pct25Deficit) < 0 THEN 0 ELSE sum(Pct25Deficit) END as 'Pct25Deficit'
