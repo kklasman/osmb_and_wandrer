@@ -236,7 +236,11 @@ def create_county_map(source_osm_df, state):
 
     convert_bounds_to_linestrings(county_gdf)
 
+    source_osm_df.drop(list(source_osm_df.filter(regex='NHD:')), axis=1, inplace=True)
+
     state_gdf = source_osm_df.dissolve(by='State')
+    columns_to_drop = state_gdf.select_dtypes(include=['datetime64']).columns
+    state_gdf.drop(columns=columns_to_drop, axis=1, inplace=True)
     state_boundary_json = json.loads(state_gdf.to_json())
 
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
@@ -255,6 +259,9 @@ def create_county_map(source_osm_df, state):
     # print(wandrerer_df)
     merged_df = county_gdf.merge(unincorporated_df, on=['State','County'])
     merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+    merged_df.drop(list(merged_df.filter(regex='NHD:')), axis=1, inplace=True)
+    columns_to_drop = merged_df.select_dtypes(include=['datetime64']).columns
+    merged_df.drop(columns=columns_to_drop, axis=1, inplace=True)
     final_df = merged_df.drop(['County'], axis=1, errors='ignore')
     final_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
     location_json = json.loads(merged_df.to_json())
@@ -355,6 +362,8 @@ def create_town_map(town_gdf, state):
         data_value =  'ActualMiles'
     merged_county_df = county_gdf.merge(wandrerer_county_df, on=['State','County'])
     merged_county_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+    columns_to_drop = merged_county_df.select_dtypes(include=['datetime64']).columns
+    merged_county_df.drop(columns=columns_to_drop, axis=1, inplace=True)
     county_location_json = json.loads(merged_county_df.to_json())
     merged_county_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
     merged_county_df['always_zero'] = 0
@@ -442,6 +451,8 @@ def create_town_map(town_gdf, state):
     ))
 
     # location_json = json.loads(town_merged_df.to_json())
+    columns_to_drop = town_unincorporated_appended_df.select_dtypes(include=['datetime64']).columns
+    town_unincorporated_appended_df.drop(columns=columns_to_drop, axis=1, inplace=True)
     location_json = json.loads(town_unincorporated_appended_df.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     town_merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
@@ -819,6 +830,9 @@ def create_state_map(source_osm_df, state):
     state_merged_df = state_gdf.merge(wandrerer_df, on='State')
     # state_merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
     state_merged_df.drop(['County','Town'], axis=1, inplace=True, errors='ignore')
+    state_merged_df.drop(list(state_merged_df.filter(regex='NHD:')), axis=1, inplace=True)
+    columns_to_drop = state_merged_df.select_dtypes(include=['datetime64']).columns
+    state_merged_df.drop(columns=columns_to_drop, axis=1, inplace=True)
     location_json = json.loads(state_merged_df.to_json())
     # county_location_json = json.loads(county_gdf.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
@@ -859,21 +873,23 @@ def create_state_map(source_osm_df, state):
 
 def create_county_gdf(source_osm_df):
     source_osm_df = source_osm_df.dropna(axis=1, how='all')
-    if not column_exists_case_insensitive(source_osm_df, 'admin_level'):
-        county_gdf = source_osm_df.dissolve(by='County')
-        county_gdf.reset_index(inplace=True)
-        # county_gdf.rename(columns={'COUNTY': 'County'}, inplace=True)
-        # county_gdf['long_county'] = county_gdf['County'] + ' County'
-    else:
-        county_gdf = source_osm_df[source_osm_df['admin_level'] == 6.0]
-        county_gdf.rename(columns={'name': 'County'}, inplace=True)
-    # if not county_gdf.County.str.endswith(' County').all():
-    # if not column_exists_case_insensitive(county_gdf, 'long_county'):
-    #     # county_gdf['County'] += ' County'
-    #     county_gdf['long_county'] = county_gdf['County'] + ' County'
-    #     state = county_gdf['State'].unique()[0]
-    #     outfile = f'{state}_location.json'
-    #     gdf.to_file(outfile, driver="GeoJSON")
+    county_gdf = source_osm_df.dissolve(by='County')
+    county_gdf.reset_index(inplace=True)
+    # if not column_exists_case_insensitive(source_osm_df, 'admin_level'):
+    #     county_gdf = source_osm_df.dissolve(by='County')
+    #     county_gdf.reset_index(inplace=True)
+    #     # county_gdf.rename(columns={'COUNTY': 'County'}, inplace=True)
+    #     # county_gdf['long_county'] = county_gdf['County'] + ' County'
+    # else:
+    #     county_gdf = source_osm_df[source_osm_df['admin_level'] == 6.0]
+    #     county_gdf.rename(columns={'name': 'County'}, inplace=True)
+    # # if not county_gdf.County.str.endswith(' County').all():
+    # # if not column_exists_case_insensitive(county_gdf, 'long_county'):
+    # #     # county_gdf['County'] += ' County'
+    # #     county_gdf['long_county'] = county_gdf['County'] + ' County'
+    # #     state = county_gdf['State'].unique()[0]
+    # #     outfile = f'{state}_location.json'
+    # #     gdf.to_file(outfile, driver="GeoJSON")
 
     convert_bounds_to_linestrings(county_gdf)
 
@@ -1267,6 +1283,8 @@ def get_geopandas_df_for_state(selected_state):
         if not column_exists_case_insensitive(gdf, 'normalized'):
             county_gdf, gdf = normalize_geojson(selected_state, gdf)
 
+        columns_to_drop = gdf.select_dtypes(include=['datetime64']).columns
+        gdf.drop(columns=columns_to_drop, axis=1, inplace=True)
         return gdf
     else:
         print(f'Getting geopandas df for {selected_state} from session state')
