@@ -12,6 +12,12 @@ from streamlit import session_state as ss
 from geopy import distance
 import numpy as np
 from shapely.geometry import LineString
+# from auth_utils import check_password
+import requests
+from io import StringIO
+from datetime import datetime
+import database as db
+# import uuid
 
 st.set_page_config(layout='wide')
 
@@ -838,7 +844,9 @@ def create_state_map(source_osm_df, state):
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     state_merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
     # template = create_template(state_merged_df, ['State', 'TotalTowns', 'TotalTownMiles', 'ActualTownMiles', 'ActualTownPct', 'Pct10Deficit', 'Pct25Deficit'])
-    template = create_template(state_merged_df, ['State', 'TotalTowns', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    template = create_template(state_merged_df, ['State', 'TotalTowns', 'CycledTowns', 'PctTownsCycled',
+                                                 'AchievedTowns', 'PctTownsAchieved',
+                                                 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     data_value = data_value.replace(' > 1', '')
     z_max = float(state_merged_df[data_value].max()) if float(state_merged_df[data_value].max()) > 0 else float(state_merged_df['TotalMiles'].max())
 
@@ -1087,8 +1095,9 @@ def get_wandrer_totals_for_states(states):
     return dfs
 
 def get_wandrer_totals_for_state(state):
-    query = f'''select Region, Country, State, sum(TotalTowns) as TotalTowns, sum(CycledTowns) as 'CycledTowns'
-		, sum(cast(CycledTowns as real))/sum(cast(TotalTowns as real)) as 'PctTownsCycled'
+    query = f'''select Region, Country, State, sum(TotalTowns) as TotalTowns
+		, sum(CycledTowns) as 'CycledTowns', sum(cast(CycledTowns as real))/sum(cast(TotalTowns as real)) as 'PctTownsCycled'
+		, sum(AchievedTowns) as 'AchievedTowns', sum(cast(AchievedTowns as real))/sum(cast(TotalTowns as real)) as 'PctTownsAchieved'
 		, sum(TotalTownMiles) as TotalMiles
         , sum(ActualMiles) as 'ActualMiles', sum(ActualMiles)/sum(TotalTownMiles) as 'ActualPct'
         , CASE WHEN sum(Pct10Deficit) < 0 THEN 0 ELSE sum(Pct10Deficit) END as 'Pct10Deficit'
@@ -1102,7 +1111,7 @@ def get_wandrer_totals_for_state(state):
 def get_wandrer_totals_for_counties_for_states(states):
     states_in_str = states.__str__().replace('[', '(').replace(']', ')')
     query = f'''select Region, Country, State, County as LongCounty
-        , REPLACE(County, " County", "") as County, StateArenaId, CountyArenaId
+        , REPLACE(County, " County", "") as County, StateArenaId, CountyArenaId, arena_short_name
         , TotalTowns, CycledTowns, PctTownsCycled, TotalTownMiles, ActualPct, ActualMiles, AchievedTowns
         , PctTownsAchieved, Pct10, Pct25, Pct50, Pct75
         , CASE WHEN Pct10Deficit < 0 THEN 0 ELSE Pct10Deficit END as Pct10Deficit
@@ -1173,7 +1182,7 @@ def get_wandrer_totals_for_towns_for_state(states):
     in_statement = parameterize_SQL_in_statement(states)
     query = f'''select distinct fqtn.Region, fqtn.Country, fqtn.State, REPLACE(fqtn.County, ' County', '') as County
         , CASE WHEN fqtn.name = "Unincorporated" THEN fqtn.name || " " || fqtn.County ELSE fqtn.name END as Town
-		, fqtn.County as LongCounty, fqtn.long_name
+		, fqtn.County as LongCounty, fqtn.long_name, fqtn.CountyLongName, town.parent_arena_id as CountyParentArenaId
 		, round(fqtn.length, 7) as TotalMiles
 		, round(fqtn.percentage, 7) as ActualPct, round(fqtn.ActualLength, 7) as ActualMiles
 		, round(fqtn.Pct10, 7) as Pct10, round(fqtn.Pct25, 7) as Pct25, round(fqtn.Pct50, 7) as Pct50
@@ -1212,14 +1221,7 @@ def get_wandrer_regions():
     return wandrerer_df
 
 def execute_query(query):
-    cwd = os.getcwd()
-    # print(f'cwd = {cwd}')
-    db_path = os.path.join(cwd, 'Lib', 'data', 'wandrer_2.0.db')
-    # print(f'db_path {db_path} exists {os.path.exists(db_path)}')
-    if not os.path.exists(db_path):
-        # file lives in different location in development
-        db_path = os.path.join(cwd, r'data', 'wandrer_2.0.db')
-        # print(f'db_path {db_path} exists {os.path.exists(db_path)}')
+    db_path = db.get_db_path()
 
     try:
         conn = sqlite3.connect(db_path)
@@ -1230,12 +1232,13 @@ def execute_query(query):
         print(f'Unable to open {db_path}')
 
 
-def update(key, ):
-    # print(f'update: ss[{key}] = {ss.select_state}')
-    # print(f'update: preserve_map_selection = {ss.preserve_map_selection}')
-    if key == 'select_map' and ss.preserve_map_selection:
-        value = None
-        ss[key] = value
+
+# def update(key, ):
+#     # print(f'update: ss[{key}] = {ss.select_state}')
+#     # print(f'update: preserve_map_selection = {ss.preserve_map_selection}')
+#     if key == 'select_map' and ss.preserve_map_selection:
+#         value = None
+#         ss[key] = value
 
 def make_map_disable(b):
     st.session_state['make_map_disable'] = b
@@ -1261,7 +1264,7 @@ def region_selected():
 
 def get_geojson_filename(selected_state):
     cwd = os.getcwd()
-    file_name = geojson_files[selected_state]
+    file_name = st.session_state.geojson_files_dict[selected_state]
     # file_path = os.path.join(cwd, r'data\10150\boundaries', file_name)
     file_path = os.path.join(cwd, 'Lib', 'data', 'boundaries', file_name)
     # print(f'file_path {file_path} exists {os.path.exists(file_path)}')
@@ -1487,9 +1490,9 @@ def town_selected():
     diagonal = st.session_state['map_gdf'].iloc[st.session_state.map_data['selection']['rows'][0]]['diagonal']
     # x_center, y_center = center_point_diagonal(diagonal)
     zoom, center = calculate_mapbox_zoom_center_from_diagonal(diagonal)
-    st.write(f'{diagonal=}')
-    st.write(f'{zoom=}')
-    st.write(f'{center=}')
+    # st.write(f'{diagonal=}')
+    # st.write(f'{zoom=}')
+    # st.write(f'{center=}')
     # center = dict(lat=(min_lat + max_lat) / 2, lon=(min_lon + max_lon) / 2)
     fig.update_layout(mapbox_style="carto-positron",
                       mapbox_zoom=zoom, mapbox_center=center)
@@ -1502,6 +1505,13 @@ def town_selected():
     # fig.conf = dict(scrollZoom=True)
 
     st.plotly_chart(fig)
+
+    if st.session_state.logged_in:
+        st.session_state.update_county = st.session_state['map_gdf'].iloc[st.session_state.map_data['selection']['rows'][0]]['County']
+        st.session_state.show_update_county_btn = True
+        # st.sidebar.button(f'Update {county} County Miles', key="update_county_btn")
+        #     # st.write('Update button clicked')
+
     st.dataframe(st.session_state['map_gdf'], use_container_width=True, selection_mode='single-row'
                  , key='map_data', on_select=town_selected)
     # town = st.session_state['map_gdf'].iloc[st.session_state.map_data['selection']['rows'][0]]['Town']
@@ -1510,76 +1520,319 @@ def town_selected():
 
 # ss
 
-if 'gdfs' not in st.session_state:
-    # Initialize geopandas df dictionary in session state.
-    st.session_state.gdfs = {}
+# if "logged_in" not in st.session_state:
+#     st.session_state.logged_in = False
+#
+# if not st.session_state.logged_in:
+# #     # Render widgets that should be visible when logged in
+# #     st.write("This is visible when logged in")
+# #     st.button("Click me (logged in)")
+# # else:
+#     # Render login form or other content for non-logged-in users
+#     st.write("Please log in")
+#     if st.button("Login"):
+#         # Simulate login success
+#         st.session_state.logged_in = True
+#         st.exp
 
-if 'current_fig' not in st.session_state:
-    st.session_state.current_fig = {}
+st.html(
+    '''
+        <style>
+            div[aria-label="dialog"]>button[aria-label="Close"] {
+                display: none;
+            }
+        </style>
+    '''
+)
 
-options = ['State', 'Counties', 'Towns']
+@st.dialog("Login")
+def login():
+    st.write("Login for full access or Cancel to for normal access.")
+    password = st.text_input('password', autocomplete="off", type='password', )
+    col1, col2 = st.columns(2)
 
-if 'selected_region' not in st.session_state:
-    st.session_state.selected_region = 'All'
+    with col1:
+        button1 = st.button('Submit', key='submit')
 
-if 'wandrer_regions' not in st.session_state:
-    st.session_state.wandrer_regions = get_wandrer_regions()
+    with col2:
+        button2 = st.button('Cancel', key= 'cancel')
 
-region_list = ['All'] + (st.session_state.wandrer_regions.subregion_name.unique().tolist())
-geojson_files = get_geojson_filenames_for_region()
-data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles > 1', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit']
+    if button1:
+        if password == st.secrets["password"]:
+            logged_in()
+        else:
+            st.write('Invalid password')
 
-if 'gdfs' not in st.session_state:
-    # Initialize geopandas df dictionary in session state.
-    st.session_state.gdfs = {}
+    if button2:
+        st.session_state.login_dismissed = True
+        st.rerun()
 
-if 'current_fig' not in st.session_state:
-    st.session_state.current_fig = {}
 
-if 'selected_region' not in st.session_state:
-    st.session_state.selected_region = 'All'
+def logged_in():
+    st.session_state.logged_in = True
+    st.rerun()
 
-with st.sidebar:
-    region_selectbox = st.selectbox('Select a region:', region_list, key='selected_region', index=0, on_change=region_selected())
-    state_selectbox = st.selectbox('Select a location (US State):', get_geojson_filenames_for_region().keys(), key='selected_state', index=None)
-    # preserve_map_selection = st.checkbox('Clear map type selection on state change', key='preserve_map_selection')
-    maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
-    datavalue_selectbox = st.selectbox('Select a data value', data_values, key='selected_datavalue_for_map', index=None, on_change=enable_make_map())
-    make_map = st.button('Generate map', key='make_map_btn', disabled=st.session_state.get("make_map_disable", True))
+def main():
+    if 'show_update_county_btn' not in st.session_state:
+        st.session_state.show_update_county_btn = False
 
-if make_map:
-    osm_gdf = {}
-    fig = {}
+    if 'gdfs' not in st.session_state:
+        # Initialize geopandas df dictionary in session state.
+        st.session_state.gdfs = {}
 
-    if state_selectbox:
-        osm_gdf = get_geopandas_df_for_state(state_selectbox)
-        match maptype_selectbox:
-            case 'State':
-                fig = create_state_map(osm_gdf.copy(), state_selectbox)
-            case 'Counties':
-                fig = create_county_map(osm_gdf.copy(), state_selectbox)
-            case 'Towns':
-                fig = create_town_map(osm_gdf.copy(), state_selectbox)
-    else:
-        osm_state_gdf, osm_county_gdf = get_geopandas_df_for_region(region_selectbox)
-        match maptype_selectbox:
-            case 'State':
-                fig = create_region_map(osm_state_gdf.copy(), region_selectbox)
-            case 'Counties':
-                fig = create_region_by_county_map(osm_county_gdf.copy(), region_selectbox)
-            case 'Towns':
-                fig = create_region_by_town_map(osm_state_gdf.copy(), region_selectbox)
+    if 'current_fig' not in st.session_state:
+        st.session_state.current_fig = {}
 
-    if fig:
-        config = {"scrollZoom": True}
-        st.session_state.current_fig = fig
-        st.plotly_chart(fig, config=config)
-        st.write('Raw Data')
-        # st.dataframe(osm_gdf, use_container_width=True)
-        st.dataframe(st.session_state['map_gdf'], use_container_width=True, selection_mode='single-row'
+    options = ['State', 'Counties', 'Towns']
+
+    if 'selected_region' not in st.session_state:
+        st.session_state.selected_region = 'All'
+
+    if 'wandrer_regions' not in st.session_state:
+        st.session_state.wandrer_regions = get_wandrer_regions()
+
+    region_list = ['All'] + (st.session_state.wandrer_regions.subregion_name.unique().tolist())
+    geojson_files = get_geojson_filenames_for_region()
+    data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles > 1', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit']
+
+    if 'gdfs' not in st.session_state:
+        # Initialize geopandas df dictionary in session state.
+        st.session_state.gdfs = {}
+
+    if 'current_fig' not in st.session_state:
+        st.session_state.current_fig = {}
+
+    if 'selected_region' not in st.session_state:
+        st.session_state.selected_region = 'All'
+
+    if 'update_county_btn' not in st.session_state:
+        st.session_state.update_county_btn = False
+
+    if st.session_state.update_county_btn:
+        update_county_data()
+
+    with st.sidebar:
+        region_selectbox = st.selectbox('Select a region:', region_list, key='selected_region', index=0, on_change=region_selected())
+        state_selectbox = st.selectbox('Select a location (US State):', get_geojson_filenames_for_region().keys(), key='selected_state', index=None)
+        # preserve_map_selection = st.checkbox('Clear map type selection on state change', key='preserve_map_selection')
+        maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
+        datavalue_selectbox = st.selectbox('Select a data value', data_values, key='selected_datavalue_for_map', index=None, on_change=enable_make_map())
+        make_map = st.button('Generate map', key='make_map_btn', disabled=st.session_state.get("make_map_disable", True))
+        if st.session_state.show_update_county_btn:
+            county = st.session_state.update_county
+            if st.button(f'Update {county} County Miles', key="update_county_btn"):
+                st.session_state.show_update_county_btn = False
+
+    if make_map:
+        st.session_state.show_update_county_btn = False
+        osm_gdf = {}
+        fig = {}
+
+        if state_selectbox:
+            osm_gdf = get_geopandas_df_for_state(state_selectbox)
+            match maptype_selectbox:
+                case 'State':
+                    fig = create_state_map(osm_gdf.copy(), state_selectbox)
+                case 'Counties':
+                    fig = create_county_map(osm_gdf.copy(), state_selectbox)
+                case 'Towns':
+                    fig = create_town_map(osm_gdf.copy(), state_selectbox)
+        else:
+            osm_state_gdf, osm_county_gdf = get_geopandas_df_for_region(region_selectbox)
+            match maptype_selectbox:
+                case 'State':
+                    fig = create_region_map(osm_state_gdf.copy(), region_selectbox)
+                case 'Counties':
+                    fig = create_region_by_county_map(osm_county_gdf.copy(), region_selectbox)
+                case 'Towns':
+                    fig = create_region_by_town_map(osm_state_gdf.copy(), region_selectbox)
+
+        if fig:
+            config = {"scrollZoom": True}
+            st.session_state.current_fig = fig
+            st.plotly_chart(fig, config=config)
+            st.write('Raw Data')
+            # st.dataframe(osm_gdf, use_container_width=True)
+            st.dataframe(st.session_state['map_gdf'], use_container_width=True, selection_mode='single-row'
                      ,key='map_data', on_select=town_selected)
-    else:
-        st.write(f'{maptype_selectbox} map unavailable for {state_selectbox}')
+        else:
+            st.write(f'{maptype_selectbox} map unavailable for {state_selectbox}')
+
+
+def add_arena_mileage_to_df(url, username, password, update_datetime, user_id, df_children_arena_summaries):
+    for index, row in df_children_arena_summaries.iterrows():
+        print(f"Index: {index}, Row: {row['arena_short_name']}")
+        separator = '/'
+        url_elements = url.split(separator)
+        parent_arena = url_elements[4]
+        url_elements[4] = row['arena_short_name']
+        child_url = separator.join(url_elements)
+        # if url.count(parent_arena) > 1:
+        #     child_url = url.replace(parent_arena, row['arena_short_name'])
+        # else:
+        #     child_url = url.replace(parent_arena, row['arena_short_name'])
+        print(f'{child_url}=')
+        response = requests.get(child_url, auth=(username, password))
+        arena_mileage = response.json()['arena_mileage']
+        df_children_arena_summaries.loc[index,('arena_mileage')] = arena_mileage
+
+
+def get_data_from_url(url, username, password, update_datetime, parent_arena_id, arena_type, user_id):
+    response = requests.get(url, auth=(username, password))
+    total = response.json()['total']
+    awarded = response.json()['awarded']
+    # TODO: enable this line if arena_mileage is ever returned from this call.
+    arena_mileage = response.json()['arena_mileage']
+    response_json = response.json()
+    arena_badges = response_json['arena_badges']
+    children_arena_summaries = response_json['children_arena_summaries']
+    print(f'{arena_type=}, {len(arena_badges)=}, {len(children_arena_summaries)=}')
+
+    results = {}
+    if len(arena_badges)>0:
+        df_arena_badges = pd.json_normalize(response_json['arena_badges'])
+        df_arena_badges['update_datetime'] = str(update_datetime)
+        df_arena_badges['arena_type'] = 'town'
+        df_arena_badges['user_id'] = user_id
+        if (parent_arena_id):
+            df_arena_badges['parent_arena_id'] = parent_arena_id
+        if df_arena_badges.duplicated().to_list().count(True) > 0:
+            print(df_arena_badges.duplicated())
+        results['arena_badges'] = df_arena_badges.to_json()
+
+
+    if len(children_arena_summaries)>0:
+        df_children_arena_summaries = pd.json_normalize(response_json['children_arena_summaries'])
+        df_children_arena_summaries['update_datetime'] = str(update_datetime)
+        df_children_arena_summaries['arena_type'] = arena_type
+        df_children_arena_summaries['user_id'] = user_id
+        if (parent_arena_id):
+            df_children_arena_summaries['parent_arena_id'] = parent_arena_id
+        if df_children_arena_summaries.duplicated().to_list().count(True) > 0:
+            print(df_children_arena_summaries.duplicated())
+        if 'arena_mileage' not in df_children_arena_summaries.columns:
+            add_arena_mileage_to_df(url, username, password, update_datetime, user_id, df_children_arena_summaries)
+        results['children_arena_summaries'] = df_children_arena_summaries.to_json()
+
+    return results, total, awarded, arena_mileage
+
+
+def get_child_df(url, arena_type, athlete_id):
+    # if 'selected_region' not in st.session_state or ss['selected_region'] == None:
+    #     # ss['selected_region'] = region_select_box
+    #     print('selected_region not in st.session_state')
+    #     return
+    #
+    # print(ss['selected_region'])
+
+    # add these fields to secrets.toml
+    username = 'kk4sites@hotmail.com'
+    password = 'A11Wh0Wand3r'
+
+    update_datetime = datetime.now()
+    results, total, awarded, arena_mileage = get_data_from_url(url, username, password,
+                                 update_datetime, None, arena_type,
+                                 athlete_id)
+    return results, total, awarded, arena_mileage
+
+
+def update_county_data():
+    st.session_state.show_update_county_btn = False
+    county_row = st.session_state['map_gdf'].iloc[st.session_state.map_data['selection']['rows'][0]]
+
+    # county = county_row['County']
+    # county = county_row['long_name'].replace(county_row['Town'].lower(), '')[:-1]
+    county = county_row['CountyLongName']
+    county_parent_arena_id = county_row['CountyParentArenaId']
+    # print(f'\n{county} URL')
+
+    # don't hardcode these variables...
+    achievement_type = 'bike'
+    user_id = int(county_row['user_id'])
+
+    url = f'https://wandrer.earth/a/{county}/explorer_achievements?athlete_id={user_id}&at={achievement_type}'
+    results, total, awarded, arena_mileage = get_child_df(url, 'county', user_id)
+    # county_data = {'arena_id': [county_parent_arena_id],
+    #                'total': [total],
+    #                'awarded': [awarded],
+    #                'arena_mileage': [arena_mileage],
+    #                'arena_short_name': county_row['CountyLongName'],
+    #                'user_id': county_row['user_id'],
+    #                'distance_mi': 0,
+    #                'update_datetime': datetime.now()}
+    # county_df = pd.DataFrame(county_data)
+
+    update_county_query = f'''update arena 
+        set total = {total}, awarded = {awarded}, arena_mileage = {arena_mileage}, update_datetime = "{datetime.now()}" 
+ 	    where arena_id = {county_parent_arena_id} and user_id = {user_id}
+	    and (total <> {total} or awarded <> {awarded} or arena_mileage <> {arena_mileage})
+    '''
+
+    county_message = f'Upserting data for {county_row["County"]} County'
+
+    town_df = pd.read_json(StringIO(results['arena_badges']))
+    # county_total, county_awarded, county_arena_badges, town_df = get_county_data_from_url(county_url, username,
+    #                                                                                       password,
+    #                                                                                       update_datetime,
+    #                                                                                       county_parent_arena_id,
+    #                                                                                       'town', athlete_id)
+    # town_df.drop_duplicates()
+    town_df.drop('icon', axis=1, inplace=True)
+    town_df['parent_arena_id'] = county_parent_arena_id
+    town_message = f'Upserting towns for {county_row["County"]} County'
+
+    conn = None
+    try:
+        db_path = db.get_db_path()
+        conn = db.create_connection(db_path)
+        cursor = conn.cursor()
+        db.save_dataframe(conn, town_df, 'arena_badge', town_message)
+        print(f'Completed {town_message}')
+        # db.save_dataframe(conn, county_df, 'arena_xx', county_message)
+        db.execute_update_query(conn, update_county_query)
+        print(f'Completed {county_message}')
+        st.write(f'{county} Wandrer data updated. Click Generate Map to regenerate the map')
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f'Error updating {county}: {e}')
+        conn.rollback()
+    except Exception as e:
+        print(f'An unexpected error occurred: {e}')
+        if conn:
+            conn.rollback()
+    finally:
+        # Close connection
+        if conn:
+            conn.close()
+            print('Database connection closed.')
+
+
 
 # ss
+
+
+# startup code
+if "startup_msg_displayed" not in st.session_state:
+    st.session_state.startup_msg_displayed = False
+
+if "logged_in" not in st.session_state and "login_dismissed" not in st.session_state:
+    st.session_state.logged_in = False
+    login()
+# else:
+#     f"You voted for {st.session_state.vote['item']} because {st.session_state.vote['reason']}"
+
+# if "logged_in" in st.session_state and "login_dismissed" in st.session_state:
+if not st.session_state.startup_msg_displayed:
+    if ("login_dismissed" in st.session_state and "login_dismissed" in st.session_state):
+        st.write("Continuing to app as normal user...")
+        st.session_state.startup_msg_displayed = True
+        main()
+    elif "logged_in" in st.session_state and st.session_state.logged_in:
+            st.write("Continuing to app as privileged user...")
+            st.session_state.startup_msg_displayed = True
+            main()
+elif st.session_state.startup_msg_displayed:
+    main()
+
+
 
