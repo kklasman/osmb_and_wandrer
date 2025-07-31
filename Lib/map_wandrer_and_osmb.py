@@ -348,7 +348,7 @@ def convert_bounds_to_linestrings(source_gdf):
     #     print(item['geometry'])
 
 
-def create_town_map(town_gdf, state):
+def create_town_map(town_gdf, state, maptype):
     town_gdf = clean_gdf(town_gdf)
     county_gdf = town_gdf.dissolve(by='County')
     convert_bounds_to_linestrings(county_gdf)
@@ -401,6 +401,8 @@ def create_town_map(town_gdf, state):
     #     county_template = create_template(merged_county_df, ['County', 'TotalTownMiles', 'ActualMiles', 'ActualPct'])
 
     wandrerer_df = get_wandrer_totals_for_towns_for_state(state_list)
+    if (maptype == 'Seacoast Towns'):
+        wandrerer_df = wandrerer_df[wandrerer_df['seacoast'] == 1]
     data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
 
     if sys.gettrace() is not None:
@@ -1027,6 +1029,10 @@ def filter_wandrerer_df(wandrerer_df):
         miles_cycled_column_name = 'TotalCountyMilesCycled' if wandrerer_df.columns.__contains__('TotalCountyMilesCycled') else 'ActualMiles'
         wandrerer_df = wandrerer_df.loc[wandrerer_df[miles_cycled_column_name] > threshold]
         data_value = 'ActualMiles'
+    elif selected_data_value == 'ActualMiles = 0':
+        wandrerer_df = wandrerer_df[wandrerer_df['ActualMiles'] == 0]
+        miles_cycled_column_name = 'TotalCountyMilesCycled' if wandrerer_df.columns.__contains__('TotalCountyMilesCycled') else 'ActualMiles'
+        data_value = 'ActualMiles'
     else:
         data_value = selected_data_value
 
@@ -1191,7 +1197,7 @@ def get_wandrer_totals_for_towns_for_state(states):
         , CASE WHEN fqtn.Pct25Deficit < 0 THEN 0 ELSE round(fqtn.Pct25Deficit, 7) END as Pct25Deficit
         , round(fqtn.Pct50Deficit, 7) as Pct50Deficit, round(fqtn.Pct75Deficit, 7) as Pct75Deficit
         , round(fqtn.Pct90Deficit, 7) as Pct90Deficit
-		, fqtn.geometries_visible, fqtn.diagonal, fqtn.user_id
+		, fqtn.geometries_visible, fqtn.diagonal, fqtn.user_id, town.seacoast
         from arena_badge town
 		inner join vw_current_town_data fqtn on fqtn.id = town.id 
         where fqtn.state in {in_statement}
@@ -1583,7 +1589,7 @@ def main():
     if 'current_fig' not in st.session_state:
         st.session_state.current_fig = {}
 
-    options = ['State', 'Counties', 'Towns']
+    options = ['State', 'Counties', 'Towns', 'Seacoast Towns']
 
     if 'selected_region' not in st.session_state:
         st.session_state.selected_region = 'All'
@@ -1593,7 +1599,7 @@ def main():
 
     region_list = ['All'] + (st.session_state.wandrer_regions.subregion_name.unique().tolist())
     geojson_files = get_geojson_filenames_for_region()
-    data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles > 1', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit']
+    data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles = 0', 'ActualMiles > 1', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit']
 
     if 'gdfs' not in st.session_state:
         # Initialize geopandas df dictionary in session state.
@@ -1635,8 +1641,8 @@ def main():
                     fig = create_state_map(osm_gdf.copy(), state_selectbox)
                 case 'Counties':
                     fig = create_county_map(osm_gdf.copy(), state_selectbox)
-                case 'Towns':
-                    fig = create_town_map(osm_gdf.copy(), state_selectbox)
+                case 'Towns' |'Seacoast Towns':
+                    fig = create_town_map(osm_gdf.copy(), state_selectbox, maptype_selectbox)
         else:
             osm_state_gdf, osm_county_gdf = get_geopandas_df_for_region(region_selectbox)
             match maptype_selectbox:
