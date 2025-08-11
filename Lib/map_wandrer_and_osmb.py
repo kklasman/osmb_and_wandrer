@@ -433,6 +433,7 @@ def create_town_map(town_gdf, state, maptype):
     #     merged_county_df = unincorporated_merged_df
     #     county_template = create_template(merged_county_df, ['County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
 
+    marker_opacity = 0.01
     fig = go.Figure()
     fig.add_trace(
         go.Choroplethmapbox(
@@ -452,7 +453,7 @@ def create_town_map(town_gdf, state, maptype):
         hoverlabel=dict(
             bgcolor="black",
             font_size=16),
-        marker_opacity=0.5,
+        marker_opacity=marker_opacity,
         marker_line_width=1.5,
         visible=True
         # colorbar_title=data_value
@@ -1025,12 +1026,12 @@ def filter_wandrerer_df(wandrerer_df):
     threshold = 1
     selected_data_value = ss['selected_datavalue_for_map']
     data_value = ''
-    if selected_data_value == 'ActualMiles > 1':
+    if selected_data_value == 'ActualMiles >= 1':
         miles_cycled_column_name = 'TotalCountyMilesCycled' if wandrerer_df.columns.__contains__('TotalCountyMilesCycled') else 'ActualMiles'
-        wandrerer_df = wandrerer_df.loc[wandrerer_df[miles_cycled_column_name] > threshold]
+        wandrerer_df = wandrerer_df.loc[wandrerer_df[miles_cycled_column_name] >= threshold]
         data_value = 'ActualMiles'
-    elif selected_data_value == 'ActualMiles = 0':
-        wandrerer_df = wandrerer_df[wandrerer_df['ActualMiles'] == 0]
+    elif selected_data_value == 'ActualMiles < 1':
+        wandrerer_df = wandrerer_df[wandrerer_df['ActualMiles'] < 1]
         miles_cycled_column_name = 'TotalCountyMilesCycled' if wandrerer_df.columns.__contains__('TotalCountyMilesCycled') else 'ActualMiles'
         data_value = 'ActualMiles'
     else:
@@ -1599,7 +1600,7 @@ def main():
 
     region_list = ['All'] + (st.session_state.wandrer_regions.subregion_name.unique().tolist())
     geojson_files = get_geojson_filenames_for_region()
-    data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles = 0', 'ActualMiles > 1', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit']
+    data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles < 1', 'ActualMiles >= 1', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit']
 
     if 'gdfs' not in st.session_state:
         # Initialize geopandas df dictionary in session state.
