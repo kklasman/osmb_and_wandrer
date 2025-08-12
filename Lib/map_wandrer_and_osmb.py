@@ -519,7 +519,7 @@ def create_town_map(town_gdf, state, maptype):
 def clean_gdf(town_gdf):
     town_gdf = town_gdf.dropna(axis=1, how='all')
     town_gdf = town_gdf[town_gdf.columns.drop(list(town_gdf.filter(regex='name:')))]
-    town_gdf.drop(['diagonal', 'landuse', 'military', 'military_service', 'population',
+    town_gdf.drop(['diagonal', 'landuse', 'military', 'military_service', 'population', 'admin_level',
                    'population:date', 'source:population', 'start_date'], axis=1, inplace=True, errors='ignore')
     town_gdf.reset_index(inplace=True)
     return town_gdf
