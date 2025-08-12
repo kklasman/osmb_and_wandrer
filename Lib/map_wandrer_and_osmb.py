@@ -264,7 +264,7 @@ def create_county_map(source_osm_df, state):
 
     # print(wandrerer_df)
     merged_df = county_gdf.merge(unincorporated_df, on=['State','County'])
-    merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+    # merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
     merged_df.drop(list(merged_df.filter(regex='NHD:')), axis=1, inplace=True)
     columns_to_drop = merged_df.select_dtypes(include=['datetime64']).columns
     merged_df.drop(columns=columns_to_drop, axis=1, inplace=True)
@@ -517,12 +517,9 @@ def create_town_map(town_gdf, state, maptype):
 
 
 def clean_gdf(town_gdf):
-    town_gdf = town_gdf.dropna(axis=1, how='all')
-    town_gdf = town_gdf[town_gdf.columns.drop(list(town_gdf.filter(regex='name:')))]
-    town_gdf.drop(['diagonal', 'landuse', 'military', 'military_service', 'population', 'admin_level',
-                   'population:date', 'source:population', 'start_date'], axis=1, inplace=True, errors='ignore')
-    town_gdf.reset_index(inplace=True)
-    return town_gdf
+    columns_to_keep = ['Town', 'State', 'long_county', 'long_name', 'County', 'normalized', 'geometry']
+    filtered_gdf = town_gdf[columns_to_keep]
+    return filtered_gdf
 
 
 def dump_town_misses_and_matches(state, town_gdf, wandrerer_df):
@@ -911,13 +908,13 @@ def create_region_map(source_osm_df, region):
     renamed_gdf = {}
     county_gdf = {}
     # source_osm_df['State'] = state
-    data_value_raw = ss['selected_datavalue_for_map']
-    data_value = data_value_raw.removesuffix(' > 1')
+
     state_gdf = source_osm_df.dissolve(by='State')
     state_gdf.reset_index(inplace=True)
     convert_bounds_to_linestrings(state_gdf)
 
     wandrerer_df = get_wandrer_totals_for_states(state_gdf.State.to_list())
+    data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
     state_merged_df = state_gdf.merge(wandrerer_df, on='State')
 
     state_merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
@@ -1041,17 +1038,20 @@ def filter_wandrerer_df(wandrerer_df):
 
 
 def get_unneeded_column_names():
-    return ['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng', 'admin_centre_node_id'
-        , 'admin_centre_node_lat', 'admin_centre_node_lng'
-        , 'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'
-        , 'NAME', 'MCD', 'KEY', 'DCF_OFFICE', 'DCF_REGION'
-        , 'FIPS6', 'TOWN', 'TOWNNAMEMC', 'TOWNGEOID', 'SqMi'
-        , 'OBJECTID', 'CNTY', 'CNTYGEOID', 'LAND'
-        , 'osm_id', 'boundary', 'NAME', 'MCD', 'KEY', 'DCF_OFFICE', 'DCF_REGION'
-        , 'GEOCODE', 'GEOCODENUM', 'CNTYCODE', 'TAG', 'ISLAND', 'CIREG', 'LURC', 'BAXTER', 'ISLANDID', 'TYPE'
-        , 'DOT_REGNUM', 'DOT_REGION', 'GlobalID', 'created_user'
-        , 'created_date', 'last_edited_user', 'last_edited_date','CountyArenaId','StateArenaId'
-            ]
+    # unneeded_column_names =  ['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng', 'admin_centre_node_id'
+    #     , 'admin_centre_node_lat', 'admin_centre_node_lng'
+    #     , 'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'
+    #     , 'NAME', 'MCD', 'KEY', 'DCF_OFFICE', 'DCF_REGION'
+    #     , 'FIPS6', 'TOWN', 'TOWNNAMEMC', 'TOWNGEOID', 'SqMi'
+    #     , 'OBJECTID', 'CNTY', 'CNTYGEOID', 'LAND'
+    #     , 'osm_id', 'boundary', 'NAME', 'MCD', 'KEY', 'DCF_OFFICE', 'DCF_REGION'
+    #     , 'GEOCODE', 'GEOCODENUM', 'CNTYCODE', 'TAG', 'ISLAND', 'CIREG', 'LURC', 'BAXTER', 'ISLANDID', 'TYPE'
+    #     , 'DOT_REGNUM', 'DOT_REGION', 'GlobalID', 'created_user'
+    #     , 'created_date', 'last_edited_user', 'last_edited_date','CountyArenaId','StateArenaId'
+    #     ]
+
+    unneeded_column_names = []
+    return unneeded_column_names
 
 
 def get_geojson_filenames():
