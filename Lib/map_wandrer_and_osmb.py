@@ -528,13 +528,20 @@ def dump_town_misses_and_matches(state, town_gdf, wandrerer_df):
         json_matches['DataSource'] = 'json'
         json_matches_no_dupes = json_matches.drop_duplicates()
         selected_columns = ['DataSource', 'County', 'Town']
-        json_matches_no_dupes[selected_columns].to_csv(f'{state}-Matching-Towns.csv', index=False)
+        try:
+            json_matches_no_dupes[selected_columns].to_csv(f'{state}-Matching-Towns.csv', index=False)
+        except Exception as e:
+            st.write(f"An unexpected error occurred: {e}")
+
     json_diffs = wandrerer_df[~wandrerer_df['Town'].isin(town_gdf['Town'])]
     if len(json_diffs) > 0:
         json_diffs['DataSource'] = 'json'
         json_diffs_no_dupes = json_diffs.drop_duplicates()
         selected_columns = ['DataSource', 'County', 'Town']
-        json_diffs_no_dupes[selected_columns].to_csv(f'{state}-Missing-Towns.csv', index=False)
+        try:
+            json_diffs_no_dupes[selected_columns].to_csv(f'{state}-Missing-Towns.csv', index=False)
+        except Exception as e:
+            st.write(f"An unexpected error occurred: {e}")
 
 
 def create_town_map_old(town_gdf, state):
