@@ -23,11 +23,65 @@ st.set_page_config(layout='wide')
 
 max_50_pct_color_scale = ['white', 'gold', 'red']
 
+
+award_levels_color_map = {
+    '0.00 Pct': 'white',
+    '0.05 Pct': 'lightskyblue',
+    '0.10 Pct': 'lightgreen',
+    '0.25 Pct': 'rgb(255,215,0)',
+    '0.50 Pct': 'darkorange',
+    '0.75 Pct': 'crimson',
+    '0.90 Pct': 'magenta',
+    '0.99 Pct': 'blue'
+}
+
+# award_levels_color_map = {
+#     '0.0': 'gray',
+#     '0.10': 'white',
+#     '0.25': 'almond',
+#     '0.50': 'yellow',
+#     '0.75': 'orange',
+#     '0.90': 'red',
+#     '0.99': 'magenta',
+#     '1.00': 'blue'
+# }
+
+# color_discrete_map = {
+#     'High': 'red',
+#     'Moderate': 'blue',
+#     'Low': 'green'
+# }
+
+# color_schemes = [
+#     ['#890000'],['#890000'],['#5c0000'],
+#     ['#2a6b28'],['#0b4c07'],['#003206'],
+#     ['#fff4b1']
+# ]
+color_schemes = ['#890000','#890000','#5c0000','#2a6b28','#0b4c07','#003206','#fff4b1']
+
+# award_levels_color_map = {
+#     0: 'gray',
+#     1: 'white',
+#     2: 'rgb(255, 255, 200)',
+#     3: 'yellow',
+#     4: 'orange',
+#     5: 'red',
+#     6: 'magenta',
+#     7: 'blue'
+# }
+
+
 def create_template(data, col_names):
     template = ''
     for idx, name in enumerate(col_names):
         try:
-            if name == 'State':
+            if name == 'awarded':
+                template += "<b>Awarded:</b> %{" + f"customdata[{data.columns.get_loc('awarded')}]" + "}<br>"
+
+            elif name == 'AwardLevel':
+                template += "<b>Award Level:</b> %{" + f"customdata[{data.columns.get_loc('AwardLevel')}]" + "}<br>"
+
+            elif name == 'State':
                 template += "<b>State:</b> %{" + f"customdata[{data.columns.get_loc('State')}]" + "}<br>"
 
             elif name == 'County':
@@ -287,7 +341,7 @@ def create_county_map_v2(source_osm_df, state):
         data_value = 'TotalCountyMiles'
 
     z_max = float(merged_df[data_value].max()) if float(merged_df[data_value].max()) > 0 else float(merged_df[data_value].max())
-    z_data_value = 'TotalCountyMilesCycled' if data_value.startswith('ActualMiles') else 'TotalCountyMiles'
+    z_data_value = 'TotalCountyMilesCycled' if data_value.startswith('ActualMiles') else data_value
 
     st.session_state['map_gdf'] = merged_df
     fig = go.Figure(go.Choroplethmapbox(
@@ -606,16 +660,32 @@ def create_town_map(town_gdf, state, maptype):
     # # z_max_raw = float(town_unincorporated_appended_df[data_value].max()) \
     # #     if float(town_unincorporated_appended_df[data_value].max()) > 0 \
     # #     else float(town_unincorporated_appended_df['TotalMiles'].max())
+
+    if data_value == 'AwardLevel':
+        # fig = create_town_map_discrete_color(center, county_location_json, data_value, fig, location_json, state,
+        #                                        town_merged_df, zoom)
+        fig = create_town_map_discrete_color(center, county_location_json, data_value, location_json, state,
+                                               town_merged_df, zoom)
+    else:
+        fig = create_town_map_continuous_color(center, county_location_json, data_value, fig, location_json, state,
+                                                       town_merged_df, zoom)
+
+    return fig
+
+
+def create_town_map_continuous_color(center, county_location_json, data_value, fig, location_json, state,
+                                     town_merged_df, zoom):
     z_max_raw = town_merged_df[data_value].max() if town_merged_df[data_value].max() > 0 else 0
     z_max = int(round(z_max_raw + 250, -3))
     z_min = 0
-
     # st.session_state['map_gdf'] = town_merged_df
     # st.session_state['map_gdf'] = town_unincorporated_appended_df
     st.session_state['map_gdf'] = town_merged_df
-
     # town_template = create_template(town_merged_df, ['Town', 'County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
-    town_template = create_template(town_merged_df, ['Town', 'County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    town_template = create_template(town_merged_df,
+                                    ['Town', 'County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit',
+                                     'Pct25Deficit'])
+    town_color_scale = award_levels_color_map if data_value == 'AwardLevel' else max_50_pct_color_scale
     fig.add_trace(
         go.Choroplethmapbox(
             customdata=town_merged_df,
@@ -625,7 +695,7 @@ def create_town_map(town_gdf, state, maptype):
             # locations=town_unincorporated_appended_df['long_name'],
             # z=filtered_df[z_col_name] * 100,
             z=town_merged_df[data_value],
-            colorscale=max_50_pct_color_scale,
+            colorscale=town_color_scale,
             colorbar_title=data_value,
             # hovertemplate="County: %{customdata[2]}<br>Actual Pct: %{customdata[4]}<extra></extra>",
             hovertemplate=town_template,
@@ -637,7 +707,9 @@ def create_town_map(town_gdf, state, maptype):
             name='Town Data Values',
             # visible=map_feature_selected == 'Town Boundaries',
             zmin=z_min,
-            zmax=z_max))
+            zmax=z_max
+        )
+    )
 
     fig.update_layout(mapbox_layers=[dict(sourcetype='geojson',
                                           source=county_location_json,
@@ -646,14 +718,169 @@ def create_town_map(town_gdf, state, maptype):
                                           line=dict(width=1.5)
                                           # hovertemplate=template
                                           )]);
-
     fig.update_layout(mapbox_style="carto-positron",
                       mapbox_zoom=zoom, mapbox_center=center)
     fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
                             , title=dict(text=f'{data_value} for Towns in {state}', x=0.5
-                            , xanchor="center")
+                                         , xanchor="center")
                             )
+    return fig
 
+def generateDiscreteColourScale(colour_set):
+    #colour set is a list of lists
+    # colour_output = []
+    # num_colours = len(colour_set)
+    # divisions = 1./num_colours
+    divisions = [0,.10, .25, .50, .75, .90, .99]
+    # divisions = ['0','.10', '.25', '.50', '.75', '.90', '.99']
+    colour_output = [list(t) for t in zip(divisions, colour_set)]
+    # c_index = int(0)
+    # # Loop over the colour set
+    # for cset in colour_set:
+    #     colour_output.append((divisions[c_index], cset))
+    #     c_index += 1
+
+    #
+    #     num_subs = len(cset)
+    #     sub_divisions = divisions/num_subs
+    #     # Loop over the sub colours in this set
+    #     for subcset in cset:
+    #         colour_output.append((c_index,subcset))
+    #         colour_output.append((c_index + sub_divisions-
+    #             .001,subcset))
+    #         c_index = c_index + sub_divisions
+    # colour_output[-1]=(1,colour_output[-1][1])
+    return colour_output
+
+
+def create_town_map_discrete_color(center, county_location_json, data_value, location_json, state,
+                                     town_merged_df, zoom):
+    # z_max_raw = town_merged_df[data_value].max() if town_merged_df[data_value].max() > 0 else 0
+    # z_max = int(round(z_max_raw + 250, -3))
+    z_max = 1.0
+    z_min = 0
+    # st.session_state['map_gdf'] = town_merged_df
+    # st.session_state['map_gdf'] = town_unincorporated_appended_df
+    st.session_state['map_gdf'] = town_merged_df
+    # town_template = create_template(town_merged_df, ['Town', 'County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    town_template = create_template(town_merged_df,
+                                    ['Town', 'County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit',
+                                     'Pct25Deficit', 'awarded', 'AwardLevel'])
+    # town_color_scale = award_levels_color_map if data_value == 'AwardLevel' else max_50_pct_color_scale
+    town_color_scale = ((0.00, 'rgb(247,251,255)'), (0.125, 'rgb(222,235,247)'), (0.25, 'rgb(198,219,239)'), (0.375, 'rgb(158,202,225)'), (0.5, 'rgb(107,174,214)'), (0.625, 'rgb(66,146,198)'), (0.75, 'rgb(33,113,181)'), (0.875, 'rgb(8,81,156)'), (1.0, 'rgb(8,48,107)'))
+    # colorscale = generateDiscreteColourScale(color_schemes)
+
+    filtered_df = town_merged_df[['Town', 'AwardLevel']]
+    # fig.add_trace(
+    #     px.choropleth(
+    #         filtered_df,
+    #         geojson=location_json,
+    #         featureidkey="properties.Town",
+    #         # locations='Town',
+    #         # locationmode='town names',  # Uses country names to locate the areas
+    #         color='AwardLevel',
+    #         # color_discrete_map=award_levels_color_map,
+    #         hover_data=['AwardLevel'],  # Shows population on hover
+    #         title='Choropleth Map with Discrete Colors'
+    #     )
+    # )
+
+    # fig = px.choropleth(
+    #     town_merged_df,
+    #     geojson=location_json,
+    #     featureidkey="properties.Town",
+    #     locations='Town',
+    #     # locationmode='town names',  # Uses country names to locate the areas
+    #     color='AwardLevel',
+    #     color_discrete_map=award_levels_color_map,
+    #     hover_data=['AwardLevel'],  # Shows population on hover
+    #     title='Choropleth Map with Discrete Colors'
+    # )
+
+    fig = px.choropleth_mapbox(
+        town_merged_df,
+        geojson=location_json,
+        locations='Town',
+        color='AwardLevel',  # Use the categorical column for discrete colors
+        featureidkey='properties.Town',
+        # color_discrete_map=award_levels_color_map,
+        # scope='usa',
+        zoom=8,
+        # center={"lat": 43.80471, "lon": -71.57059}, # Center of the map
+        color_discrete_map=award_levels_color_map,
+        # color_discrete_map= {
+        #     '0.00 Pct': 'white',
+        #     '0.05 Pct': 'lightskyblue',
+        #     '0.10 Pct': 'lightgreen',
+        #     # 'OneTenthPct': 'darkgray',
+        #     '0.25 Pct': 'rgb(255,215,0)',
+        #     '0.50 Pct': 'darkorange',
+        #     '0.75 Pct': 'crimson',
+        #     '0.90 Pct': 'magenta',
+        #     '0.99 Pct': 'blue'
+        # },
+        category_orders={'AwardLevel': ['0.00 Pct','0.05 Pct','0.10 Pct','0.25 Pct','0.50 Pct','0.75 Pct','0.90 Pct','0.99 Pct']},
+        title='<b>U.S. Election Results by County (Discrete Colors)</b>'
+    )
+
+    # fig.add_trace(
+    #     go.Choroplethmapbox(customdata=town_merged_df, geojson=location_json,
+    #                         # color=town_merged_df[data_value],
+    #                         colorscale=colorscale,
+    #                         locations=town_merged_df['Town'], featureidkey="properties.Town",
+    #                         # center={"lat": 45.5517, "lon": -73.7073},
+    #                         # map_style="carto-positron",
+    #                         # zoom=zoom
+    #                         )
+    # )
+
+    # fig.add_trace(
+    #     go.Choroplethmapbox(
+    #         customdata=town_merged_df,
+    #         geojson=location_json,
+    #         featureidkey='properties.Town',
+    #         locations=town_merged_df['Town'],
+    #         # locations=town_unincorporated_appended_df['long_name'],
+    #         # z=filtered_df[z_col_name] * 100,
+    #         z=town_merged_df[data_value],
+    #         # colorscale='agsunset_r',
+    #         colorscale=max_50_pct_color_scale,
+    #         # colorscale='greens',
+    #         autocolorscale=False,
+    #         # color=town_merged_df[data_value],
+    #         # colorscale=[[0, 'white'], [1, 'red']],
+    #         # colorscale=[[0.00, 'rgb(255,255,255)'], [0.05, 'rgb(222,235,247)'], [0.10, 'rgb(198,219,239)'], [0.25, 'rgb(158,202,225)'], [0.50, 'rgb(107,174,214)'], [0.75, 'rgb(33,113,181)'], [0.90, 'rgb(8,81,156)'], [0.99, 'rgb(8,48,107)']],
+    #         # colorscale=((0.0, 'rgb(255,255,255)'), (0.125, 'rgb(222,235,247)'), (0.25, 'rgb(198,219,239)'), (0.375, 'rgb(158,202,225)'), (0.5, 'rgb(107,174,214)'), (0.625, 'rgb(66,146,198)'), (0.75, 'rgb(33,113,181)'), (0.875, 'rgb(8,81,156)'), (1.0, 'rgb(8,48,107)')),
+    #         # colorscale = ((0.0, 'rgb(255,255,255)'), (0.1, 'rgb(222,235,247)'), (0.25, 'rgb(198,219,239)'), (0.5, 'rgb(107,174,214)'), (0.75, 'rgb(33,113,181)'), (0.9, 'rgb(8,81,156)'), (1.0, 'rgb(8,48,107)')),
+    #         # colorscale=award_levels_color_map,
+    #         # color_discrete_map=award_levels_color_map,
+    #         # colorscale=town_color_scale,
+    #         # colorbar_title=data_value,
+    #         # hovertemplate="County: %{customdata[2]}<br>Actual Pct: %{customdata[4]}<extra></extra>",
+    #         hovertemplate=town_template,
+    #         # hoverlabel_bgcolor='white',
+    #         hoverlabel=dict(
+    #             bgcolor="black",
+    #             font_size=16),
+    #         marker_opacity=1,
+    #         name='Town Data Values',
+    #         # visible=map_feature_selected == 'Town Boundaries',
+    #         zmin=z_min,
+    #         zmax=z_max
+    #     ))
+    fig.update_layout(mapbox_layers=[dict(sourcetype='geojson',
+                                          source=county_location_json,
+                                          color='#303030',
+                                          type='line',
+                                          line=dict(width=1.5)
+                                          # hovertemplate=template
+                                          )]);
+    fig.update_layout(mapbox_style="carto-positron",
+                      mapbox_zoom=zoom, mapbox_center=center)
+    fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
+                            , title=dict(text=f'{data_value} for Towns in {state}', x=0.5
+                                         , xanchor="center")
+                            )
     return fig
 
 
@@ -936,7 +1163,11 @@ def create_region_by_town_map(source_osm_df, region):
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     # town_merged_df.drop(['tags', 'geometry','lcase_town','arena_id','County','COUNTY'], axis=1, inplace=True, errors='ignore')
     # town_merged_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
-    z_max = float(town_merged_df[data_value].max()) if float(town_merged_df[data_value].max()) > 0 else float(town_merged_df['TotalMiles'].max())
+    if data_value == 'AwardLevel':
+        z_max = 1
+    else:
+        z_max = float(town_merged_df[data_value].max()) if float(town_merged_df[data_value].max()) > 0 else float(town_merged_df['TotalMiles'].max())
+
     location_gdf = town_merged_df.drop(['TotalMiles','ActualPct','ActualMiles','Pct10','Pct25','Pct50','Pct75','Pct90','awarded'
                                            ,'Pct10Deficit','Pct25Deficit','Pct50Deficit','Pct75Deficit','Pct90Deficit']
                                        , axis=1, errors='ignore')
@@ -1375,6 +1606,19 @@ def get_wandrer_totals_for_towns_for_state(states):
 		, round(fqtn.percentage, 7) as ActualPct, round(fqtn.ActualLength, 7) as ActualMiles
 		, round(fqtn.Pct10, 7) as Pct10, round(fqtn.Pct25, 7) as Pct25, round(fqtn.Pct50, 7) as Pct50
         , round(fqtn.Pct75, 7) as Pct75, round(fqtn.Pct90, 7) as Pct90, fqtn.awarded
+ 		, CASE 
+			WHEN fqtn.percentage <= 0 then '0.00 Pct' 
+	-- 		WHEN fqtn.percentage > 0 and fqtn.percentage <= .10 then '0.00 Pct' 
+			WHEN fqtn.percentage <= .10 and fqtn.ActualLength < 1 then '0.00 Pct'
+			WHEN fqtn.percentage <= .10 and fqtn.ActualLength >= 1 then '0.05 Pct' 
+			WHEN fqtn.percentage > .10 and fqtn.percentage < .25 then '0.10 Pct'
+			WHEN fqtn.percentage >= .25 and fqtn.percentage < .50 then '0.25 Pct'
+			WHEN fqtn.percentage >= .50 and fqtn.percentage < .75 then '0.50 Pct'
+			WHEN fqtn.percentage >= .75 and fqtn.percentage < .90 then '0.75 Pct'
+			WHEN fqtn.percentage >= .90 and fqtn.percentage < .99 then '0.90 Pct'
+			WHEN fqtn.percentage >= .99 then '0.99 Pct'
+--			ELSE '0.00 Pct'
+		END as AwardLevel
         , CASE WHEN fqtn.Pct10Deficit < 0 THEN 0 ELSE round(fqtn.Pct10Deficit, 7) END as Pct10Deficit
         , CASE WHEN fqtn.Pct25Deficit < 0 THEN 0 ELSE round(fqtn.Pct25Deficit, 7) END as Pct25Deficit
         , round(fqtn.Pct50Deficit, 7) as Pct50Deficit, round(fqtn.Pct75Deficit, 7) as Pct75Deficit
@@ -1383,7 +1627,7 @@ def get_wandrer_totals_for_towns_for_state(states):
         from arena_badge town
 		inner join vw_current_town_data fqtn on fqtn.id = town.id 
         where fqtn.state in {in_statement}
-        order by fqtn.region, fqtn.country, fqtn.state, fqtn.county, fqtn.name'''
+        order by AwardLevel, fqtn.region, fqtn.country, fqtn.state, fqtn.county, fqtn.name'''
     # print(query)
     wandrerer_df = execute_query(query)
     return wandrerer_df
@@ -1781,7 +2025,7 @@ def main():
 
     region_list = ['All'] + (st.session_state.wandrer_regions.subregion_name.unique().tolist())
     geojson_files = get_geojson_filenames_for_region()
-    data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles < 1', 'ActualMiles >= 1', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit']
+    data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles < 1', 'ActualMiles >= 1', 'ActualPct', 'AwardLevel', 'Pct10Deficit', 'Pct25Deficit']
 
     if 'gdfs' not in st.session_state:
         # Initialize geopandas df dictionary in session state.
