@@ -26,6 +26,8 @@ max_50_pct_color_scale = ['white', 'gold', 'red']
 
 award_levels_color_map = {
     '0%': 'white',
+    '< 1 mile': 'rgb(224,224,223)',
+    '< 5%': 'rgb(197,197,195)',
     '5%': 'lightskyblue',
     '10%': 'lightgreen',
     '25%': 'rgb(255,215,0)',
@@ -808,7 +810,7 @@ def create_town_map_discrete_color(center, county_location_json, data_value, loc
         zoom=8,
         # center={"lat": 43.80471, "lon": -71.57059}, # Center of the map
         color_discrete_map=award_levels_color_map,
-        category_orders={'Award Level': ['0%','5%','10%','25%','50%','75%','90%','99%']}
+        category_orders={'Award Level': ['0%','< 1 mile','< 5%','5%','10%','25%','50%','75%','90%','99%']}
     )
 
     # Add template for each trace, filtering the data on 'Award Level'.
@@ -1557,7 +1559,8 @@ def get_wandrer_totals_for_towns_for_state(states):
  		, CASE 
 			WHEN fqtn.percentage <= 0 then '0%' 
 	-- 		WHEN fqtn.percentage > 0 and fqtn.percentage <= .10 then '0%' 
-			WHEN fqtn.percentage <= .10 and fqtn.ActualLength < 1 then '0%'
+			WHEN fqtn.percentage > 0 and fqtn.ActualLength < 1 then '< 1 mile'
+			WHEN fqtn.percentage < .05 and fqtn.ActualLength > 1 then '< 5%'
 			WHEN fqtn.percentage <= .10 and fqtn.ActualLength >= 1 then '5%' 
 			WHEN fqtn.percentage > .10 and fqtn.percentage < .25 then '10%'
 			WHEN fqtn.percentage >= .25 and fqtn.percentage < .50 then '25%'
