@@ -503,6 +503,11 @@ def convert_bounds_to_linestrings(source_gdf):
 def create_town_map(town_gdf, state, maptype):
     town_gdf = clean_gdf(town_gdf)
     # county_gdf = town_gdf.dissolve(by='County')
+
+    # # Save the GeoDataFrame to a GeoJSON file
+    # output_filename = f'{state}_locations_filtered.geojson'
+    # town_gdf.to_file(output_filename, driver='GeoJSON')
+
     county_gdf = town_gdf.dissolve(by='long_county')
     county_gdf.reset_index(inplace=True)
     convert_bounds_to_linestrings(county_gdf)
@@ -850,9 +855,9 @@ def create_town_map_discrete_color(center, county_location_json, data_value, mer
 
 def clean_gdf(town_gdf):
     if column_exists_case_insensitive(town_gdf, 'osm_id'):
-        columns_to_keep = ['osm_id', 'Town', 'State', 'long_county', 'long_name', 'County', 'normalized', 'geometry']
+        columns_to_keep = ['osm_id', 'Town', 'State', 'long_county', 'long_name', 'County', 'normalized', 'geometry', 'diagonal']
     else:
-        columns_to_keep = ['Town', 'State', 'long_county', 'long_name', 'County', 'normalized', 'geometry']
+        columns_to_keep = ['Town', 'State', 'long_county', 'long_name', 'County', 'normalized', 'geometry', 'diagonal']
 
     filtered_gdf = town_gdf[columns_to_keep]
     return filtered_gdf
