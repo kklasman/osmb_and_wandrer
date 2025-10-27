@@ -1975,6 +1975,8 @@ def login():
     with col2:
         button2 = st.button('Cancel', key= 'cancel')
 
+    st.write('About:')
+    st.write(f'python version: {sys.version}')
     if button1:
         if password == st.secrets["password"]:
             logged_in()
