@@ -17,11 +17,18 @@ import requests
 from io import StringIO
 from datetime import datetime
 import database as db
+import logging
 # import uuid
 # from pympler import asizeof
 
-print(f'{sys.version}=')
-print(f'{sys.version_info}=')
+# Configure the root logger
+logging.basicConfig(level=logging.INFO)
+
+# Get a logger for the current module
+logger = logging.getLogger(__name__)
+
+logger.info(f'python version: {sys.version}')
+logger.info(f'python version_info: {sys.version_info}')
 
 os.environ['PYOGRIO_USE_ARROW'] = '1'
 
