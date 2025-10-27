@@ -18,6 +18,9 @@ from io import StringIO
 from datetime import datetime
 import database as db
 # import uuid
+from pympler import asizeof
+
+os.environ['PYOGRIO_USE_ARROW'] = '1'
 
 st.set_page_config(layout='wide')
 
@@ -855,9 +858,9 @@ def create_town_map_discrete_color(center, county_location_json, data_value, mer
 
 def clean_gdf(town_gdf):
     if column_exists_case_insensitive(town_gdf, 'osm_id'):
-        columns_to_keep = ['osm_id', 'Town', 'State', 'long_county', 'long_name', 'County', 'normalized', 'geometry', 'diagonal']
+        columns_to_keep = ['osm_id', 'Town', 'State', 'long_county', 'long_name', 'County', 'normalized', 'geometry']
     else:
-        columns_to_keep = ['Town', 'State', 'long_county', 'long_name', 'County', 'normalized', 'geometry', 'diagonal']
+        columns_to_keep = ['Town', 'State', 'long_county', 'long_name', 'County', 'normalized', 'geometry']
 
     filtered_gdf = town_gdf[columns_to_keep]
     return filtered_gdf
@@ -1978,6 +1981,8 @@ def logged_in():
     st.rerun()
 
 def main():
+    # ss
+
     if 'show_update_county_btn' not in st.session_state:
         st.session_state.show_update_county_btn = False
 
