@@ -20,6 +20,9 @@ import database as db
 # import uuid
 # from pympler import asizeof
 
+print(f'{sys.version}=')
+print(f'{sys.version_info}=')
+
 os.environ['PYOGRIO_USE_ARROW'] = '1'
 
 st.set_page_config(layout='wide')
@@ -2062,10 +2065,10 @@ def main():
             config = {"scrollZoom": True}
             st.session_state.current_fig = fig
             st.plotly_chart(fig, config=config)
-            # st.write('Raw Data')
+            st.write('Raw Data')
             # st.dataframe(osm_gdf, use_container_width=True)
-            # st.dataframe(st.session_state['map_gdf'], use_container_width=True, selection_mode='single-row'
-            #          ,key='map_data', on_select=town_selected)
+            st.dataframe(st.session_state['map_gdf'], use_container_width=True, selection_mode='single-row'
+                     ,key='map_data', on_select=town_selected)
         else:
             st.write(f'{maptype_selectbox} map unavailable for {state_selectbox}')
 
