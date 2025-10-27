@@ -1977,6 +1977,7 @@ def login():
 
     st.write('About:')
     st.write(f'python version: {sys.version}')
+    st.write(f'python version_info: {sys.version_info}')
     if button1:
         if password == st.secrets["password"]:
             logged_in()
