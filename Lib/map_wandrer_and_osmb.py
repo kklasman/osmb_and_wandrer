@@ -28,7 +28,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 logger.info(f'python version: {sys.version}')
-logger.info(f'python version_info: {sys.version_info}')
+# logger.info(f'python version_info: {sys.version_info}')
+logger.info(f'Streamlit version: {st.__version__}')
 
 os.environ['PYOGRIO_USE_ARROW'] = '1'
 
@@ -1977,7 +1978,8 @@ def login():
 
     st.write('About:')
     st.write(f'python version: {sys.version}')
-    st.write(f'python version_info: {sys.version_info}')
+    st.write(f'Streamlit version: {st.__version__}')
+
     if button1:
         if password == st.secrets["password"]:
             logged_in()
