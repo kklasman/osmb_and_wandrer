@@ -1990,6 +1990,30 @@ def login():
         st.session_state.login_dismissed = True
         st.rerun()
 
+@st.dialog("Settings")
+def settings():
+    # ss
+    st.write("User Settings")
+    # col1, col2 = st.columns(2)
+
+    # if 'show_raw_data' not in st.session_state:
+    #     st.session_state.show_raw_data = False
+    # else:
+
+    st.checkbox('Show raw data grid', key='show_raw_data', value=st.session_state.show_raw_data_state)
+
+    st.write(f"Checkbox value from session state: {st.session_state.show_raw_data_state}")
+
+    # button1 = st.button('Close', key='close')
+
+    # with col2:
+    #     button2 = st.button('Cancel', key= 'cancel')
+
+    if st.button('Close', key='close'):
+        st.session_state.show_raw_data_state = st.session_state.show_raw_data
+        st.session_state.settings_dismissed = True
+        st.rerun()
+
 
 def logged_in():
     st.session_state.logged_in = True
@@ -1997,6 +2021,8 @@ def logged_in():
 
 def main():
     # ss
+    if 'show_raw_data_state' not in st.session_state:
+        st.session_state.show_raw_data_state = False
 
     if 'show_update_county_btn' not in st.session_state:
         st.session_state.show_update_county_btn = False
@@ -2037,6 +2063,9 @@ def main():
         update_county_data()
 
     with st.sidebar:
+        if st.button('Settings'):
+            settings()
+
         region_selectbox = st.selectbox('Select a region:', region_list, key='selected_region', index=0, on_change=region_selected())
         state_selectbox = st.selectbox('Select a location (US State):', get_geojson_filenames_for_region().keys(), key='selected_state', index=None)
         # preserve_map_selection = st.checkbox('Clear map type selection on state change', key='preserve_map_selection')
@@ -2077,10 +2106,11 @@ def main():
             config = {"scrollZoom": True}
             st.session_state.current_fig = fig
             st.plotly_chart(fig, config=config)
-            st.write('Raw Data')
-            # st.dataframe(osm_gdf, use_container_width=True)
-            st.dataframe(st.session_state['map_gdf'], use_container_width=True, selection_mode='single-row'
-                     ,key='map_data', on_select=town_selected)
+            if st.session_state.show_raw_data_state:
+                st.write('Raw Data')
+                # st.dataframe(osm_gdf, use_container_width=True)
+                st.dataframe(st.session_state['map_gdf'], use_container_width=True, selection_mode='single-row'
+                         ,key='map_data', on_select=town_selected)
         else:
             st.write(f'{maptype_selectbox} map unavailable for {state_selectbox}')
 
@@ -2235,7 +2265,6 @@ def update_county_data():
 
 
 # ss
-
 
 # startup code
 if "startup_msg_displayed" not in st.session_state:
