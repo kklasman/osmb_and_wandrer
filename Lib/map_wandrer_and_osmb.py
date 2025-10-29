@@ -6,6 +6,7 @@ import pandas as pd
 import json
 import os
 import sqlite3
+import plotly
 import plotly.express as px
 import streamlit as st
 from streamlit import session_state as ss
@@ -1976,10 +1977,12 @@ def login():
     with col2:
         button2 = st.button('Cancel', key= 'cancel')
 
-    st.write('About:')
-    st.write(f'python version: {sys.version}')
-    st.write(f'Streamlit version: {st.__version__}')
-
+    # st.write('About:')
+    # with st.container(height=100, gap=None):
+    #     st.write(f'Plotly version: {plotly.__version__}')
+    #     st.write(f'python version: {sys.version.split(" ")[0]}')
+    #     st.write(f'Streamlit version: {st.__version__}')
+    #
     if button1:
         if password == st.secrets["password"]:
             logged_in()
@@ -1994,20 +1997,15 @@ def login():
 def settings():
     # ss
     st.write("User Settings")
-    # col1, col2 = st.columns(2)
-
-    # if 'show_raw_data' not in st.session_state:
-    #     st.session_state.show_raw_data = False
-    # else:
-
     st.checkbox('Show raw data grid', key='show_raw_data', value=st.session_state.show_raw_data_state)
 
-    st.write(f"Checkbox value from session state: {st.session_state.show_raw_data_state}")
+    st.write('About:')
+    with st.container(height=100, gap=None):
+        st.write(f'Plotly version: {plotly.__version__}')
+        st.write(f'python version: {sys.version.split(" ")[0]}')
+        st.write(f'Streamlit version: {st.__version__}')
 
-    # button1 = st.button('Close', key='close')
-
-    # with col2:
-    #     button2 = st.button('Cancel', key= 'cancel')
+    # st.write(f"Checkbox value from session state: {st.session_state.show_raw_data_state}")
 
     if st.button('Close', key='close'):
         st.session_state.show_raw_data_state = st.session_state.show_raw_data
@@ -2103,10 +2101,12 @@ def main():
                     fig = create_region_by_town_map(osm_state_gdf.copy(), region_selectbox)
 
         if fig:
-            config = {"scrollZoom": True}
             st.session_state.current_fig = fig
-            st.plotly_chart(fig, config=config)
+            st.plotly_chart(fig)
             if st.session_state.show_raw_data_state:
+                st.write(' ')
+                st.write(' ')
+                st.write(' ')
                 st.write('Raw Data')
                 # st.dataframe(osm_gdf, use_container_width=True)
                 st.dataframe(st.session_state['map_gdf'], use_container_width=True, selection_mode='single-row'
