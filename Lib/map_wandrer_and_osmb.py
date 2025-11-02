@@ -19,6 +19,8 @@ from io import StringIO
 from datetime import datetime
 import database as db
 import logging
+import re
+
 # import uuid
 # from pympler import asizeof
 
@@ -181,6 +183,27 @@ def create_template(data, col_names):
 
             elif name == 'TownsNotCycled':
                 template += "<b>Towns Not Cycled:</b> %{" + f"customdata[{data.columns.get_loc('TownsNotCycled')}]" + "}<br>"
+
+            elif name == 'TownsAwarded':
+                template += "<b>Towns Awarded:</b> %{" + f"customdata[{data.columns.get_loc('TownsAwarded')}]" + "}<br>"
+
+            elif name == 'Pct10_Count':
+                template += "<b>10% Count:</b> %{" + f"customdata[{data.columns.get_loc('Pct10_Count')}]" + "}<br>"
+
+            elif name == 'Pct25_Count':
+                template += "<b>25% Count:</b> %{" + f"customdata[{data.columns.get_loc('Pct25_Count')}]" + "}<br>"
+
+            elif name == 'Pct50_Count':
+                template += "<b>50% Count:</b> %{" + f"customdata[{data.columns.get_loc('Pct50_Count')}]" + "}<br>"
+
+            elif name == 'Pct75_Count':
+                template += "<b>75% Count:</b> %{" + f"customdata[{data.columns.get_loc('Pct75_Count')}]" + "}<br>"
+
+            elif name == 'Pct90_Count':
+                template += "<b>90% Count:</b> %{" + f"customdata[{data.columns.get_loc('Pct90_Count')}]" + "}<br>"
+
+            elif name == 'Pct99_Count':
+                template += "<b>99% Count:</b> %{" + f"customdata[{data.columns.get_loc('Pct99_Count')}]" + "}<br>"
 
             elif name == 'PctTownsCycled':
                 template += "<b>Pct Towns Cycled:</b> %{" + f"customdata[{data.columns.get_loc('PctTownsCycled')}]:.2%" + "}<br>"
@@ -357,8 +380,12 @@ def create_county_map_v2(source_osm_df, state):
     if data_value == 'TotalMiles':
         data_value = 'TotalCountyMiles'
 
-    z_max = float(merged_df[data_value].max()) if float(merged_df[data_value].max()) > 0 else float(merged_df[data_value].max())
-    z_data_value = 'TotalCountyMilesCycled' if data_value.startswith('ActualMiles') else data_value
+    if data_value == 'Award Level':
+        z_max = merged_df['TownsAwarded'].max()
+        z_data_value = 'TownsAwarded'
+    else:
+        z_max = float(merged_df[data_value].max()) if float(merged_df[data_value].max()) > 0 else float(merged_df[data_value].max())
+        z_data_value = 'TotalCountyMilesCycled' if data_value.startswith('ActualMiles') else data_value
 
     st.session_state['map_gdf'] = merged_df
     fig = go.Figure(go.Choroplethmap(
@@ -488,6 +515,11 @@ def create_county_map_v2(source_osm_df, state):
 
 
 def get_template_field_list_for_county_scope_map(merged_df):
+    if ss['selected_datavalue_for_map'] == 'Award Level':
+        template_fields = ['State', 'County', 'TotalTowns', 'CycledTowns', 'TownsAwarded', 'Pct10_Count'
+                           , 'Pct25_Count', 'Pct50_Count', 'Pct75_Count', 'Pct90_Count', 'Pct99_Count']
+        return template_fields
+
     template_fields = ['State','County', 'TotalTowns', 'CycledTowns', 'PctTownsCycled', 'AchievedTowns', 'PctTownsAchieved',
                        'TotalTownMiles', 'ActualMiles', 'ActualPct']
     # if any(merged_df['UnincorporatedMiles'] > 0):
@@ -1343,7 +1375,8 @@ def create_region_by_county_map(source_osm_df, region):
     state_gdf = source_osm_df.dissolve(by='State')
     state_gdf.reset_index(inplace=True)
 
-    wandrerer_df = get_wandrer_totals_for_counties_for_states(state_gdf.State.to_list())
+    # wandrerer_df = get_wandrer_totals_for_counties_for_states(state_gdf.State.to_list())
+    wandrerer_df = get_wandrer_totals_for_counties_for_states_v2(state_gdf.State.to_list())
 
     data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
 
@@ -1362,7 +1395,17 @@ def create_region_by_county_map(source_osm_df, region):
     if data_value == 'TotalMiles':
         data_value = 'TotalCountyMiles'
 
-    z_max = float(merged_df[data_value].max()) if float(merged_df[data_value].max()) > 0 else float(merged_df['TotalCountyMiles'].max())
+    # z_max = float(merged_df[data_value].max()) if float(merged_df[data_value].max()) > 0 else float(merged_df['TotalCountyMiles'].max())
+    if data_value == 'Award Level':
+        z_max = merged_df['TownsAwarded'].max()
+        z_column = 'TownsAwarded'
+    else:
+        z_max = float(merged_df[data_value].max()) if float(merged_df[data_value].max()) > 0 else float(
+            merged_df['TotalCountyMiles'].max())
+        z_column = data_value
+
+    z_column_formatted = re.sub('([A-Z])', r' \1', z_column).strip()
+
     z_min =  1000 if data_value == 'TotalMiles' else 0
 
     st.session_state['map_gdf'] = merged_df
@@ -1372,7 +1415,7 @@ def create_region_by_county_map(source_osm_df, region):
         geojson=location_json,
         featureidkey='properties.long_name',
         locations=merged_df['long_name'],
-        z=merged_df[data_value],
+        z=merged_df[z_column],
         colorscale=max_50_pct_color_scale,
         zmin=z_min,
         zmax=z_max,
@@ -1384,7 +1427,7 @@ def create_region_by_county_map(source_osm_df, region):
             font_size=16),
         # marker_line_width=2,
         visible=True,
-        colorbar_title=data_value
+        colorbar_title=z_column_formatted
     ))
     fig.update_layout(map_style="carto-positron",
                       map_zoom=zoom, map_center=center)
@@ -1395,7 +1438,7 @@ def create_region_by_county_map(source_osm_df, region):
                                           line=dict(width=1.5)
                                           )]);
     fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
-                            , title=dict(text=f'{data_value} by County for Region of {region}', x=0.5
+                            , title=dict(text=f'{z_column_formatted} by County for {region}', x=0.5
                             , xanchor="center")
                             )
 
@@ -1527,8 +1570,9 @@ def get_wandrer_totals_for_counties_for_states(states):
 
 def get_wandrer_totals_for_counties_for_states_v2(states):
     states_in_str = states.__str__().replace('[', '(').replace(']', ')')
-    query = f'''select *
-		from vw_county_aggregates 
+    query = f'''select vca.*
+		, vca.Pct10_Count + vca.Pct25_Count + vca.Pct50_Count + vca.Pct75_Count + vca.Pct90_Count + vca.Pct99_Count as TownsAwarded
+		from vw_county_aggregates vca
     	where State in {states_in_str}
     	order by region, country, State, County'''
     # print(query)
