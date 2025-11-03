@@ -187,6 +187,9 @@ def create_template(data, col_names):
             elif name == 'TownsAwarded':
                 template += "<b>Towns Awarded:</b> %{" + f"customdata[{data.columns.get_loc('TownsAwarded')}]" + "}<br>"
 
+            elif name == 'Pct5_Count':
+                template += "<b>5% Count:</b> %{" + f"customdata[{data.columns.get_loc('Pct5_Count')}]" + "}<br>"
+
             elif name == 'Pct10_Count':
                 template += "<b>10% Count:</b> %{" + f"customdata[{data.columns.get_loc('Pct10_Count')}]" + "}<br>"
 
@@ -516,7 +519,7 @@ def create_county_map_v2(source_osm_df, state):
 
 def get_template_field_list_for_county_scope_map(merged_df):
     if ss['selected_datavalue_for_map'] == 'Award Level':
-        template_fields = ['State', 'County', 'TotalTowns', 'CycledTowns', 'TownsAwarded', 'Pct10_Count'
+        template_fields = ['State', 'County', 'TotalTowns', 'CycledTowns', 'TownsAwarded', 'Pct5_Count', 'Pct10_Count'
                            , 'Pct25_Count', 'Pct50_Count', 'Pct75_Count', 'Pct90_Count', 'Pct99_Count']
         return template_fields
 
@@ -547,7 +550,7 @@ def convert_bounds_to_linestrings(source_gdf):
     #     print(item['geometry'])
 
 
-def create_town_map(town_gdf, state, maptype):
+def create_town_map(town_gdf, state_list, maptype):
     town_gdf = clean_gdf(town_gdf)
     # county_gdf = town_gdf.dissolve(by='County')
 
@@ -563,13 +566,13 @@ def create_town_map(town_gdf, state, maptype):
     state_gdf.reset_index(inplace=True)
     data_value = ss['selected_datavalue_for_map']
 
-    dissolved_town_gdf = town_gdf.dissolve('Town')
+    dissolved_town_gdf = town_gdf.dissolve(by='long_name')
     dissolved_town_gdf.reset_index(inplace=True)
     dissolved_town_gdf = dissolved_town_gdf.dropna(axis=1, how='all')
     dissolved_town_gdf = dissolved_town_gdf[dissolved_town_gdf.columns.drop(list(dissolved_town_gdf.filter(regex='name:')))]
 
-    state_list = []
-    state_list.append(state)
+    # state_list = []
+    # state_list.append(state)
     wandrerer_county_df = get_wandrer_totals_for_counties_for_states(state_list)
     if data_value == 'ActualMiles > 1':
         data_value =  'ActualMiles'
@@ -613,14 +616,15 @@ def create_town_map(town_gdf, state, maptype):
 
     data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
 
-    if sys.gettrace() is not None:
-        dump_town_misses_and_matches(state, town_gdf, wandrerer_df)
+    # if sys.gettrace() is not None:
+    #     dump_town_misses_and_matches(state, town_gdf, wandrerer_df)
 
     # town_merged_df = town_gdf.merge(wandrerer_df, on=['State','County','Town','long_name'])
     # town_merged_df = dissolved_town_gdf.merge(wandrerer_df, on=['State','County','Town','long_name'])
     if wandrerer_df['osm_id'].isnull().all():
         # old format towns without osm_id values
-        town_merged_df = dissolved_town_gdf.merge(wandrerer_df, on=['State','County', 'Town','long_name'])
+        # town_merged_df = dissolved_town_gdf.merge(wandrerer_df, on=['State','County', 'Town','long_name'])
+        town_merged_df = dissolved_town_gdf.merge(wandrerer_df, on=['long_name', 'State','County', 'Town'])
         town_merged_df.drop('osm_id', axis=1, inplace=True, errors='ignore')
     else:
         # new format towns with osm_id values
@@ -706,7 +710,9 @@ def create_town_map(town_gdf, state, maptype):
     # columns_to_drop = town_unincorporated_appended_df.select_dtypes(include=['datetime64']).columns
     # town_unincorporated_appended_df.drop(columns=columns_to_drop, axis=1, inplace=True)
     # town_unincorporated_appended_df.reset_index(drop=True, inplace=True)
-    location_json = json.loads(town_merged_df.to_json())
+    location_df = town_merged_df.drop('diagonal', axis=1, errors='ignore')
+    location_json = json.loads(location_df.to_json())
+    # location_json = json.loads(town_merged_df.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     town_merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
     # town_unincorporated_appended_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
@@ -718,10 +724,10 @@ def create_town_map(town_gdf, state, maptype):
     if data_value == 'Award Level':
         # fig = create_town_map_discrete_color(center, county_location_json, data_value, fig, location_json, state,
         #                                        town_merged_df, zoom)
-        fig = create_town_map_discrete_color(center, county_location_json, data_value, merged_county_df, location_json, state,
+        fig = create_town_map_discrete_color(center, county_location_json, data_value, merged_county_df, location_json, state_list,
                                                town_merged_df, zoom)
     else:
-        fig = create_town_map_continuous_color(center, county_location_json, data_value, fig, location_json, state,
+        fig = create_town_map_continuous_color(center, county_location_json, data_value, fig, location_json, state_list,
                                                        town_merged_df, zoom)
 
     return fig
@@ -737,15 +743,15 @@ def create_town_map_continuous_color(center, county_location_json, data_value, f
     st.session_state['map_gdf'] = town_merged_df
     # town_template = create_template(town_merged_df, ['Town', 'County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     town_template = create_template(town_merged_df,
-                                    ['Town', 'County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit',
+                                    ['State', 'County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit',
                                      'Pct25Deficit'])
     town_color_scale = award_levels_color_map if data_value == 'Award Level' else max_50_pct_color_scale
     fig.add_trace(
         go.Choroplethmap(
             customdata=town_merged_df,
             geojson=location_json,
-            featureidkey='properties.Town',
-            locations=town_merged_df['Town'],
+            featureidkey='properties.long_name',
+            locations=town_merged_df['long_name'],
             # locations=town_unincorporated_appended_df['long_name'],
             # z=filtered_df[z_col_name] * 100,
             z=town_merged_df[data_value],
@@ -818,7 +824,7 @@ def create_town_map_discrete_color(center, county_location_json, data_value, mer
     st.session_state['map_gdf'] = town_merged_df
     # town_template = create_template(town_merged_df, ['Town', 'County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     town_template = create_template(town_merged_df,
-                                    ['Town', 'County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit',
+                                    ['State', 'County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit',
                                      'Pct25Deficit', 'awarded', 'Award Level'])
     # town_color_scale = award_levels_color_map if data_value == 'Award Level' else max_50_pct_color_scale
     # town_color_scale = ((0.00, 'rgb(247,251,255)'), (0.125, 'rgb(222,235,247)'), (0.25, 'rgb(198,219,239)'), (0.375, 'rgb(158,202,225)'), (0.5, 'rgb(107,174,214)'), (0.625, 'rgb(66,146,198)'), (0.75, 'rgb(33,113,181)'), (0.875, 'rgb(8,81,156)'), (1.0, 'rgb(8,48,107)'))
@@ -828,9 +834,9 @@ def create_town_map_discrete_color(center, county_location_json, data_value, mer
     fig = px.choropleth_map(
         town_merged_df,
          geojson=location_json,
-        locations='Town',
+        locations='long_name',
         color='Award Level',  # Use the categorical column for discrete colors
-        featureidkey='properties.Town',
+        featureidkey='properties.long_name',
         # color_discrete_map=award_levels_color_map,
         # scope='usa',
         zoom=8,
@@ -1179,17 +1185,30 @@ def create_region_by_town_map(source_osm_df, region):
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     # town_merged_df.drop(['tags', 'geometry','lcase_town','arena_id','County','COUNTY'], axis=1, inplace=True, errors='ignore')
     # town_merged_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
+
+    location_gdf = town_merged_df.drop(['TotalMiles','ActualPct','ActualMiles','Pct10','Pct25','Pct50','Pct75','Pct90','awarded'
+                                           ,'Pct10Deficit','Pct25Deficit','Pct50Deficit','Pct75Deficit','Pct90Deficit', 'diagonal']
+                                       , axis=1, errors='ignore')
+    location_json = json.loads(location_gdf.to_json())
+    # location_json = location_gdf.to_json()
+    with open("location.json", "w") as f:
+        json.dump(location_json, f, indent=4)
+
     if data_value == 'Award Level':
-        z_max = 1
+        # fig = create_town_map_discrete_color(center, county_location_json, data_value, fig, location_json, state,
+        #                                        town_merged_df, zoom)
+        county_location_json = json.loads(county_gdf.to_json())
+        with open("county_location.json", "w") as f:
+            json.dump(county_location_json, f, indent=4)
+        merged_county_df = pd.DataFrame()
+        fig = create_town_map_discrete_color(center, county_location_json, data_value, merged_county_df, location_json, region,
+                                               town_merged_df, zoom)
+        return fig
+    # if data_value == 'Award Level':
+    #     z_max = 1
     else:
         z_max = float(town_merged_df[data_value].max()) if float(town_merged_df[data_value].max()) > 0 else float(town_merged_df['TotalMiles'].max())
 
-    location_gdf = town_merged_df.drop(['TotalMiles','ActualPct','ActualMiles','Pct10','Pct25','Pct50','Pct75','Pct90','awarded'
-                                           ,'Pct10Deficit','Pct25Deficit','Pct50Deficit','Pct75Deficit','Pct90Deficit']
-                                       , axis=1, errors='ignore')
-    location_json = json.loads(location_gdf.to_json())
-    with open("location.json", "w") as f:
-        json.dump(location_json, f, indent=4)
     county_location_json = json.loads(county_gdf.to_json())
     town_merged_df.drop(['tags','lcase_town','arena_id','COUNTY','geometry'], axis=1, inplace=True, errors='ignore')
     template = create_template(town_merged_df, ['State','County','Town','TotalMiles','ActualMiles','ActualPct','Pct10Deficit','Pct25Deficit'])
@@ -1741,30 +1760,30 @@ def get_geojson_filename(selected_state):
     return file_path
 
 def get_geopandas_df_for_state(selected_state):
-    if selected_state not in st.session_state.gdfs.keys():
+    # if selected_state not in st.session_state.gdfs.keys():
         print(f'Creating geopandas df for {selected_state}')
         file_path = get_geojson_filename(selected_state)
         gdf = gpd.read_file(f'{file_path}')
         convert_bounds_to_linestrings(gdf)
-        st.session_state.gdfs[selected_state] = gdf
+        # st.session_state.gdfs[selected_state] = gdf
         if not column_exists_case_insensitive(gdf, 'normalized'):
             county_gdf, gdf = normalize_geojson(selected_state, gdf)
 
         columns_to_drop = gdf.select_dtypes(include=['datetime64']).columns
         gdf.drop(columns=columns_to_drop, axis=1, inplace=True)
         return gdf
-    else:
-        print(f'Getting geopandas df for {selected_state} from session state')
-        return st.session_state.gdfs[selected_state]
+    # else:
+    #     print(f'Getting geopandas df for {selected_state} from session state')
+    #     return st.session_state.gdfs[selected_state]
 
 def get_geopandas_df_for_region(selected_region):
-    if selected_region not in st.session_state.gdfs.keys():
+    # if not set(selected_region).issubset(set(st.session_state.gdfs.keys())):
         print(f'Creating geopandas df for {selected_region}')
         # file_path = get_geojson_filename(state_selectbox)
         # file_paths = wandrer_regions.geojson_filename.to_list()
         gdfs = gpd.GeoDataFrame()
         county_gdfs = gpd.GeoDataFrame()
-        for state in st.session_state.geojson_files_dict.keys():
+        for state in selected_region:
             gdf = get_geopandas_df_for_state(state)
             gdf = clean_gdf(gdf)
             if not column_exists_case_insensitive(gdf, 'normalized'):
@@ -1789,9 +1808,9 @@ def get_geopandas_df_for_region(selected_region):
                 county_gdfs = pd.concat([county_gdfs, county_gdf])
 
         return gdfs, county_gdfs
-    else:
-        print(f'Getting geopandas df for {selected_region} from session state')
-        return st.session_state.gdfs[selected_region]
+    # else:
+    #     print(f'Getting geopandas df for {selected_region} from session state')
+    #     return st.session_state.gdfs[selected_region[0]]
 
 def to_jaden_case(sentence):
     if sentence is None:
@@ -2069,9 +2088,9 @@ def main():
     if 'show_update_county_btn' not in st.session_state:
         st.session_state.show_update_county_btn = False
 
-    if 'gdfs' not in st.session_state:
-        # Initialize geopandas df dictionary in session state.
-        st.session_state.gdfs = {}
+    # if 'gdfs' not in st.session_state:
+    #     # Initialize geopandas df dictionary in session state.
+    #     st.session_state.gdfs = {}
 
     if 'current_fig' not in st.session_state:
         st.session_state.current_fig = {}
@@ -2088,10 +2107,10 @@ def main():
     geojson_files = get_geojson_filenames_for_region()
     data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles < 1', 'ActualMiles >= 1', 'ActualPct', 'Award Level', 'Pct10Deficit', 'Pct25Deficit']
 
-    if 'gdfs' not in st.session_state:
-        # Initialize geopandas df dictionary in session state.
-        st.session_state.gdfs = {}
-
+    # if 'gdfs' not in st.session_state:
+    #     # Initialize geopandas df dictionary in session state.
+    #     st.session_state.gdfs = {}
+    #
     if 'current_fig' not in st.session_state:
         st.session_state.current_fig = {}
 
@@ -2109,7 +2128,8 @@ def main():
             settings()
 
         region_selectbox = st.selectbox('Select a region:', region_list, key='selected_region', index=0, on_change=region_selected())
-        state_selectbox = st.selectbox('Select a location (US State):', get_geojson_filenames_for_region().keys(), key='selected_state', index=None)
+        # state_selectbox = st.selectbox('Select a location (US State):', get_geojson_filenames_for_region().keys(), key='selected_state', index=None)
+        state_selectbox = st.multiselect('Select a location (US State):', get_geojson_filenames_for_region().keys(), key='selected_state')
         # preserve_map_selection = st.checkbox('Clear map type selection on state change', key='preserve_map_selection')
         maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
         datavalue_selectbox = st.selectbox('Select a data value', data_values, key='selected_datavalue_for_map', index=None, on_change=enable_make_map())
@@ -2125,15 +2145,16 @@ def main():
         fig = {}
 
         if state_selectbox:
-            osm_gdf = get_geopandas_df_for_state(state_selectbox)
+            # osm_gdf = get_geopandas_df_for_state(state_selectbox)
+            osm_gdf, osm_county_gdf = get_geopandas_df_for_region(state_selectbox)
             match maptype_selectbox:
                 case 'State':
                     fig = create_state_map(osm_gdf.copy(), state_selectbox)
                 case 'Counties':
                     # fig = create_county_map(osm_gdf.copy(), state_selectbox)
-                    fig = create_county_map_v2(osm_gdf.copy(), state_selectbox)
+                    fig = create_county_map_v2(osm_county_gdf.copy(), state_selectbox)
                 case 'Towns' |'Seacoast Towns':
-                    fig = create_town_map(osm_gdf.copy(), state_selectbox, maptype_selectbox)
+                        fig = create_town_map(osm_gdf.copy(), state_selectbox, maptype_selectbox)
         else:
             osm_state_gdf, osm_county_gdf = get_geopandas_df_for_region(region_selectbox)
             match maptype_selectbox:
