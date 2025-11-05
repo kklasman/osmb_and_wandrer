@@ -821,11 +821,14 @@ def create_town_map_discrete_color(center, county_location_json, data_value, mer
     z_min = 0
     # st.session_state['map_gdf'] = town_merged_df
     # st.session_state['map_gdf'] = town_unincorporated_appended_df
-    st.session_state['map_gdf'] = town_merged_df
     # town_template = create_template(town_merged_df, ['Town', 'County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
-    town_template = create_template(town_merged_df,
-                                    ['State', 'County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit',
-                                     'Pct25Deficit', 'awarded', 'Award Level'])
+    template_columns = ['State', 'County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit',
+                                     'Pct25Deficit', 'awarded', 'Award Level']
+    columns_to_keep = template_columns
+    columns_to_keep.extend(['Region', 'long_name', 'diagonal'])
+    town_merged_df = town_merged_df[columns_to_keep]
+    st.session_state['map_gdf'] = town_merged_df
+    town_template = create_template(town_merged_df, template_columns)
     # town_color_scale = award_levels_color_map if data_value == 'Award Level' else max_50_pct_color_scale
     # town_color_scale = ((0.00, 'rgb(247,251,255)'), (0.125, 'rgb(222,235,247)'), (0.25, 'rgb(198,219,239)'), (0.375, 'rgb(158,202,225)'), (0.5, 'rgb(107,174,214)'), (0.625, 'rgb(66,146,198)'), (0.75, 'rgb(33,113,181)'), (0.875, 'rgb(8,81,156)'), (1.0, 'rgb(8,48,107)'))
     # colorscale = generateDiscreteColourScale(color_schemes)
