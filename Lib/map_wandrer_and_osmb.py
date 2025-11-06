@@ -2183,6 +2183,15 @@ def logged_in():
     st.session_state.logged_in = True
     st.rerun()
 
+def clear_selection_callback():
+    # Check if the multiselect value is empty (indicating "x" was clicked)
+    if not st.session_state.selected_state and 'current_fig' in st.session_state:
+        # st.session_state.my_multiselect_data = [] # Clear the associated session state data
+        current_fig_size = asizeof.asizeof(st.session_state.current_fig)
+        del st.session_state.current_fig
+        logger.info(f'st.session_state.current_fig deleted. {current_fig_size} bytes released.')
+
+
 def main():
     # ss
     if 'show_raw_data_state' not in st.session_state:
@@ -2232,7 +2241,8 @@ def main():
 
         region_selectbox = st.selectbox('Select a region:', region_list, key='selected_region', index=0, on_change=region_selected())
         # state_selectbox = st.selectbox('Select a location (US State):', get_geojson_filenames_for_region().keys(), key='selected_state', index=None)
-        state_selectbox = st.multiselect('Select a location (US State):', get_geojson_filenames_for_region().keys(), key='selected_state')
+        state_selectbox = st.multiselect('Select a location (US State):', get_geojson_filenames_for_region().keys(),
+                                         key='selected_state', on_change=clear_selection_callback)
         # preserve_map_selection = st.checkbox('Clear map type selection on state change', key='preserve_map_selection')
         maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
         datavalue_selectbox = st.selectbox('Select a data value', data_values, key='selected_datavalue_for_map', index=None, on_change=enable_make_map())
