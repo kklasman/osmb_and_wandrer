@@ -20,6 +20,7 @@ from datetime import datetime
 import database as db
 import logging
 import re
+from pympler import asizeof
 
 # import uuid
 # from pympler import asizeof
@@ -30,9 +31,9 @@ logging.basicConfig(level=logging.INFO)
 # Get a logger for the current module
 logger = logging.getLogger(__name__)
 
-logger.info(f'python version: {sys.version}')
+# logger.info(f'python version: {sys.version}')
 # logger.info(f'python version_info: {sys.version_info}')
-logger.info(f'Streamlit version: {st.__version__}')
+# logger.info(f'Streamlit version: {st.__version__}')
 
 os.environ['PYOGRIO_USE_ARROW'] = '1'
 
@@ -40,19 +41,31 @@ st.set_page_config(layout='wide')
 
 max_50_pct_color_scale = ['white', 'gold', 'red']
 
+award_levels_color_map = [
+    [0.0, 'rgb(211,211,211)'],
+    [0.1, 'rgb(192,192,192)'],
+    [0.2, 'rgb(169,169,169)'],
+    [0.3, 'rgb(128,128,128)'],
+    [0.4, 'rgb(255,250,205)'],
+    [0.5, 'rgb(255,215,0)'],
+    [0.6, 'darkorange'],
+    [0.7, 'crimson'],
+    [0.8, 'magenta'],
+    [1.0, 'blue']
+]
 
-award_levels_color_map = {
-    '0%': 'rgb(211,211,211)',
-    '< 1 mile': 'rgb(192,192,192)',
-    '< 5%': 'rgb(169,169,169)',
-    '5%': 'rgb(128,128,128)',
-    '10%': 'rgb(255,250,205)',
-    '25%': 'rgb(255,215,0)',
-    '50%': 'darkorange',
-    '75%': 'crimson',
-    '90%': 'magenta',
-    '99%': 'blue'
-}
+# award_levels_color_map = {
+#     '0%': 'rgb(211,211,211)',
+#     '< 1 mile': 'rgb(192,192,192)',
+#     '< 5%': 'rgb(169,169,169)',
+#     '5%': 'rgb(128,128,128)',
+#     '10%': 'rgb(255,250,205)',
+#     '25%': 'rgb(255,215,0)',
+#     '50%': 'darkorange',
+#     '75%': 'crimson',
+#     '90%': 'magenta',
+#     '99%': 'blue'
+# }
 
 # award_levels_color_map = {
 #     '0.0': 'gray',
@@ -99,6 +112,9 @@ def create_template(data, col_names):
 
             elif name == 'Award Level':
                 template += "<b>Award Level:</b> %{" + f"customdata[{data.columns.get_loc('Award Level')}]" + "}<br>"
+
+            elif name == 'Region':
+                template += "<b>Region:</b> %{" + f"customdata[{data.columns.get_loc('Region')}]" + "}<br>"
 
             elif name == 'State':
                 template += "<b>State:</b> %{" + f"customdata[{data.columns.get_loc('State')}]" + "}<br>"
@@ -724,8 +740,10 @@ def create_town_map(town_gdf, state_list, maptype):
     if data_value == 'Award Level':
         # fig = create_town_map_discrete_color(center, county_location_json, data_value, fig, location_json, state,
         #                                        town_merged_df, zoom)
-        fig = create_town_map_discrete_color(center, county_location_json, data_value, merged_county_df, location_json, state_list,
+        fig = create_town_map_discrete_color_go(center, county_location_json, data_value, merged_county_df, location_json, state_list,
                                                town_merged_df, zoom)
+        # fig = create_town_map_discrete_color(center, county_location_json, data_value, merged_county_df, location_json, state_list,
+        #                                        town_merged_df, zoom)
     else:
         fig = create_town_map_continuous_color(center, county_location_json, data_value, fig, location_json, state_list,
                                                        town_merged_df, zoom)
@@ -850,9 +868,11 @@ def create_town_map_discrete_color(center, county_location_json, data_value, mer
 
     # Add template for each trace, filtering the data on 'Award Level'.
     for trace in fig.data:
-        trace.customdata=town_merged_df[town_merged_df['Award Level'] == trace.name]
+        trace_name = trace.name
+        trace_df=town_merged_df[town_merged_df['Award Level'] == trace_name]
+        trace.customdata=trace_df
         trace.hovertemplate = town_template
-        trace.ids = [trace.name]
+        trace.ids = [trace_name]
 
     # county_template = create_template(merged_county_df, ['State', 'County'])
     #
@@ -892,6 +912,134 @@ def create_town_map_discrete_color(center, county_location_json, data_value, mer
     # ))
     #
     # # fig.add_trace(county_fig)
+
+    fig.update_layout(map_layers=[dict(sourcetype='geojson',
+                                          source=county_location_json,
+                                          color='#303030',
+                                          type='line',
+                                          line=dict(width=1.5),
+                                          # hovertemplate=county_template
+                                          )])
+    fig.update_layout(map_style="carto-positron",
+                      map_zoom=zoom, map_center=center)
+    fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
+                            , title=dict(text=f'{data_value} for Towns in {state}', x=0.5
+                                         , xanchor="center")
+                            )
+    return fig
+def create_town_map_discrete_color_go(center, county_location_json, data_value, merged_county_df, location_json, state,
+                                     town_merged_df, zoom):
+    template_columns = ['State', 'County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit',
+                                     'Pct25Deficit', 'awarded', 'Award Level']
+    columns_to_keep = template_columns.copy()
+    columns_to_keep.extend(['Region', 'long_name', 'diagonal', 'color_value'])
+    town_merged_df['color_value'] = town_merged_df['Award Level'].map(
+        {'0%': 0.0, '< 1 mile': 0.1, '< 5%': 0.2, '5%': 0.3, '10%': 0.4, '25%': 0.5, '50%': 0.6, '75%': 0.7, '90%': 0.8,
+         '99%': 1.0})
+
+    town_merged_df = town_merged_df[columns_to_keep]
+    st.session_state['map_gdf'] = town_merged_df
+    town_template = create_template(town_merged_df, template_columns)
+
+    # fig = px.choropleth_map(
+    #     town_merged_df,
+    #      geojson=location_json,
+    #     locations='long_name',
+    #     color='Award Level',  # Use the categorical column for discrete colors
+    #     featureidkey='properties.long_name',
+    #     zoom=8,
+    #     # center={"lat": 43.80471, "lon": -71.57059}, # Center of the map
+    #     color_discrete_map=award_levels_color_map,
+    #     category_orders={'Award Level': ['0%','< 1 mile','< 5%','5%','10%','25%','50%','75%','90%','99%']}
+    # )
+
+    category_order = ['0%', '< 1 mile', '< 5%', '5%', '10%', '25%', '50%', '75%', '90%', '99%']
+    category_to_num = {cat: i for i, cat in enumerate(category_order)}
+    # print(f'{category_to_num=}')
+
+    town_merged_df['z_value'] = town_merged_df['Award Level'].map(category_to_num)
+
+    fig = go.Figure()
+    town_merged_sorted_df = town_merged_df.sort_values(by='z_value')
+
+    logger.info(f"{asizeof.asizeof(location_json)=} bytes")
+
+    trace_dictionary_size_total = 0
+    for i, level in enumerate(town_merged_sorted_df['z_value'].sort_values().unique()):
+        # mask = town_merged_df['color_value'] == level
+        # dfp = town_merged_df.loc[mask]
+        trace_df = town_merged_sorted_df[town_merged_sorted_df['z_value'] == level]
+        # rel_districts = town_merged_df.loc[mask, 'long_name'].values
+        trace_locations = trace_df.long_name.to_list()
+        trace_features = [f for f in location_json['features'] if f['properties']['long_name'] in trace_locations]
+        trace_geojson = location_json.copy()
+        trace_geojson.update({'features': trace_features})
+        trace_dictionary_size = asizeof.asizeof(trace_geojson)
+        trace_dictionary_size_total += trace_dictionary_size
+        logger.info(f"{trace_df['Award Level'].unique()[0]} {trace_dictionary_size=} bytes")
+        lists_containing_value = []
+        defined_color = [inner_list for inner_list in award_levels_color_map if trace_df['color_value'].unique()[0] in inner_list]
+
+        if defined_color[0][0] != 0.0:
+            low_color = defined_color[0].copy()
+            low_color[0] = 0.0
+            lists_containing_value.append(low_color)
+
+        lists_containing_value.append(defined_color[0])
+        high_color = defined_color[0].copy()
+        high_color[0] = 1.0
+        lists_containing_value.append(high_color)
+        # lists_containing_value = []
+        # # lists_containing_value.append(award_levels_color_map[level])
+        # lists_containing_value.append(trace_df['color_value'].unique()[0])
+        # lists_containing_value.append(trace_df['color_value'].unique()[0])
+        fig.add_trace(go.Choroplethmap(geojson=trace_geojson,
+                                       locations=trace_df['long_name'],
+                                       customdata=trace_df,
+                                 # z=[i, ] * len(dfp),
+                                 # z=trace_df['color_value'],
+                                 z=trace_df['z_value'],
+                                 featureidkey="properties.long_name",
+                                 showlegend=True,
+                                 name=trace_df['Award Level'].unique()[0],
+                                 # colorscale=list(award_levels_color_map.values())[i],
+                                 colorscale=lists_containing_value,
+                                 hovertemplate=town_template,
+                                 showscale=False))
+
+        # fig.add_trace(go.Choroplethmap(geojson=cat_geojson,
+        #                                locations=dfp['long_name'],
+        #                                customdata=dfp,
+        #                          # z=[i, ] * len(dfp),
+        #                          z=dfp['color_value'],
+        #                          featureidkey="properties.long_name",
+        #                          showlegend=True, name=level,
+        #                          # colorscale=list(award_levels_color_map.values())[i],
+        #                          colorscale=lists_containing_value,
+        #                          showscale=False))
+
+        # fig.add_choroplethmapbox(geojson=location_json, locations=dfp['long_name'],
+        #                          z=[i, ] * len(dfp), featureidkey="properties.long_name",
+        #                          showlegend=True, name=level,
+        #                          showscale=False)
+        # fig.add_choroplethmapbox(geojson=cat_geojson, locations=dfp['long_name'],
+        #                          z=[i, ] * len(dfp), featureidkey="properties.long_name",
+        #                          showlegend=True, name=level,
+        #                          colorscale=list(award_levels_color_map.values())[i], showscale=False)
+
+    # Add template for each trace, filtering the data on 'Award Level'.
+    # for trace in fig.data:
+    #     trace_name = trace.name
+    #     trace_df=town_merged_df[town_merged_df['Award Level'] == trace_name]
+    #     trace.customdata=trace_df
+    #     trace.hovertemplate = town_template
+    #     trace.ids = [trace_name]
+
+    logger.info(f"{trace_dictionary_size_total=} bytes")
+
+    # for trace in fig.data:
+    #     print(f'{trace.name=}')
+    #     print(f'{trace.colorscale=}')
 
     fig.update_layout(map_layers=[dict(sourcetype='geojson',
                                           source=county_location_json,
@@ -1204,8 +1352,10 @@ def create_region_by_town_map(source_osm_df, region):
         with open("county_location.json", "w") as f:
             json.dump(county_location_json, f, indent=4)
         merged_county_df = pd.DataFrame()
-        fig = create_town_map_discrete_color(center, county_location_json, data_value, merged_county_df, location_json, region,
+        fig = create_town_map_discrete_color_go(center, county_location_json, data_value, merged_county_df, location_json, region,
                                                town_merged_df, zoom)
+        # fig = create_town_map_discrete_color(center, county_location_json, data_value, merged_county_df, location_json, region,
+        #                                        town_merged_df, zoom)
         return fig
     # if data_value == 'Award Level':
     #     z_max = 1
