@@ -2188,8 +2188,11 @@ def clear_selection_callback():
     if not st.session_state.selected_state and 'current_fig' in st.session_state:
         # st.session_state.my_multiselect_data = [] # Clear the associated session state data
         current_fig_size = asizeof.asizeof(st.session_state.current_fig)
-        del st.session_state.current_fig
-        logger.info(f'st.session_state.current_fig deleted. {current_fig_size} bytes released.')
+        try:
+            del st.session_state.current_fig
+            logger.info(f'st.session_state.current_fig deleted. {current_fig_size} bytes released.')
+        except Exception as e:
+            logger.error(f'An error occurred: {e}')
 
 
 def main():
