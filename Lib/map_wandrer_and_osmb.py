@@ -985,6 +985,7 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
                                  showlegend=True,
                                  name=trace_df['Award Level'].unique()[0],
                                  colorscale=trace_color_range,
+                                 marker_opacity=0.6,
                                  hovertemplate=town_template,
                                  showscale=False))
 
