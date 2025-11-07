@@ -1619,12 +1619,14 @@ def get_geojson_filenames():
     return result
 
 def get_geojson_filenames_for_region():
-    # if 'geojson_files_dict' not in st.session_state:
+    if 'geojson_files_dict' in st.session_state:
+        return st.session_state.geojson_files_dict
+
     filter = ''
     if st.session_state.selected_region != 'All':
         filter = f'''and subregion_name = "{st.session_state.selected_region}"'''
 
-    print("Getting geojson filenames from db.")
+    # print("Getting geojson filenames from db.")
     query = f'''select sm.subregion_name, st.arena_name as State, agd.geojson_filename 
         from subregion_mapping sm
         inner join arena st on st.arena_id = sm.child_arena_id
@@ -1633,7 +1635,7 @@ def get_geojson_filenames_for_region():
         {filter}
         order by State'''
 
-    print(query)
+    # print(query)
     df = execute_query(query)
     result =  df.set_index('State')['geojson_filename'].to_dict()
     st.session_state.geojson_files_dict = result
@@ -1865,7 +1867,7 @@ def get_geojson_filename(selected_state):
 
 def get_geopandas_df_for_state(selected_state):
     # if selected_state not in st.session_state.gdfs.keys():
-        print(f'Creating geopandas df for {selected_state}')
+        logger.info(f'Creating geopandas df for {selected_state}')
         file_path = get_geojson_filename(selected_state)
         gdf = gpd.read_file(f'{file_path}')
         convert_bounds_to_linestrings(gdf)
@@ -1882,7 +1884,7 @@ def get_geopandas_df_for_state(selected_state):
 
 def get_geopandas_df_for_region(selected_region):
     # if not set(selected_region).issubset(set(st.session_state.gdfs.keys())):
-        print(f'Creating geopandas df for {selected_region}')
+    #     logger.info(f'Creating geopandas df for {selected_region}')
         # file_path = get_geojson_filename(state_selectbox)
         # file_paths = wandrer_regions.geojson_filename.to_list()
         gdfs = gpd.GeoDataFrame()
@@ -2186,6 +2188,15 @@ def logged_in():
 
 def clear_selection_callback():
     # Check if the multiselect value is empty (indicating "x" was clicked)
+
+    if 'map_gdf' in st.session_state:
+        current_gdf_size = asizeof.asizeof(st.session_state.map_gdf)
+        logger.info(f'st.session_state.map_gdf size: {current_gdf_size}.')
+
+    if 'geojson_files_dict' in st.session_state:
+        geojson_files_dict_size = asizeof.asizeof(st.session_state.geojson_files_dict)
+        logger.info(f'st.session_state.geojson_files_dict size: {geojson_files_dict_size}.')
+
     if not st.session_state.selected_state and 'current_fig' in st.session_state:
         # st.session_state.my_multiselect_data = [] # Clear the associated session state data
         current_fig_size = asizeof.asizeof(st.session_state.current_fig)
@@ -2220,7 +2231,7 @@ def main():
         st.session_state.wandrer_regions = get_wandrer_regions()
 
     region_list = ['All'] + (st.session_state.wandrer_regions.subregion_name.unique().tolist())
-    geojson_files = get_geojson_filenames_for_region()
+    # geojson_files = get_geojson_filenames_for_region()
     data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles < 1', 'ActualMiles >= 1', 'ActualPct', 'Award Level', 'Pct10Deficit', 'Pct25Deficit']
 
     # if 'gdfs' not in st.session_state:
@@ -2295,6 +2306,7 @@ def main():
                          ,key='map_data', on_select=town_selected)
         else:
             st.write(f'{maptype_selectbox} map unavailable for {state_selectbox}')
+
 
 
 def add_arena_mileage_to_df(url, username, password, update_datetime, user_id, df_children_arena_summaries):
@@ -2470,6 +2482,6 @@ if not st.session_state.startup_msg_displayed:
             main()
 elif st.session_state.startup_msg_displayed:
     main()
-
+    # ss
 
 
