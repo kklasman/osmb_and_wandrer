@@ -176,17 +176,35 @@ def create_template(data, col_names):
             elif name == 'Pct25':
                 template += "<b>25% Miles Target</b> %{" + f"customdata[{data.columns.get_loc('Pct25')}]:,.2f" + "}<br>"
 
+            elif name == 'Pct5Deficit':
+                template += "<b>5% Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct5Deficit')}]:,.2f" + "}<br>"
+
             elif name == 'Pct10Deficit':
                 template += "<b>10% Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct10Deficit')}]:,.2f" + "}<br>"
+
+            elif name == 'Pct25Deficit':
+                template += "<b>25% Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct25Deficit')}]:,.2f" + "}<br>"
+
+            elif name == 'Pct50Deficit':
+                template += "<b>50% Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct50Deficit')}]:,.2f" + "}<br>"
+
+            elif name == 'Pct75Deficit':
+                template += "<b>75% Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct75Deficit')}]:,.2f" + "}<br>"
+
+            elif name == 'Pct90Deficit':
+                template += "<b>90% Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct90Deficit')}]:,.2f" + "}<br>"
+
+            elif name == 'Pct99Deficit':
+                template += "<b>99% Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct99Deficit')}]:,.2f" + "}<br>"
+
+            elif name == 'Pct100Deficit':
+                template += "<b>100% Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct100Deficit')}]:,.2f" + "}<br>"
 
             elif name == 'Pct25UnincorporatedDeficit':
                 template += "<b>25% Unincorporated Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct25UnincorporatedDeficit')}]:,.2f" + "}<br>"
 
             elif name == 'Pct10UnincorporatedDeficit':
                 template += "<b>10% Unincorporated Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct10UnincorporatedDeficit')}]:,.2f" + "}<br>"
-
-            elif name == 'Pct25Deficit':
-                template += "<b>25% Miles Deficit</b> %{" + f"customdata[{data.columns.get_loc('Pct25Deficit')}]:,.2f" + "}<br>"
 
             elif name == 'TotalTowns':
                 template += "<b>Total Towns:</b> %{" + f"customdata[{data.columns.get_loc('TotalTowns')}]" + "}<br>"
@@ -929,17 +947,24 @@ def create_town_map_discrete_color(center, county_location_json, data_value, mer
     return fig
 def create_town_map_discrete_color_go(center, county_location_json, data_value, merged_county_df, location_json, state,
                                      town_merged_df, zoom):
-    template_columns = ['State', 'County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit',
-                                     'Pct25Deficit', 'awarded', 'Award Level']
+
+    # Template columns covers all award level trace templates
+    template_columns = ['State', 'County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct',
+                                     'awarded', 'Award Level']
+    # template_columns = ['State', 'County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit',
+    #                                  'Pct25Deficit', 'awarded', 'Award Level',
+    #                                 'Pct50Deficit', 'Pct75Deficit','Pct90Deficit'
+    #                     ]
     columns_to_keep = template_columns.copy()
-    columns_to_keep.extend(['Region', 'long_name', 'diagonal', 'color_value'])
+    columns_to_keep.extend(['Region', 'long_name', 'diagonal', 'color_value',
+                            'Pct5Deficit', 'Pct10Deficit', 'Pct25Deficit', 'Pct50Deficit', 'Pct75Deficit',
+                            'Pct90Deficit', 'Pct99Deficit', 'Pct100Deficit'])
     town_merged_df['color_value'] = town_merged_df['Award Level'].map(
         {'0%': 0.0, '< 1 mile': 0.1, '< 5%': 0.2, '5%': 0.3, '10%': 0.4, '25%': 0.5, '50%': 0.6, '75%': 0.7, '90%': 0.8,
          '99%': 1.0})
 
     town_merged_df = town_merged_df[columns_to_keep]
     st.session_state['map_gdf'] = town_merged_df
-    town_template = create_template(town_merged_df, template_columns)
 
     category_order = ['0%', '< 1 mile', '< 5%', '5%', '10%', '25%', '50%', '75%', '90%', '99%']
     category_to_num = {cat: i for i, cat in enumerate(category_order)}
@@ -976,6 +1001,45 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
         high_color = defined_color[0].copy()
         high_color[0] = 1.0
         trace_color_range.append(high_color)
+        trace_template_columns = template_columns.copy()
+
+        match category_order[level]:
+            case s if s in ['0%', '< 1 mile', '< 5%']:
+                trace_template_columns.extend(['Pct5Deficit', 'Pct10Deficit'])
+            case '5%':
+                trace_template_columns.extend(['Pct10Deficit', 'Pct25Deficit'])
+            case '10%':
+                trace_template_columns.extend(['Pct25Deficit', 'Pct50Deficit'])
+            case '25%':
+                trace_template_columns.extend(['Pct50Deficit', 'Pct75Deficit'])
+            case '50%':
+                trace_template_columns.extend(['Pct75Deficit', 'Pct90Deficit'])
+            case '75%':
+                trace_template_columns.extend(['Pct90Deficit', 'Pct99Deficit'])
+            case '90%':
+                trace_template_columns.extend(['Pct99Deficit', 'Pct100Deficit'])
+            case '99%':
+                trace_template_columns.extend(['Pct100Deficit'])
+            case _:
+                print('Unhandled case in category_order[level]')
+
+        # if category_order[level] in ['0%', '< 1 mile', '< 5%', '5%']:
+        #     # trace_template_columns.extend(['Pct10Deficit', 'Pct25Deficit'])
+        #     trace_template_columns.extend(['Pct10Deficit', 'Pct25Deficit'])
+        #
+        #  elif category_order[level] == '10%':
+        #      trace_template_columns.extend(['Pct25Deficit', 'Pct50Deficit'])
+        #
+        #  elif category_order[level] == '25%':
+        #      trace_template_columns.extend(['Pct50Deficit', 'Pct75Deficit'])
+        #
+        #  elif category_order[level] == '50%':
+        #      trace_template_columns.extend(['Pct75Deficit', 'Pct90Deficit'])
+        #
+        #  else:
+        #      trace_template_columns.extend('Pct90Deficit')
+
+        trace_template = create_template(town_merged_df, trace_template_columns)
 
         fig.add_trace(go.Choroplethmap(geojson=trace_geojson,
                                        locations=trace_df['long_name'],
@@ -986,7 +1050,7 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
                                  name=trace_df['Award Level'].unique()[0],
                                  colorscale=trace_color_range,
                                  marker_opacity=0.6,
-                                 hovertemplate=town_template,
+                                 hovertemplate=trace_template,
                                  showscale=False))
 
 
@@ -1787,6 +1851,9 @@ def get_wandrer_totals_for_towns_for_state(states):
         order by 'Award Level', fqtn.region, fqtn.country, fqtn.state, fqtn.county, fqtn.name'''
     # print(query)
     wandrerer_df = execute_query(query)
+    wandrerer_df['Pct99Deficit'] = wandrerer_df.TotalMiles * .99 - wandrerer_df.ActualMiles
+    wandrerer_df['Pct100Deficit'] = wandrerer_df.TotalMiles - wandrerer_df.ActualMiles
+    wandrerer_df['Pct5Deficit'] = wandrerer_df.TotalMiles * .05 - wandrerer_df.ActualMiles
     return wandrerer_df
 
 def get_fq_town_name_for_state(state):
