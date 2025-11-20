@@ -107,7 +107,12 @@ def create_template(data, col_names):
     template = ''
     for idx, name in enumerate(col_names):
         try:
-            if name == 'awarded':
+            if name == 'blank line':
+                # template += "<div><span style='text-align:center;'>----------------</span></div><br>"
+                # template += "<div><b><span style='text-align: center;'>Centered Line</span></b></div>"
+                template += "--------------------------------<br>"
+
+            elif name == 'awarded':
                 template += "<b>Awarded:</b> %{" + f"customdata[{data.columns.get_loc('awarded')}]" + "}<br>"
 
             elif name == 'Award Level':
@@ -168,7 +173,7 @@ def create_template(data, col_names):
                 template += "<b>Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('MilesRidden')}]:,.2f" + "}<br>"
 
             elif name == 'ActualPct':
-                template += "<b>Pct Town Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('ActualPct')}]:.2%" + "}<br>"
+                template += "<b>% Town Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('ActualPct')}]:.2%" + "}<br>"
 
             elif name == 'Pct10':
                 template += "<b>10% Miles Target</b> %{" + f"customdata[{data.columns.get_loc('Pct10')}]:,.2f" + "}<br>"
@@ -221,6 +226,15 @@ def create_template(data, col_names):
             elif name == 'TownsAwarded':
                 template += "<b>Towns Awarded:</b> %{" + f"customdata[{data.columns.get_loc('TownsAwarded')}]" + "}<br>"
 
+            elif name == 'Pct0_Count':
+                template += "<b>Towns Not Cycled:</b> %{" + f"customdata[{data.columns.get_loc('Pct0_Count')}]" + "}<br>"
+
+            elif name == 'Total < 5%':
+                template += "<b>< 5% Count:</b> %{" + f"customdata[{data.columns.get_loc('Total < 5%')}]" + "}<br>"
+
+            elif name == '< Pct5_Count':
+                template += "<b>< 5% Count:</b> %{" + f"customdata[{data.columns.get_loc('< Pct5_Count')}]" + "}<br>"
+
             elif name == 'Pct5_Count':
                 template += "<b>5% Count:</b> %{" + f"customdata[{data.columns.get_loc('Pct5_Count')}]" + "}<br>"
 
@@ -246,7 +260,7 @@ def create_template(data, col_names):
                 template += "<b>Pct Towns Cycled:</b> %{" + f"customdata[{data.columns.get_loc('PctTownsCycled')}]:.2%" + "}<br>"
 
             elif name == 'AchievedTowns':
-                template += "<b>Towns Achieved:</b> %{" + f"customdata[{data.columns.get_loc('AchievedTowns')}]" + "}<br>"
+                template += "<b>Towns Awarded:</b> %{" + f"customdata[{data.columns.get_loc('AchievedTowns')}]" + "}<br>"
 
             elif name == 'PctTownsAchieved':
                 template += "<b>Pct Towns Achieved:</b> %{" + f"customdata[{data.columns.get_loc('PctTownsAchieved')}" + "]:.2%}<br>"
@@ -386,7 +400,7 @@ def create_county_map_v2(source_osm_df, state):
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
 
     state_list = []
-    state_list.append(state)
+    state_list.extend(state)
     wandrerer_df = get_wandrer_totals_for_counties_for_states_v2(state_list)
     data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
 
@@ -553,8 +567,28 @@ def create_county_map_v2(source_osm_df, state):
 
 def get_template_field_list_for_county_scope_map(merged_df):
     if ss['selected_datavalue_for_map'] == 'Award Level':
-        template_fields = ['State', 'County', 'TotalTowns', 'CycledTowns', 'TownsAwarded', 'Pct5_Count', 'Pct10_Count'
-                           , 'Pct25_Count', 'Pct50_Count', 'Pct75_Count', 'Pct90_Count', 'Pct99_Count']
+        template_fields = ['State', 'County', 'TotalTowns', 'CycledTowns',  'Pct0_Count', 'Total < 5%', 'Pct5_Count'
+                            , 'blank line', 'TownsAwarded', 'Pct10_Count', 'Pct25_Count', 'Pct50_Count', 'Pct75_Count'
+                            , 'Pct90_Count', 'Pct99_Count']
+        return template_fields
+
+    template_fields = ['State','County', 'TotalTowns', 'CycledTowns', 'PctTownsCycled', 'AchievedTowns', 'PctTownsAchieved',
+                       'TotalTownMiles', 'ActualMiles', 'ActualPct']
+    # if any(merged_df['UnincorporatedMiles'] > 0):
+    #     template_fields.extend(['TotalCountyMiles', 'TotalCountyMilesCycled', 'PctCountyMilesCycled'])
+    # template_fields.extend(['TotalTowns', 'CycledTowns', 'PctTownsCycled', 'AchievedTowns', 'PctTownsAchieved',
+    #                         'TotalTownMiles', 'ActualMiles', 'ActualPct'])
+    if any(merged_df['UnincorporatedMiles'] > 0):
+        template_fields.extend(['TotalCountyMiles', 'TotalCountyMilesCycled', 'PctCountyMilesCycled',
+                                'UnincorporatedMiles', 'UnincorporatedMilesCycled', 'PctUnincorporatedMilesCycled'])
+    return template_fields
+
+
+def get_template_field_list_for_state_scope_map(merged_df):
+    if ss['selected_datavalue_for_map'] == 'Award Level':
+        template_fields = ['State', 'TotalTowns', 'CycledTowns','Pct0_Count', '< Pct5_Count', 'Pct5_Count'
+            , 'blank line', 'AchievedTowns','Pct10_Count', 'Pct25_Count', 'Pct50_Count', 'Pct75_Count', 'Pct90_Count'
+            , 'Pct99_Count']
         return template_fields
 
     template_fields = ['State','County', 'TotalTowns', 'CycledTowns', 'PctTownsCycled', 'AchievedTowns', 'PctTownsAchieved',
@@ -872,7 +906,7 @@ def create_town_map_discrete_color(center, county_location_json, data_value, mer
     # filtered_df = town_merged_df[['Town', 'Award Level']]
     fig = px.choropleth_map(
         town_merged_df,
-         geojson=location_json,
+        geojson=location_json,
         locations='long_name',
         color='Award Level',  # Use the categorical column for discrete colors
         featureidkey='properties.long_name',
@@ -963,6 +997,10 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
         {'0%': 0.0, '< 1 mile': 0.1, '< 5%': 0.2, '5%': 0.3, '10%': 0.4, '25%': 0.5, '50%': 0.6, '75%': 0.7, '90%': 0.8,
          '99%': 1.0})
 
+    # # Filter out non-existent columns
+    # existing_columns = [col for col in template_columns if col in town_merged_df.columns]
+
+    # town_merged_df = town_merged_df[existing_columns]
     town_merged_df = town_merged_df[columns_to_keep]
     st.session_state['map_gdf'] = town_merged_df
 
@@ -976,6 +1014,11 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
     town_merged_sorted_df = town_merged_df.sort_values(by='z_value')
 
     logger.info(f"{asizeof.asizeof(location_json)=} bytes")
+
+    element_to_find = 'Town'
+    if element_to_find in template_columns:
+        index = template_columns.index(element_to_find)
+        template_columns.insert(index + 1, 'blank line')
 
     trace_dictionary_size_total = 0
     for i, level in enumerate(town_merged_sorted_df['z_value'].sort_values().unique()):
@@ -1053,6 +1096,8 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
                                  hovertemplate=trace_template,
                                  showscale=False))
 
+        logger.info(f"Trace name {trace_df['Award Level'].unique()[0]} has {len(trace_df)} towns")
+
 
     logger.info(f"{trace_dictionary_size_total=} bytes")
 
@@ -1066,8 +1111,7 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
     fig.update_layout(map_style="carto-positron",
                       map_zoom=zoom, map_center=center)
     fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
-                            , title=dict(text=f'{data_value} for Towns in {state}', x=0.5
-                                         , xanchor="center")
+                            , title=dict(text=f'{data_value} for Towns in {state}', x=0.5, xanchor="center")
                             )
     return fig
 
@@ -1524,8 +1568,18 @@ def create_region_map(source_osm_df, region):
     location_json = json.loads(state_merged_df.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
     state_merged_df.drop(['tags', 'geometry','COUNTY','name','Town'], axis=1, inplace=True, errors='ignore')
-    template = create_template(state_merged_df, ['State', 'TotalTowns', 'CycledTowns', 'PctTownsCycled', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
-    z_max = float(state_merged_df[data_value].max()) if float(state_merged_df[data_value].max()) > 0 else float(state_merged_df['TotalMiles'].max())
+
+    template_fields = get_template_field_list_for_state_scope_map(state_merged_df)
+    template = create_template(state_merged_df, template_fields)
+
+    # z_max = float(state_merged_df[data_value].max()) if float(state_merged_df[data_value].max()) > 0 else float(state_merged_df['TotalMiles'].max())
+    if data_value == 'Award Level':
+        z_max = state_merged_df['AchievedTowns'].max()
+        z_data_value = 'AchievedTowns'
+    else:
+        z_max = float(state_merged_df[data_value].max()) if float(state_merged_df[data_value].max()) > 0 else float(state_merged_df[data_value].max())
+        z_data_value = 'TotalCountyMilesCycled' if data_value.startswith('ActualMiles') else data_value
+
     st.session_state['map_gdf'] = state_merged_df
 
     fig = go.Figure(go.Choroplethmap(
@@ -1533,7 +1587,7 @@ def create_region_map(source_osm_df, region):
         geojson=location_json,
         featureidkey='properties.State',
         locations=state_merged_df['State'],
-        z=state_merged_df[data_value],
+        z=state_merged_df[z_data_value],
         colorscale=max_50_pct_color_scale,
         zmin=0,
         zmax=z_max,
@@ -1727,6 +1781,10 @@ def get_wandrer_totals_for_state(state):
 		, sum(UnincorporatedMiles) as UnincorporatedMiles
 		, sum(UnincorporatedMilesCycled) as UnincorporatedMilesCycled
 		, sum(UnincorporatedMilesCycled) / sum(UnincorporatedMiles) as PctUnincorporatedMilesCycled
+ 		, sum(Pct0_Count) as 'Pct0_Count', sum(LT_1_Mile_Count) + sum(LT_5Pct_Count) as '< Pct5_Count'
+ 		, sum(Pct5_Count) as 'Pct5_Count', sum(Pct10_Count) as 'Pct10_Count', sum(Pct25_Count) as 'Pct25_Count'
+ 		, sum(Pct50_Count) as 'Pct50_Count', sum(Pct75_Count) as 'Pct75_Count', sum(Pct90_Count) as 'Pct90_Count'
+ 		, sum(Pct99_Count) as 'Pct99_Count'
     	from vw_county_aggregates
     	where State = "{state}"'''
     # print(query)
@@ -1760,6 +1818,7 @@ def get_wandrer_totals_for_counties_for_states(states):
 def get_wandrer_totals_for_counties_for_states_v2(states):
     states_in_str = states.__str__().replace('[', '(').replace(']', ')')
     query = f'''select vca.*
+        , LT_1_Mile_Count + LT_5Pct_Count as 'Total < 5%'
 		, vca.Pct10_Count + vca.Pct25_Count + vca.Pct50_Count + vca.Pct75_Count + vca.Pct90_Count + vca.Pct99_Count as TownsAwarded
 		from vw_county_aggregates vca
     	where State in {states_in_str}
@@ -2274,6 +2333,14 @@ def clear_selection_callback():
             logger.error(f'An error occurred: {e}')
 
 
+# def _map_selected():
+#     event = st.session_state.plotly_chart_event
+#     print(f'{event=}')
+#     if 'plotly_chart_event' in st.session_state:
+#         print(st.session_state.plotly_chart_event)
+#     else:
+#         print('no event')
+
 def main():
     # ss
     if 'show_raw_data_state' not in st.session_state:
@@ -2317,6 +2384,12 @@ def main():
     if st.session_state.update_county_btn:
         update_county_data()
 
+    # if 'selected_point_x' not in st.session_state:
+    #     st.session_state['selected_point_x'] = None
+    #
+    # if 'plotly_chart_event' not in st.session_state:
+    #     st.session_state['plotly_chart_event'] = None
+
     with st.sidebar:
         if st.button('Settings'):
             settings()
@@ -2344,7 +2417,8 @@ def main():
             osm_gdf, osm_county_gdf = get_geopandas_df_for_region(state_selectbox)
             match maptype_selectbox:
                 case 'State':
-                    fig = create_state_map(osm_gdf.copy(), state_selectbox)
+                    # fig = create_state_map(osm_gdf.copy(), state_selectbox)
+                    fig = create_region_map(osm_gdf.copy(), state_selectbox)
                 case 'Counties':
                     # fig = create_county_map(osm_gdf.copy(), state_selectbox)
                     fig = create_county_map_v2(osm_county_gdf.copy(), state_selectbox)
@@ -2360,9 +2434,41 @@ def main():
                 case 'Towns':
                     fig = create_region_by_town_map(osm_state_gdf.copy(), region_selectbox)
 
+        # if fig:
+        #     # 3. Use plotly_events to capture clicks
+        #     # The component captures clicks on data points (including the colorbar area)
+        #     selected_point = plotly_events(
+        #         fig,
+        #         click_event=True,
+        #         key="heatmap_click_event"
+        #     )
+        #
+        #     # 4. Process the selected point
+        #     if selected_point:
+        #         # selected_point is a list of dictionaries, one for each clicked point
+        #         point_info = selected_point[0]
+        #
+        #         # Check if the click originated from the colorbar ('x' key for colorbar is often absent or specific)
+        #         # The 'z' value is the most reliable way to get the data value
+        #         # Clicks on the main heatmap also return 'z'
+        #
+        #         st.write("### Click Event Details:")
+        #         st.json(point_info)
+        #
+        #         try:
+        #             # The 'z' key contains the value clicked on the color scale
+        #             value = point_info.get('z')
+        #             st.success(f"You clicked on a value: **{value:.4f}**")
+        #
+        #         except (KeyError, IndexError):
+        #             st.warning("Could not extract value from click event.")
+        #     else:
+        #         st.info("Click on a section of the heatmap or colorbar to see the value.")
+
         if fig:
             st.session_state.current_fig = fig
             st.plotly_chart(fig)
+            # st.plotly_chart(fig, key='plotly_chart_event', on_select=_map_selected, selection_mode="points")
             if st.session_state.show_raw_data_state:
                 st.write(' ')
                 st.write(' ')
