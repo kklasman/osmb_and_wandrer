@@ -2200,35 +2200,51 @@ select vca.Region, vca.Country, vca.State
 
 
 def get_wandrer_totals_for_counties_for_states_v4(states):
+    """
+        The query in this method is complicated by the fact that I don't always load every town for a given county or state.
+        Thus the 2 CTEs.
+    """
+
     # states_in_str = states.__str__().replace('[', '(').replace(']', ')')
     df_list = []
+    query = ""
 
     for state in states:
         query = f'''
-        select vca.*
-            , LT_1_Mile_Count + LT_5Pct_Count as 'Total < 5%'
-            , vca.Pct10_Count + vca.Pct25_Count + vca.Pct50_Count + vca.Pct75_Count + vca.Pct90_Count + vca.Pct99_Count as TownsAwarded
-            , 'Town data' as Source
-            from vw_county_aggregates vca
-            where vca.State == "{state}"
-        union	
-        select vca.Region, vca.Country, vca.State  
-            , c.arena_name as long_county, REPLACE(c.arena_name, ' County', '') as County, c.arena_short_name, vca.StateArenaId, vca.CountyArenaId, c.total as TotalTowns
-            , 0 as 'CycledTowns', 0.0 as 'PctTownsCycled', 0 as 'AchievedTowns', 0.0 as 'PctTownsAchieved'
-            , 0 as 'Pct0_Count', 0 as 'LT_1_Mile_Count',0 as 'LT_5Pct_Count', 0 as 'Pct5_Count', 0 as 'Pct10_Count', 0 as 'Pct25_Count', 0 as 'Pct50_Count'
-            , 0 as 'Pct75_Count', 0 as 'Pct90_Count', 0 as 'Pct99_Count'
-            , c.arena_mileage as TotalTownMiles, c.arena_mileage as 'UnincorporatedMiles', 0 as 'UnincorporatedMilesCycled', 0.0 as 'PctUnincorporatedMilesCycled'
-            , c.arena_mileage as 'TotalCountyMiles', 0 as 'TotalCountyMilesCycled', 0.0 as 'PctCountyMilesCycled'
-            , c.arena_mileage * .1 as 'Pct10', c.arena_mileage * .25 as 'Pct25', c.arena_mileage *.50 as 'Pct50', c.arena_mileage * .75 as 'Pct75'
-            , 0 as 'ActualMiles', 0.0 as 'ActualPct'
-            , c.arena_mileage * .1 as 'Pct10Deficit', c.arena_mileage * .25 as 'Pct25Deficit', c.arena_mileage *.50 as 'Pct50Deficit', c.arena_mileage * .75 as 'Pct75Deficit', c.arena_mileage * .9 as 'Pct90Deficit'
-            , c.map_version_id, 0 as 'Total < 5%', 0 as 'TownsAwarded'
-            , 'County data' as Source
-            from arena c
-            inner join vw_county_aggregates vca on vca.StateArenaId = c.parent_arena_id
-            where vca.State == "{state}"
-            and c.arena_short_name not in (select arena_short_name from vw_county_aggregates where State == "{state}")
-            order by State, County'''
+with loaded_towns as (
+select vca.*
+	, LT_1_Mile_Count + LT_5Pct_Count as 'Total < 5%'
+	, vca.Pct10_Count + vca.Pct25_Count + vca.Pct50_Count + vca.Pct75_Count + vca.Pct90_Count + vca.Pct99_Count as TownsAwarded
+	, 'Town data' as Source
+	from vw_county_aggregates vca
+	where vca.State == "{state}"
+),
+not_loaded_towns as (
+select 
+	fqcn.Region, fqcn.Country, fqcn.State,
+     c.arena_name as long_county, REPLACE(c.arena_name, ' County', '') as County, c.arena_short_name
+	 , fqcn.StateArenaId, fqcn.CountyArenaId
+	 , c.total as TotalTowns
+    , 0 as 'CycledTowns', 0.0 as 'PctTownsCycled', 0 as 'AchievedTowns', 0.0 as 'PctTownsAchieved'
+    , 0 as 'Pct0_Count', 0 as 'LT_1_Mile_Count',0 as 'LT_5Pct_Count', 0 as 'Pct5_Count', 0 as 'Pct10_Count', 0 as 'Pct25_Count', 0 as 'Pct50_Count'
+    , 0 as 'Pct75_Count', 0 as 'Pct90_Count', 0 as 'Pct99_Count'
+    , c.arena_mileage as TotalTownMiles, c.arena_mileage as 'UnincorporatedMiles', 0 as 'UnincorporatedMilesCycled', 0.0 as 'PctUnincorporatedMilesCycled'
+    , c.arena_mileage as 'TotalCountyMiles', 0 as 'TotalCountyMilesCycled', 0.0 as 'PctCountyMilesCycled'
+    , c.arena_mileage * .1 as 'Pct10', c.arena_mileage * .25 as 'Pct25', c.arena_mileage *.50 as 'Pct50', c.arena_mileage * .75 as 'Pct75'
+    , 0 as 'ActualMiles', 0.0 as 'ActualPct'
+    , c.arena_mileage * .1 as 'Pct10Deficit', c.arena_mileage * .25 as 'Pct25Deficit', c.arena_mileage *.50 as 'Pct50Deficit', c.arena_mileage * .75 as 'Pct75Deficit', c.arena_mileage * .9 as 'Pct90Deficit'
+    , c.map_version_id, 0 as 'Total < 5%', 0 as 'TownsAwarded'
+    , 'County data' as Source
+    from arena c
+	inner join fq_county_name fqcn on c.arena_id = fqcn.CountyArenaId
+    where fqcn.State == '{state}'    
+		and c.arena_short_name not in (select arena_short_name from loaded_towns)
+)
+select * from loaded_towns
+union    
+select * from not_loaded_towns
+order by State, County
+        '''
         # print(query)
         df = execute_query(query)
 
