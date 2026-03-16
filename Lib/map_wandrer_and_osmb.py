@@ -372,6 +372,8 @@ def calculate_mapbox_zoom_center_from_diagonal(diagonal) -> (float, dict):
         circumference_at_latitude = 40_000 * np.cos(np.abs(center['lat']) * np.pi / 180)
         zoom = np.log2(circumference_at_latitude / x_range)
 
+    logger.info(f'Reducing zoom by 10%')
+    zoom = zoom - .1 * zoom
     return zoom, center
 
 def bounds_to_linestrings(gdf):
@@ -1686,6 +1688,9 @@ def create_state_map(source_osm_df, state):
 
 
 def create_county_gdf(source_osm_df):
+    if 'County' not in source_osm_df.columns:
+        return gpd.GeoDataFrame()
+
     source_osm_df = source_osm_df.dropna(axis=1, how='all')
     county_gdf = source_osm_df.dissolve(by='County')
     county_gdf.reset_index(inplace=True)
@@ -1718,7 +1723,7 @@ def create_region_map(source_osm_df, region):
     state_gdf = source_osm_df.dissolve(by='State')
     state_gdf.reset_index(inplace=True)
     convert_bounds_to_linestrings(state_gdf)
-    state_gdf = clean_state_gdf(state_gdf)
+    # state_gdf = clean_state_gdf(state_gdf)
 
     if ss['selected_datavalue_for_map'] == 'Award Level':
         wandrerer_df = get_wandrer_totals_for_states(state_gdf.State.to_list())
@@ -2372,11 +2377,20 @@ def get_fq_town_name_for_state(state):
 
 
 def get_wandrer_regions():
-    query = f'''select sm.subregion_name, st.arena_name as State, agd.geojson_filename 
+    # query = f'''select sm.subregion_name, st.arena_name as State, agd.geojson_filename
+    # , agd.state_geojson_filename, agd.county_geojson_filename
+	# from subregion_mapping sm
+	# inner join arena st on st.arena_id = sm.child_arena_id
+	# inner join arena_geo_data agd on agd.arena_id = st.arena_id
+	# where agd.geojson_filename is not null or agd.state_geojson_filename is not null'''
+
+    query = f'''select sm.subregion_name, st.arena_name as State,
+	case when agd.state_geojson_filename is not null then agd.state_geojson_filename else agd.geojson_filename end as geojson_filename
 	from subregion_mapping sm
 	inner join arena st on st.arena_id = sm.child_arena_id
 	inner join arena_geo_data agd on agd.arena_id = st.arena_id
-	where agd.geojson_filename is not null'''
+	where agd.geojson_filename is not null or agd.state_geojson_filename is not null
+'''
     # print(query)
     wandrerer_df = execute_query(query)
     return wandrerer_df
@@ -2436,7 +2450,12 @@ def region_selected():
 def get_geojson_filename(selected_state):
     cwd = os.getcwd()
     # file_name = st.session_state.geojson_files_dict[selected_state]
+    # filename_column = 'geojson_filename' if st.session_state.selected_maptype == 'Town' else 'state_geojson_filename'
+    # file_name = ss.wandrer_regions.query(f'State == "{selected_state}"')[filename_column].to_list()[0]
     file_name = ss.wandrer_regions.query(f'State == "{selected_state}"')['geojson_filename'].to_list()[0]
+    if file_name is None:
+        return ''
+
     # file_path = os.path.join(cwd, r'data\10150\boundaries', file_name)
     file_path = os.path.join(cwd, 'Lib', 'data', 'boundaries', file_name)
     # print(f'file_path {file_path} exists {os.path.exists(file_path)}')
@@ -2450,8 +2469,10 @@ def get_geojson_filename(selected_state):
 
 def get_geopandas_df_for_state(selected_state):
     # if selected_state not in st.session_state.gdfs.keys():
-        logger.info(f'Creating geopandas df for {selected_state}')
         file_path = get_geojson_filename(selected_state)
+        if len(file_path) == 0:
+            return gpd.GeoDataFrame(),  -1
+
         gdf = gpd.read_file(f'{file_path}')
         if 'id' in gdf.columns:
             if 'osm_id' not in gdf.columns:
@@ -2468,7 +2489,10 @@ def get_geopandas_df_for_state(selected_state):
 
         columns_to_drop = gdf.select_dtypes(include=['datetime64']).columns
         gdf.drop(columns=columns_to_drop, axis=1, inplace=True)
-        return gdf
+
+        current_gdf_size = asizeof.asizeof(gdf)
+        logger.info(f'Creating geopandas df for {selected_state}, size: {current_gdf_size:,} bytes from {file_path}')
+        return gdf, current_gdf_size
     # else:
     #     print(f'Getting geopandas df for {selected_state} from session state')
     #     return st.session_state.gdfs[selected_state]
@@ -2480,8 +2504,13 @@ def get_geopandas_df_for_region(selected_region):
         # file_paths = wandrer_regions.geojson_filename.to_list()
         gdfs = gpd.GeoDataFrame()
         county_gdfs = gpd.GeoDataFrame()
+        total_gdf_size = 0
         for state in selected_region:
-            gdf = get_geopandas_df_for_state(state)
+            gdf, current_gdf_size = get_geopandas_df_for_state(state)
+            if gdf.empty:
+                continue
+
+            total_gdf_size += current_gdf_size
             # if "Town" in gdf.columns:
             #     gdf = clean_gdf(gdf)
 
@@ -2506,6 +2535,7 @@ def get_geopandas_df_for_region(selected_region):
                 gdfs = pd.concat([gdfs, gdf])
                 county_gdfs = pd.concat([county_gdfs, county_gdf])
 
+        logger.info(f'Total size for {len(selected_region)} states: {total_gdf_size:,} bytes')
         return gdfs, county_gdfs
     # else:
     #     print(f'Getting geopandas df for {selected_region} from session state')
@@ -2836,8 +2866,11 @@ def main():
 
     region_list = ['All'] + (ss.wandrer_regions.subregion_name.unique().tolist())
     # geojson_files = get_geojson_filenames_for_region()
-    data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles < 1', 'ActualMiles >= 1', 'ActualPct', 'Award Level', 'Pct10Deficit', 'Pct25Deficit']
-
+    state_data_values = ['ActualMiles', 'TotalMiles', 'TownsCycled']
+    county_data_values = ['ActualMiles', 'TotalMiles', 'TownsCycled']
+    town_data_values = ['TotalMiles', 'ActualMiles', 'ActualPct', 'Award Level', 'Pct10Deficit', 'Pct25Deficit']
+    original_data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles < 1', 'ActualMiles >= 1', 'ActualPct', 'Award Level', 'Pct10Deficit', 'Pct25Deficit']
+    data_values = original_data_values
     # if 'gdfs' not in st.session_state:
     #     # Initialize geopandas df dictionary in session state.
     #     st.session_state.gdfs = {}
@@ -2864,12 +2897,22 @@ def main():
         if st.button('Settings'):
             settings()
 
+        maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
+        st.session_state.selected_maptype = maptype_selectbox
+        match maptype_selectbox:
+            case 'State':
+                data_values = state_data_values
+            case 'Counties':
+                data_values = county_data_values
+            case 'Towns', 'Seacoast Towns':
+                data_values = town_data_values
+
         region_selectbox = st.selectbox('Select a region:', region_list, key='selected_region', index=0, on_change=region_selected())
         # state_selectbox = st.selectbox('Select a location (US State):', get_geojson_filenames_for_region().keys(), key='selected_state', index=None)
         state_selectbox = st.multiselect('Select a location (US State):', get_geojson_filenames_for_region(),
                                          key='selected_state', on_change=clear_selection_callback)
         # preserve_map_selection = st.checkbox('Clear map type selection on state change', key='preserve_map_selection')
-        maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
+        # maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
         datavalue_selectbox = st.selectbox('Select a data value', data_values, key='selected_datavalue_for_map', index=None, on_change=enable_make_map())
         make_map = st.button('Generate map', key='make_map_btn', disabled=st.session_state.get("make_map_disable", True))
         if st.session_state.show_update_county_btn:
@@ -3023,12 +3066,27 @@ def display_state_map_type_totals():
         StateCount=('State', 'count'),
         TownsTotal=('TotalTowns', 'sum'),
         CycledTownsTotal=(cycledTownsColumn, 'sum'),
-        AwardedTownsTotal=(awardedTownsColumn, 'sum'))
-    st.dataframe(info_df, width='content', column_config={
+        AwardedTownsTotal=(awardedTownsColumn, 'sum'),
+        StateMilesTotal=('StateMiles', 'sum'),
+        TotalMilesCycled=('TownMilesCycled', 'sum')
+    )
+
+    # Format the output for display
+    # Use a dictionary to apply specific formats to different columns
+    styled_df = info_df.style.format({
+        'TownsTotal': '{:,.0f}',  # Format as integer with comma separator
+        'CycledTownsTotal': '{:,.0f}',  # Format as integer with comma separator
+        'StateMilesTotal': '{:,.2f}',  # Format as float with comma separator and 2 decimal places
+        'TotalMilesCycled': '{:,.2f}'  # Format as float with comma separator and 2 decimal places
+    })
+
+    st.dataframe(styled_df, width='content', column_config={
         "StateCount": "States"
         , "TownsTotal": "Total Towns"
         , "CycledTownsTotal": cycledTownsColumn
         , "AwardedTownsTotal": awardedTownsColumn
+        , "StateMilesTotal": "StateMiles"
+        , "TotalMilesCycled": "TotalMilesCycled"
         }
     )
 
