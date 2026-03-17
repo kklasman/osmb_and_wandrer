@@ -21,7 +21,10 @@ import database as db
 import logging
 import re
 from pympler import asizeof
+# from streamlit-tree-select2 import streamlit_tree_select
 import math
+import tracemalloc
+
 
 # import uuid
 # from pympler import asizeof
@@ -102,6 +105,23 @@ color_schemes = ['#890000','#890000','#5c0000','#2a6b28','#0b4c07','#003206','#f
 #     6: 'magenta',
 #     7: 'blue'
 # }
+
+def log_session_variable_size(variable_name):
+    if variable_name in globals():
+        var = globals()[variable_name]
+        logger.info(f"{var} bytes")
+
+
+def memory_profiler(func):
+    def wrapper(*args, **kwargs):
+        tracemalloc.start()
+        result = func(*args, **kwargs)
+        snapshot = tracemalloc.take_snapshot()
+        top_stats = snapshot.statistics('lineno')
+        print(f"Memory allocated by {func.__name__}: {top_stats[0].size / 1024} KB")
+        tracemalloc.stop()
+        return result
+    return wrapper
 
 
 def create_template(data, col_names):
@@ -1624,6 +1644,7 @@ def create_region_by_town_map(source_osm_df, region):
 
     return fig
 
+@memory_profiler
 def create_state_map(source_osm_df, state):
     renamed_gdf = {}
     source_osm_df['State'] = state
@@ -1715,6 +1736,7 @@ def create_county_gdf(source_osm_df):
     county_gdf['County'] = county_gdf['County'].str.title() # required for merge with Wandrer data
     return county_gdf
 
+@memory_profiler
 def create_region_map(source_osm_df, region):
     renamed_gdf = {}
     county_gdf = {}
@@ -2690,6 +2712,7 @@ def center_point_diagonal(diagonal):
     return (x_center, y_center)
 
 
+@memory_profiler
 def town_selected():
     # st.plotly_chart(st.session_state.current_fig, config=config)
     fig = st.session_state.current_fig
@@ -2838,6 +2861,7 @@ def clear_selection_callback():
 #     else:
 #         print('no event')
 
+
 def main():
     # ss
     if 'show_raw_data_state' not in st.session_state:
@@ -2907,7 +2931,21 @@ def main():
             case 'Towns', 'Seacoast Towns':
                 data_values = town_data_values
 
+        # nodes = [
+        #     {"label": "North Zone", "value": "north", "children": [
+        #         {"label": "Delhi Region", "value": "delhi", "children": [
+        #             {"label": "Branch 101", "value": "b101"},
+        #             {"label": "Branch 102", "value": "b102"}
+        #         ]},
+        #     ]},
+        # ]
+        #
+        # st.subheader("Select Branches")
+        # selection = tree_select(nodes=nodes)
+        # st.write("Selected values:", selection['checked'])
+
         region_selectbox = st.selectbox('Select a region:', region_list, key='selected_region', index=0, on_change=region_selected())
+
         # state_selectbox = st.selectbox('Select a location (US State):', get_geojson_filenames_for_region().keys(), key='selected_state', index=None)
         state_selectbox = st.multiselect('Select a location (US State):', get_geojson_filenames_for_region(),
                                          key='selected_state', on_change=clear_selection_callback)
@@ -2924,6 +2962,11 @@ def main():
         st.session_state.show_update_county_btn = False
         osm_gdf = {}
         fig = {}
+        # log_session_variable_size('ss.current_fig')
+
+        logger.info(f"{asizeof.asizeof( ss.current_fig)=} bytes")
+        ss.current_fig = fig
+        logger.info(f"{asizeof.asizeof(ss.current_fig)=} bytes")
 
         if state_selectbox:
             # osm_gdf = get_geopandas_df_for_state(state_selectbox)
@@ -3003,7 +3046,20 @@ def main():
 
         display_map_type_totals()
 
-    # ss
+        # snapshot = tracemalloc.take_snapshot()
+        # top_stats = snapshot.statistics("lineno")
+        # for stat in top_stats[:10]:
+        #     print(stat)
+
+    # log_session_variable_size('ss.current_fig')
+
+    if 'current_fig' in st.session_state:
+        logger.info(f"{asizeof.asizeof(ss.current_fig)=} bytes")
+
+    if 'map_gdf' in st.session_state:
+        logger.info(f"{asizeof.asizeof(ss.map_gdf)=} bytes")
+
+    ss
 
 
 def create_info_df(source_df):
