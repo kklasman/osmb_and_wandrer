@@ -1644,7 +1644,7 @@ def create_region_by_town_map(source_osm_df, region):
 
     return fig
 
-@memory_profiler
+# @memory_profiler
 def create_state_map(source_osm_df, state):
     renamed_gdf = {}
     source_osm_df['State'] = state
@@ -1736,7 +1736,7 @@ def create_county_gdf(source_osm_df):
     county_gdf['County'] = county_gdf['County'].str.title() # required for merge with Wandrer data
     return county_gdf
 
-@memory_profiler
+# @memory_profiler
 def create_region_map(source_osm_df, region):
     renamed_gdf = {}
     county_gdf = {}
@@ -2712,7 +2712,7 @@ def center_point_diagonal(diagonal):
     return (x_center, y_center)
 
 
-@memory_profiler
+# @memory_profiler
 def town_selected():
     # st.plotly_chart(st.session_state.current_fig, config=config)
     fig = st.session_state.current_fig
@@ -3028,7 +3028,10 @@ def main():
         #         st.info("Click on a section of the heatmap or colorbar to see the value.")
 
         if fig:
-            st.session_state.current_fig = fig
+            if st.session_state.show_raw_data_state:
+                # don't need current_fig in session.state if the raw data table isn't being shwon.
+                st.session_state.current_fig = fig
+
             st.plotly_chart(fig)
             # st.plotly_chart(fig, key='plotly_chart_event', on_select=_map_selected, selection_mode="points")
             if st.session_state.show_raw_data_state:
@@ -3059,7 +3062,7 @@ def main():
     if 'map_gdf' in st.session_state:
         logger.info(f"{asizeof.asizeof(ss.map_gdf)=} bytes")
 
-    ss
+    # ss
 
 
 def create_info_df(source_df):
