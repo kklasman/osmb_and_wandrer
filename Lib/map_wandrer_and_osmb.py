@@ -1944,33 +1944,41 @@ def get_geojson_filenames_for_region():
     #     return st.session_state.geojson_files_dict
 
     states = []
+    result = pd.DataFrame()
 
     if not ss.wandrer_regions.empty:
-        if ss.selected_region == 'All':
-            states = ss.wandrer_regions['State'].to_list()
-        else:
-            states = ss.wandrer_regions.query(f'subregion_name == "{ss.selected_region}"')['State'].to_list()
+        regions = ss.wandrer_regions
+        region = ss.selected_region.replace('All ', '')
+        result = pd.DataFrame()
+        states = []
+        match ss.selected_region:
+            case 'All':
+                result = regions
+            case 'All Canada' | 'All United States':
+                result = regions.query(f"Country == @region")
+            case _:
+                result = regions.query(f'subregion_name == "{ss.selected_region}"')
 
-    return states
+    return states if result.empty else result['State'].to_list()
 
-    filter = ''
-    if st.session_state.selected_region != 'All':
-        filter = f'''and subregion_name = "{st.session_state.selected_region}"'''
-
-    # print("Getting geojson filenames from db.")
-    query = f'''select sm.subregion_name, st.arena_name as State, agd.geojson_filename 
-        from subregion_mapping sm
-        inner join arena st on st.arena_id = sm.child_arena_id
-        inner join arena_geo_data agd on agd.arena_id = st.arena_id
-        where agd.geojson_filename is not null
-        {filter}
-        order by State'''
-
-    # print(query)
-    df = execute_query(query)
-    result =  df.set_index('State')['geojson_filename'].to_dict()
-    st.session_state.geojson_files_dict = result
-    return result
+    # filter = ''
+    # if st.session_state.selected_region != 'All':
+    #     filter = f'''and subregion_name = "{st.session_state.selected_region}"'''
+    #
+    # # print("Getting geojson filenames from db.")
+    # query = f'''select sm.subregion_name, st.arena_name as State, agd.geojson_filename
+    #     from subregion_mapping sm
+    #     inner join arena st on st.arena_id = sm.child_arena_id
+    #     inner join arena_geo_data agd on agd.arena_id = st.arena_id
+    #     where agd.geojson_filename is not null
+    #     {filter}
+    #     order by State'''
+    #
+    # # print(query)
+    # df = execute_query(query)
+    # result =  df.set_index('State')['geojson_filename'].to_dict()
+    # st.session_state.geojson_files_dict = result
+    # return result
 
 def get_wandrer_totals_for_states(states):
     dfs = pd.DataFrame()
@@ -2399,20 +2407,20 @@ def get_fq_town_name_for_state(state):
 
 
 def get_wandrer_regions():
-    # query = f'''select sm.subregion_name, st.arena_name as State, agd.geojson_filename
-    # , agd.state_geojson_filename, agd.county_geojson_filename
-	# from subregion_mapping sm
-	# inner join arena st on st.arena_id = sm.child_arena_id
-	# inner join arena_geo_data agd on agd.arena_id = st.arena_id
-	# where agd.geojson_filename is not null or agd.state_geojson_filename is not null'''
-
-    query = f'''select sm.subregion_name, st.arena_name as State,
+#     query = f'''select sm.subregion_name, st.arena_name as State,
+# 	case when agd.state_geojson_filename is not null then agd.state_geojson_filename else agd.geojson_filename end as geojson_filename
+# 	from subregion_mapping sm
+# 	inner join arena st on st.arena_id = sm.child_arena_id
+# 	inner join arena_geo_data agd on agd.arena_id = st.arena_id
+# 	where agd.geojson_filename is not null or agd.state_geojson_filename is not null
+# '''
+    query = f'''select sm.subregion_name, c.arena_name as Country, st.arena_name as State,
 	case when agd.state_geojson_filename is not null then agd.state_geojson_filename else agd.geojson_filename end as geojson_filename
 	from subregion_mapping sm
 	inner join arena st on st.arena_id = sm.child_arena_id
+	inner join arena c on c.arena_id = sm.parent_arena_id 
 	inner join arena_geo_data agd on agd.arena_id = st.arena_id
-	where agd.geojson_filename is not null or agd.state_geojson_filename is not null
-'''
+	where (agd.geojson_filename is not null or agd.state_geojson_filename is not null)'''
     # print(query)
     wandrerer_df = execute_query(query)
     return wandrerer_df
@@ -2888,7 +2896,7 @@ def main():
     if 'wandrer_regions' not in st.session_state:
         ss.wandrer_regions = get_wandrer_regions()
 
-    region_list = ['All'] + (ss.wandrer_regions.subregion_name.unique().tolist())
+    region_list = ['All', 'All Canada', 'All United States'] + (ss.wandrer_regions.subregion_name.unique().tolist())
     # geojson_files = get_geojson_filenames_for_region()
     state_data_values = ['ActualMiles', 'TotalMiles', 'TownsCycled']
     county_data_values = ['ActualMiles', 'TotalMiles', 'TownsCycled']
@@ -2947,7 +2955,8 @@ def main():
         region_selectbox = st.selectbox('Select a region:', region_list, key='selected_region', index=0, on_change=region_selected())
 
         # state_selectbox = st.selectbox('Select a location (US State):', get_geojson_filenames_for_region().keys(), key='selected_state', index=None)
-        state_selectbox = st.multiselect('Select a location (US State):', get_geojson_filenames_for_region(),
+        selected_region_states = get_geojson_filenames_for_region()
+        state_selectbox = st.multiselect('Select a location (US State):', selected_region_states,
                                          key='selected_state', on_change=clear_selection_callback)
         # preserve_map_selection = st.checkbox('Clear map type selection on state change', key='preserve_map_selection')
         # maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
@@ -2982,8 +2991,9 @@ def main():
                         fig = create_town_map(osm_gdf.copy(), state_selectbox, maptype_selectbox)
         else:
             state_list = []
-            if st.session_state.selected_region == 'All':
-                state_list = ss.wandrer_regions['State'].to_list()
+            if st.session_state.selected_region.startswith('All'):
+                # state_list = ss.wandrer_regions['State'].to_list()
+                state_list = selected_region_states
             else:
                 state_list = ss.wandrer_regions[ss.wandrer_regions.subregion_name == ss.selected_region]['State'].to_list()
 
