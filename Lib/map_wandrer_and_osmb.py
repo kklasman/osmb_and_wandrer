@@ -1758,7 +1758,7 @@ def create_region_map(source_osm_df, region):
     # state_merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
 
     location_json = json.loads(state_merged_df.to_json())
-    zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
+    zoom, center = calculate_mapbox_zoom_center(state_merged_df.bounds)
     state_merged_df.drop(['tags', 'geometry','COUNTY','name','Town'], axis=1, inplace=True, errors='ignore')
 
     template_fields = get_template_field_list_for_state_scope_map(state_merged_df)
@@ -1905,6 +1905,16 @@ def filter_wandrerer_df(wandrerer_df):
     else:
         data_value = selected_data_value
 
+    if ss.selected_maptype == 'State' and ss.hide_zero_data_state:
+        df = pd.DataFrame()
+        if ss.selected_datavalue_for_map == 'TownsCycled':
+            df = wandrerer_df.query('TownsCycled > 0')
+        elif ss.selected_datavalue_for_map == 'ActualMiles':
+            df = wandrerer_df.query('TownMilesCycled > 0')
+
+        if not df.empty:
+            return data_value, df
+
     return data_value, wandrerer_df
 
 
@@ -1958,7 +1968,7 @@ def get_geojson_filenames_for_region():
             case 'All Canada' | 'All United States':
                 result = regions.query(f"Country == @region")
             case _:
-                result = regions.query(f'subregion_name == "{ss.selected_region}"')
+                result = regions.query(f'subregion_name_formatted == "{ss.selected_region}"')
 
     return states if result.empty else result['State'].to_list()
 
@@ -2415,7 +2425,9 @@ def get_wandrer_regions():
 # 	inner join arena_geo_data agd on agd.arena_id = st.arena_id
 # 	where agd.geojson_filename is not null or agd.state_geojson_filename is not null
 # '''
-    query = f'''select sm.subregion_name, c.arena_name as Country, st.arena_name as State,
+    query = f'''
+with all_regions as (
+select sm.subregion_name, c.arena_name as Country, st.arena_name as State,
 	case when agd.state_geojson_filename is not null then agd.state_geojson_filename else agd.geojson_filename end as state_geojson_filename,
 	case when agd.county_geojson_filename is not null then agd.county_geojson_filename else agd.geojson_filename end as county_geojson_filename,
 	agd.geojson_filename
@@ -2424,7 +2436,21 @@ def get_wandrer_regions():
 	inner join arena c on c.arena_id = sm.parent_arena_id 
 	inner join arena_geo_data agd on agd.arena_id = st.arena_id
 	where (agd.geojson_filename is not null or agd.state_geojson_filename is not null)
-	order by sm.subregion_name, State'''
+	order by Country, sm.subregion_name, State
+)
+select subregion_name
+	, case when subregion_name like '%Canada%' then replace(subregion_name,' Canada', ' (CA)') else  subregion_name || ' (CA)' end as subregion_name_formatted
+	,Country, State
+	, state_geojson_filename, county_geojson_filename, geojson_filename 
+	from all_regions
+	where Country = 'Canada'
+UNION
+select subregion_name, subregion_name || ' (US)' as subregion_name_formatted
+		,Country, State
+	, state_geojson_filename, county_geojson_filename, geojson_filename 
+from all_regions
+	where Country <> 'Canada'
+order by Country, subregion_name, State'''
     # print(query)
     wandrerer_df = execute_query(query)
     return wandrerer_df
@@ -2834,6 +2860,7 @@ def settings():
     # ss
     st.write("User Settings")
     st.checkbox('Show raw data grid', key='show_raw_data', value=st.session_state.show_raw_data_state)
+    st.checkbox('Hide locations with 0 values', key='hide_zero_data', value=st.session_state.hide_zero_data_state)
 
     st.write('About:')
     with st.container(height=100, gap=None):
@@ -2845,6 +2872,7 @@ def settings():
 
     if st.button('Close', key='close'):
         st.session_state.show_raw_data_state = st.session_state.show_raw_data
+        st.session_state.hide_zero_data_state = st.session_state.hide_zero_data
         st.session_state.settings_dismissed = True
         st.rerun()
 
@@ -2888,6 +2916,9 @@ def main():
     if 'show_raw_data_state' not in st.session_state:
         st.session_state.show_raw_data_state = False
 
+    if 'hide_zero_data_state' not in st.session_state:
+        st.session_state.hide_zero_data_state = False
+
     if 'show_update_county_btn' not in st.session_state:
         st.session_state.show_update_county_btn = False
 
@@ -2909,12 +2940,13 @@ def main():
     if 'wandrer_regions' not in st.session_state:
         ss.wandrer_regions = get_wandrer_regions()
 
-    region_list = ['All', 'All Canada', 'All United States'] + (ss.wandrer_regions.subregion_name.unique().tolist())
+    # region_list = ['All', 'All Canada', 'All United States'] + ss.wandrer_regions.subregion_name_formatted.unique().tolist()
+    region_list = ['All', 'All Canada', 'All United States'] + list(dict.fromkeys(ss.wandrer_regions['subregion_name_formatted']))
     # geojson_files = get_geojson_filenames_for_region()
-    state_data_values = ['ActualMiles', 'TotalMiles', 'TownsCycled']
-    county_data_values = ['ActualMiles', 'TotalMiles', 'CycledTowns']
-    town_data_values = ['TotalMiles', 'ActualMiles', 'ActualPct', 'Award Level', 'Pct10Deficit', 'Pct25Deficit']
-    original_data_values = ['TotalMiles', 'ActualMiles', 'ActualMiles < 1', 'ActualMiles >= 1', 'ActualPct', 'Award Level', 'Pct10Deficit', 'Pct25Deficit']
+    state_data_values = sorted(['ActualMiles', 'TotalMiles', 'TownsCycled'])
+    county_data_values = sorted(['ActualMiles', 'TotalMiles', 'CycledTowns'])
+    town_data_values = sorted(['TotalMiles', 'ActualMiles', 'ActualPct', 'Award Level', 'Pct10Deficit', 'Pct25Deficit'])
+    original_data_values = sorted(['TotalMiles', 'ActualMiles', 'ActualMiles < 1', 'ActualMiles >= 1', 'ActualPct', 'Award Level', 'Pct10Deficit', 'Pct25Deficit'])
     data_values = original_data_values
     # if 'gdfs' not in st.session_state:
     #     # Initialize geopandas df dictionary in session state.
@@ -3010,7 +3042,7 @@ def main():
                 # state_list = ss.wandrer_regions['State'].to_list()
                 state_list = selected_region_states
             else:
-                state_list = ss.wandrer_regions[ss.wandrer_regions.subregion_name == ss.selected_region]['State'].to_list()
+                state_list = ss.wandrer_regions[ss.wandrer_regions.subregion_name_formatted == ss.selected_region]['State'].to_list()
 
             osm_state_gdf, osm_county_gdf = get_geopandas_df_for_region(state_list)
             match maptype_selectbox:
