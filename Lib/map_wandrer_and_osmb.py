@@ -1814,6 +1814,89 @@ def create_region_map(source_osm_df, region):
                             )
     return fig
 
+
+def create_region_map_v2():
+    renamed_gdf = {}
+    county_gdf = {}
+    # source_osm_df['State'] = state
+    wandrerer_df = pd.DataFrame()
+
+    selected_data_value = ss['selected_datavalue_for_map']
+    if selected_data_value == 'Award Level':
+        pass
+        # wandrerer_df = get_wandrer_totals_for_states(state_gdf.State.to_list())
+    else:
+        wandrerer_df = get_Wandrer_aggregates_for_cycled_states()
+
+    state_list = wandrerer_df['State'].to_list()
+
+    states_gdf, county_gdf = get_geopandas_df_for_region(state_list)
+
+    # convert_bounds_to_linestrings(states_gdf)
+    # state_gdf = clean_state_gdf(state_gdf)
+
+    data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
+    state_merged_df = states_gdf.merge(wandrerer_df, on='State')
+    # state_merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+
+    location_json = json.loads(state_merged_df.to_json())
+    zoom, center = calculate_mapbox_zoom_center(state_merged_df.bounds)
+    state_merged_df.drop(['tags', 'geometry','COUNTY','name','Town'], axis=1, inplace=True, errors='ignore')
+
+    template_fields = get_template_field_list_for_state_scope_map(state_merged_df)
+    template = create_template(state_merged_df, template_fields)
+
+    # z_max = float(state_merged_df[data_value].max()) if float(state_merged_df[data_value].max()) > 0 else float(state_merged_df['TotalMiles'].max())
+    if data_value == 'Award Level':
+        z_max = state_merged_df['TownsAwarded'].max()
+        z_data_value = 'TownsAwarded'
+    elif data_value == 'TotalMiles':
+        data_value = 'StateMiles'
+        z_max = state_merged_df[data_value].max()
+        z_data_value = data_value
+    elif data_value == 'ActualMiles':
+        data_value = 'TownMilesCycled'
+        z_max = state_merged_df[data_value].max()
+        z_data_value = data_value
+    elif data_value == 'ActualPct':
+        data_value = 'PctMilesCycled'
+        z_max = state_merged_df[data_value].max()
+        z_data_value = data_value
+    else:
+        z_max = float(state_merged_df[data_value].max()) if float(state_merged_df[data_value].max()) > 0 else float(state_merged_df[data_value].max())
+        z_data_value = 'TotalCountyMilesCycled' if data_value.startswith('ActualMiles') else data_value
+
+    st.session_state['map_gdf'] = state_merged_df
+
+    fig = go.Figure(go.Choroplethmap(
+        customdata=state_merged_df,
+        geojson=location_json,
+        featureidkey='properties.State',
+        locations=state_merged_df['State'],
+        z=state_merged_df[z_data_value],
+        colorscale=max_50_pct_color_scale,
+        zmin=0,
+        zmax=z_max,
+        marker_opacity=0.5,
+        hovertemplate=template,
+        # hoverlabel_bgcolor='white',
+        hoverlabel=dict(
+            bgcolor="black",
+            font_size=16),
+        # marker_line_width=2,
+        visible=True,
+        colorbar_title=data_value
+    ))
+    fig.update_layout(map_style="carto-positron",
+                      map_zoom=zoom * .9, map_center=center)
+    region = 'All'
+    fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
+                            , title=dict(text=f'{data_value} for Region of {region}', x=0.5
+                            , xanchor="center")
+                            )
+    return fig
+
+
 def create_region_by_county_map(source_osm_df, region):
     renamed_gdf = {}
     county_gdf = {}
@@ -2122,6 +2205,36 @@ def get_wandrer_total_miles_for_states_v4(statelist):
 
     wandrerer_df = pd.concat(df_list, ignore_index=True)
 
+    return wandrerer_df
+
+
+def get_Wandrer_aggregates_for_cycled_states():
+    query = f'''select Region, Country, State, StateArenaId
+	, sum(TotalTowns) as TotalTowns
+	, sum(CycledTowns) as TownsCycled
+	, sum(CycledTowns) * 1.0 / sum(TotalTowns) as PctTownsCycled
+	, sum(AchievedTowns) as TownsAwarded
+	, sum(AchievedTowns) * 1.0 / sum(TotalTowns) as PctTownsAwarded
+	, sum(TotalTownMiles) as StateMiles
+	, sum(UnincorporatedMiles) as UnincorporatedMiles
+	, sum(TotalCountyMiles) as TotalCountyMiles
+	, sum(ActualMiles) as TownMilesCycled
+	, sum(ActualMiles) / sum(TotalTownMiles) as PctMilesCycled
+	, sum(Pct0_Count) as Pct0_Count
+	, sum(LT_1_Mile_Count) as LT_1_Mile_Count
+	, sum(LT_5Pct_Count) as LT_5Pct_Count
+	, sum(Pct5_Count) as Pct5_Count
+	, sum(Pct10_Count) as Pct10_Count
+	, sum(Pct25_Count) as Pct25_Count
+	, sum(Pct50_Count) as Pct50_Count
+	, sum(Pct75_Count) as Pct75_Count
+	, sum(Pct90_Count) as Pct90_Count
+	, sum(Pct99_Count) as Pct99_Count
+	from vw_county_aggregates
+	where CycledTowns > 0
+	group by Region, Country, State, StateArenaId
+'''
+    wandrerer_df = execute_query(query)
     return wandrerer_df
 
 
@@ -2566,7 +2679,8 @@ def get_geopandas_df_for_state(selected_state):
     #     print(f'Getting geopandas df for {selected_state} from session state')
     #     return st.session_state.gdfs[selected_state]
 
-def get_geopandas_df_for_region(selected_region):
+
+def get_geopandas_df_for_region(state_list):
     # if not set(selected_region).issubset(set(st.session_state.gdfs.keys())):
     #     logger.info(f'Creating geopandas df for {selected_region}')
         # file_path = get_geojson_filename(state_selectbox)
@@ -2574,14 +2688,12 @@ def get_geopandas_df_for_region(selected_region):
         gdfs = gpd.GeoDataFrame()
         county_gdfs = gpd.GeoDataFrame()
         total_gdf_size = 0
-        for state in selected_region:
+        for state in state_list:
             gdf, current_gdf_size = get_geopandas_df_for_state(state)
             if gdf.empty:
                 continue
 
             total_gdf_size += current_gdf_size
-            # if "Town" in gdf.columns:
-            #     gdf = clean_gdf(gdf)
 
             if not column_exists_case_insensitive(gdf, 'normalized'):
                 county_gdf, gdf = normalize_geojson(state, gdf)
@@ -2604,11 +2716,12 @@ def get_geopandas_df_for_region(selected_region):
                 gdfs = pd.concat([gdfs, gdf])
                 county_gdfs = pd.concat([county_gdfs, county_gdf])
 
-        logger.info(f'Total size for {len(selected_region)} states: {total_gdf_size:,} bytes')
+        logger.info(f'Total size for {len(state_list)} states: {total_gdf_size:,} bytes')
+        # if county_gdfs.empty:
+        #     return gdfs
+        # else:
+        #     return gdfs, county_gdfs
         return gdfs, county_gdfs
-    # else:
-    #     print(f'Getting geopandas df for {selected_region} from session state')
-    #     return st.session_state.gdfs[selected_region[0]]
 
 def to_jaden_case(sentence):
     if sentence is None:
@@ -3024,34 +3137,10 @@ def main():
         ss.current_fig = fig
         logger.info(f"{asizeof.asizeof(ss.current_fig)=} bytes")
 
-        if state_selectbox:
-            # osm_gdf = get_geopandas_df_for_state(state_selectbox)
-            osm_gdf, osm_county_gdf = get_geopandas_df_for_region(state_selectbox)
-            match maptype_selectbox:
-                case 'State':
-                    # fig = create_state_map(osm_gdf.copy(), state_selectbox)
-                    fig = create_region_map(osm_gdf.copy(), state_selectbox)
-                case 'Counties':
-                    # fig = create_county_map(osm_gdf.copy(), state_selectbox)
-                    fig = create_county_map_v2(osm_county_gdf.copy(), state_selectbox)
-                case 'Towns' |'Seacoast Towns':
-                        fig = create_town_map(osm_gdf.copy(), state_selectbox, maptype_selectbox)
+        if ss.hide_zero_data_state:
+            fig = create_region_map_v2()
         else:
-            state_list = []
-            if st.session_state.selected_region.startswith('All'):
-                # state_list = ss.wandrer_regions['State'].to_list()
-                state_list = selected_region_states
-            else:
-                state_list = ss.wandrer_regions[ss.wandrer_regions.subregion_name_formatted == ss.selected_region]['State'].to_list()
-
-            osm_state_gdf, osm_county_gdf = get_geopandas_df_for_region(state_list)
-            match maptype_selectbox:
-                case 'State':
-                    fig = create_region_map(osm_state_gdf, region_selectbox)
-                case 'Counties':
-                    fig = create_region_by_county_map(osm_county_gdf.copy(), region_selectbox)
-                case 'Towns':
-                    fig = create_region_by_town_map(osm_state_gdf.copy(), region_selectbox)
+            fig = include_states_with_zero_data(fig, maptype_selectbox, region_selectbox, selected_region_states, state_selectbox)
 
         # if fig:
         #     # 3. Use plotly_events to capture clicks
@@ -3120,6 +3209,39 @@ def main():
         logger.info(f"{asizeof.asizeof(ss.map_gdf)=} bytes")
 
     # ss
+
+
+def include_states_with_zero_data(fig, maptype_selectbox, region_selectbox, selected_region_states, state_selectbox):
+    if state_selectbox:
+        # osm_gdf = get_geopandas_df_for_state(state_selectbox)
+        osm_gdf, osm_county_gdf = get_geopandas_df_for_region(state_selectbox)
+        match maptype_selectbox:
+            case 'State':
+                # fig = create_state_map(osm_gdf.copy(), state_selectbox)
+                fig = create_region_map(osm_gdf.copy(), state_selectbox)
+            case 'Counties':
+                # fig = create_county_map(osm_gdf.copy(), state_selectbox)
+                fig = create_county_map_v2(osm_county_gdf.copy(), state_selectbox)
+            case 'Towns' | 'Seacoast Towns':
+                fig = create_town_map(osm_gdf.copy(), state_selectbox, maptype_selectbox)
+    else:
+        state_list = []
+        if st.session_state.selected_region.startswith('All'):
+            # state_list = ss.wandrer_regions['State'].to_list()
+            state_list = selected_region_states
+        else:
+            state_list = ss.wandrer_regions[ss.wandrer_regions.subregion_name_formatted == ss.selected_region][
+                'State'].to_list()
+
+        osm_state_gdf, osm_county_gdf = get_geopandas_df_for_region(state_list)
+        match maptype_selectbox:
+            case 'State':
+                fig = create_region_map(osm_state_gdf, region_selectbox)
+            case 'Counties':
+                fig = create_region_by_county_map(osm_county_gdf.copy(), region_selectbox)
+            case 'Towns':
+                fig = create_region_by_town_map(osm_state_gdf.copy(), region_selectbox)
+    return fig
 
 
 def create_info_df(source_df):
