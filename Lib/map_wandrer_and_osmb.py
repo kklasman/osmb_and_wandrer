@@ -1299,6 +1299,12 @@ def clean_county_gdf(town_gdf):
     else:
         columns_to_keep = ['State', 'long_county', 'long_name', 'County', 'normalized', 'geometry']
 
+    if 'arena_id' in town_gdf.columns:
+        columns_to_keep.append('arena_id')
+
+    if 'arena_badge_id' in town_gdf.columns:
+        columns_to_keep.append('arena_badge_id')
+
     if set(columns_to_keep).issubset(set(town_gdf.columns)):
         filtered_gdf = town_gdf[columns_to_keep]
         return filtered_gdf
