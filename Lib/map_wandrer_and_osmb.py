@@ -1720,7 +1720,9 @@ def create_county_gdf(source_osm_df):
         return gpd.GeoDataFrame()
 
     source_osm_df = source_osm_df.dropna(axis=1, how='all')
-    county_gdf = source_osm_df.dissolve(by='County')
+    gdf_polygons_only = source_osm_df[source_osm_df.geom_type.isin(["MultiPolygon", "Polygon"])]
+    county_gdf = gdf_polygons_only.dissolve(by='County')
+    # county_gdf = source_osm_df.dissolve(by='County')
     county_gdf.reset_index(inplace=True)
     # if not column_exists_case_insensitive(source_osm_df, 'admin_level'):
     #     county_gdf = source_osm_df.dissolve(by='County')
@@ -3227,7 +3229,8 @@ def include_states_with_zero_data(fig, maptype_selectbox, region_selectbox, sele
                 fig = create_region_map(osm_gdf.copy(), state_selectbox)
             case 'Counties':
                 # fig = create_county_map(osm_gdf.copy(), state_selectbox)
-                fig = create_county_map_v2(osm_county_gdf.copy(), state_selectbox)
+                # fig = create_county_map_v2(osm_county_gdf.copy(), state_selectbox)
+                fig = create_county_map_v3(osm_county_gdf.copy(), state_selectbox)
             case 'Towns' | 'Seacoast Towns':
                 fig = create_town_map(osm_gdf.copy(), state_selectbox, maptype_selectbox)
     else:
