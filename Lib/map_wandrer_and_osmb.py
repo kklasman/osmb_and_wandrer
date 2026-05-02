@@ -9,6 +9,7 @@ import os
 import sqlite3
 import plotly
 import plotly.express as px
+import plotly_functions as pf
 import streamlit as st
 from streamlit import session_state as ss
 from geopy import distance
@@ -19,22 +20,24 @@ import requests
 from io import StringIO
 from datetime import datetime
 import database as db
-import logging
+import logging_functions as lf
 import re
 from pympler import asizeof
 # from streamlit-tree-select2 import streamlit_tree_select
 import math
 import tracemalloc
-
+import utilities as u
+import plotly_functions as pf
+import query as q
 
 # import uuid
 # from pympler import asizeof
 
 # Configure the root logger
-logging.basicConfig(level=logging.INFO)
+lf.logging.basicConfig(level=lf.logging.INFO)
 
 # Get a logger for the current module
-logger = logging.getLogger(__name__)
+logger = lf.logging.getLogger(__name__)
 
 # logger.info(f'python version: {sys.version}')
 # logger.info(f'python version_info: {sys.version_info}')
@@ -616,6 +619,94 @@ def create_county_map_v3(source_osm_df, state):
                             , xanchor="center")
                             )
     fig.update_geos(fitbounds="geojson", visible=True)
+    return fig
+
+
+def create_county_trace(fig, source_osm_df, state):
+    renamed_gdf = {}
+    counties_gdf = {}
+    state_gdf = {}
+
+    if 'Town' in source_osm_df.columns:
+        county_gdf = source_osm_df.dissolve(by='County')
+        county_gdf.reset_index(inplace=True)
+        county_gdf['County'] = county_gdf['County'].str.title()
+        county_gdf = clean_county_gdf(county_gdf)
+    else:
+        county_gdf = source_osm_df
+
+    convert_bounds_to_linestrings(county_gdf)
+
+# source_osm_df.drop(list(source_osm_df.filter(regex='NHD:')), axis=1, inplace=True)
+
+    state_gdf = source_osm_df.dissolve(by='State')
+    columns_to_drop = state_gdf.select_dtypes(include=['datetime64']).columns
+    state_gdf.drop(columns=columns_to_drop, axis=1, inplace=True)
+    state_boundary_json = json.loads(state_gdf.to_json())
+
+    zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
+
+    state_list = []
+    state_list.extend(state)
+    wandrerer_df = get_wandrer_totals_for_counties_for_states_v3(state_list)
+    data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
+
+    merged_df = county_gdf.merge(wandrerer_df, on=['State','County', 'long_county'])
+    merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+    location_json = json.loads(merged_df.to_json())
+    merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+    # template = create_template(merged_df, ['County', 'TotalTowns', 'TotalCountyMiles', 'TotalTownMiles', 'CountyUnincorporatedMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
+    template_fields = get_template_field_list_for_county_scope_map(merged_df)
+
+    template = create_template(merged_df, template_fields)
+
+    if data_value == 'TotalMiles':
+        data_value = 'TotalCountyMiles'
+
+    if data_value == 'Award Level':
+        z_max = merged_df['TownsAwarded'].max()
+        z_data_value = 'TownsAwarded'
+    else:
+        z_max = float(merged_df[data_value].max()) if float(merged_df[data_value].max()) > 0 else float(merged_df[data_value].max())
+        z_data_value = 'TotalCountyMilesCycled' if data_value.startswith('ActualMiles') else data_value
+
+    st.session_state['county_gdf'] = merged_df
+    fig.add_trace(go.Choroplethmap(
+        customdata=merged_df,
+        geojson=location_json,
+        featureidkey='properties.County',
+        locations=merged_df['County'],
+        z=merged_df[z_data_value],
+        zmin=0,
+        zmax=z_max,
+        colorscale=max_50_pct_color_scale,
+        hovertemplate=template,
+        # hoverlabel_bgcolor='white',
+        hoverlabel=dict(
+            bgcolor="black",
+            font_size=16),
+        marker_opacity=0.5,
+        visible=True,
+        colorbar_title=z_data_value,
+        showlegend=True,
+        name='County Map'
+        # showscale=False
+    ))
+
+    # fig.update_layout(map_layers=[dict(sourcetype='geojson',
+    #                                       source=state_boundary_json,
+    #                                       color='#303030',
+    #                                       type='line',
+    #                                       line=dict(width=1.5)
+    #                                       )])
+    #
+    # fig.update_layout(map_style="carto-positron",
+    #                   map_zoom=zoom, map_center=center)
+    # fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
+    #                         , title=dict(text=f'{data_value} for Counties in {state}', x=0.5
+    #                         , xanchor="center")
+    #                         )
+    # fig.update_geos(fitbounds="geojson", visible=True)
     return fig
 
 
@@ -1720,7 +1811,7 @@ def create_county_gdf(source_osm_df):
         return gpd.GeoDataFrame()
 
     source_osm_df = source_osm_df.dropna(axis=1, how='all')
-    gdf_polygons_only = source_osm_df[source_osm_df.geom_type.isin(["MultiPolygon", "Polygon"])]
+    gdf_polygons_only = polygons_only(source_osm_df)
     county_gdf = gdf_polygons_only.dissolve(by='County')
     # county_gdf = source_osm_df.dissolve(by='County')
     county_gdf.reset_index(inplace=True)
@@ -1744,6 +1835,70 @@ def create_county_gdf(source_osm_df):
 
     county_gdf['County'] = county_gdf['County'].str.title() # required for merge with Wandrer data
     return county_gdf
+
+
+def polygons_only(source_osm_df):
+    gdf_polygons_only = source_osm_df[source_osm_df.geom_type.isin(["MultiPolygon", "Polygon"])]
+    return gdf_polygons_only
+
+
+def add_poi_trace(fig, state, filename):
+    file_path = os.path.join('POIs', filename)
+    # print(f'Load {filename} for {state}')
+    file_path = u.get_filepath_for_filename(file_path)
+
+    gdf, file_size = get_poi_gdf_for_filename(file_path)
+
+    gdf = polygons_only(gdf)
+    # location_json =gdf.to_json()
+    location_json = json.loads(gdf.to_json())
+    gdf_no_geometry = gdf.drop(['geometry'], axis=1, errors='ignore')
+
+    gdf_no_geometry['z_value'] = 2
+
+    fig.add_trace(go.Choroplethmap(
+        customdata=gdf_no_geometry,
+        geojson=location_json,
+        featureidkey='properties.name',
+        locations=gdf_no_geometry['name'],
+        z=gdf_no_geometry['z_value'],
+        colorscale='greens',
+        zmin=0,
+        zmax=10,
+        marker_opacity=0.75,
+        # marker_opacity=0.5,
+        # hovertemplate=template,
+        # # hoverlabel_bgcolor='white',
+        # hoverlabel=dict(
+        #     bgcolor="black",
+        #     font_size=16),
+        # marker_line_width=2,
+        showlegend=True,
+        name=f'{state} Parks',
+        showscale=False
+    ))
+
+    fig.update_layout(
+        # title_text='Choropleth with Legend Example',
+        # geo=dict(scope='usa'),
+        # legend=dict(
+        #     yanchor="top",
+        #     y=0.99,
+        #     xanchor="left",
+        #     x=-1
+        # )
+        legend={
+            "title_text": "Layers",
+            "x": -1.1,
+            "y": 0.75,
+            "xref": "container",
+            # "yref": "container",
+            "yanchor": "top"
+        }
+    )
+
+    return gdf_no_geometry
+
 
 # @memory_profiler
 def create_region_map(source_osm_df, region):
@@ -1794,7 +1949,8 @@ def create_region_map(source_osm_df, region):
 
     st.session_state['map_gdf'] = state_merged_df
 
-    fig = go.Figure(go.Choroplethmap(
+    fig = go.Figure()
+    fig.add_trace(go.Choroplethmap(
         customdata=state_merged_df,
         geojson=location_json,
         featureidkey='properties.State',
@@ -1810,9 +1966,24 @@ def create_region_map(source_osm_df, region):
             bgcolor="black",
             font_size=16),
         # marker_line_width=2,
-        visible=True,
-        colorbar_title=data_value
+        # visible=True,
+        colorbar_title=data_value,
+        # showscale=False,  # Optional: hide color scale if not needed
+        showlegend=True,
+        name='State Map'
     ))
+
+    show_legend = True
+
+    # fig = create_county_trace(fig, source_osm_df, region)
+
+    for state in state_gdf.State.to_list():
+        if state in ss.wandrer_regions.query('poi_geojson_filename.notnull()')['State'].to_list():
+            filename = ss.wandrer_regions.query(f'State == "{state}"')['poi_geojson_filename'].iloc[0]
+            gdf_pois = add_poi_trace(fig, state, filename)
+            show_legend = True
+
+
     fig.update_layout(map_style="carto-positron",
                       map_zoom=zoom * .9, map_center=center)
 
@@ -1820,7 +1991,16 @@ def create_region_map(source_osm_df, region):
                             , title=dict(text=f'{data_value} for Region of {region}', x=0.5
                             , xanchor="center")
                             )
-    return fig
+
+    if show_legend:
+        fig.update_layout(legend=dict(
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=0.01
+        ))
+
+    return fig, gdf_pois
 
 
 def create_region_map_v2():
@@ -2486,11 +2666,9 @@ def get_wandrer_totals_for_counties_for_state(state):
     wandrerer_df = execute_query(query)
     return wandrerer_df
 
-def parameterize_SQL_in_statement(items):
-    return f"""('{"', '".join(items)}')"""
 
 def get_wandrer_totals_for_towns_for_state(states):
-    in_statement = parameterize_SQL_in_statement(states)
+    in_statement = q.parameterize_SQL_in_statement(states)
     query = f'''select distinct fqtn.Region, fqtn.Country, fqtn.State, REPLACE(fqtn.County, ' County', '') as County
         , CASE WHEN fqtn.name = "Unincorporated" THEN fqtn.name || " " || fqtn.County ELSE fqtn.name END as Town
 		, fqtn.County as LongCounty, fqtn.long_name, fqtn.CountyLongName, town.parent_arena_id as CountyParentArenaId
@@ -2551,7 +2729,7 @@ with all_regions as (
 select sm.subregion_name, c.arena_name as Country, st.arena_name as State,
 	case when agd.state_geojson_filename is not null then agd.state_geojson_filename else agd.geojson_filename end as state_geojson_filename,
 	case when agd.county_geojson_filename is not null then agd.county_geojson_filename else agd.geojson_filename end as county_geojson_filename,
-	agd.geojson_filename
+	agd.geojson_filename, agd.poi_geojson_filename
 	from subregion_mapping sm
 	inner join arena st on st.arena_id = sm.child_arena_id
 	inner join arena c on c.arena_id = sm.parent_arena_id 
@@ -2562,13 +2740,13 @@ select sm.subregion_name, c.arena_name as Country, st.arena_name as State,
 select subregion_name
 	, case when subregion_name like '%Canada%' then replace(subregion_name,' Canada', ' (CA)') else  subregion_name || ' (CA)' end as subregion_name_formatted
 	,Country, State
-	, state_geojson_filename, county_geojson_filename, geojson_filename 
+	, state_geojson_filename, county_geojson_filename, geojson_filename, poi_geojson_filename
 	from all_regions
 	where Country = 'Canada'
 UNION
 select subregion_name, subregion_name || ' (US)' as subregion_name_formatted
 		,Country, State
-	, state_geojson_filename, county_geojson_filename, geojson_filename 
+	, state_geojson_filename, county_geojson_filename, geojson_filename, poi_geojson_filename 
 from all_regions
 	where Country <> 'Canada'
 order by Country, subregion_name, State'''
@@ -2647,15 +2825,12 @@ def get_geojson_filename(selected_state):
         return ''
 
     # file_path = os.path.join(cwd, r'data\10150\boundaries', file_name)
-    file_path = os.path.join(cwd, 'Lib', 'data', 'boundaries', file_name)
-    # print(f'file_path {file_path} exists {os.path.exists(file_path)}')
-    if not os.path.exists(file_path):
-        # file lives in a different folder in development
-        file_path = os.path.join(cwd, r'data\boundaries', file_name)
+    file_path = u.get_filepath_for_filename(file_name)
 
     # file_path = os.path.join(cwd, r'data\boundaries', file_name)
     filesize = os.path.getsize(file_path)
     return file_path
+
 
 def get_geopandas_df_for_state(selected_state):
     # if selected_state not in st.session_state.gdfs.keys():
@@ -2683,6 +2858,36 @@ def get_geopandas_df_for_state(selected_state):
         current_gdf_size = asizeof.asizeof(gdf)
         logger.info(f'Creating geopandas df for {selected_state}, size: {current_gdf_size:,} bytes from {file_path}')
         return gdf, current_gdf_size
+
+
+def get_poi_gdf_for_filename(file_path):
+    # if selected_state not in st.session_state.gdfs.keys():
+    # file_path = get_geojson_filename(selected_state)
+    # if len(file_path) == 0:
+    #     return gpd.GeoDataFrame(),  -1
+
+    gdf = gpd.read_file(f'{file_path}')
+    # if 'id' in gdf.columns:
+    #     if 'osm_id' not in gdf.columns:
+    #         gdf['osm_id'] = None
+    #
+    #     gdf['osm_id'] = gdf['osm_id'].fillna(gdf['id'].str.split('/').str[-1])
+    # else:
+    #     logger.info(f'id column missing in {selected_state} geojson')
+
+    convert_bounds_to_linestrings(gdf)
+    # # st.session_state.gdfs[selected_state] = gdf
+    # if not column_exists_case_insensitive(gdf, 'normalized'):
+    #     county_gdf, gdf = normalize_geojson(selected_state, gdf)
+
+    columns_to_drop = gdf.select_dtypes(include=['datetime64']).columns
+    gdf.drop(columns=columns_to_drop, axis=1, inplace=True)
+
+    current_gdf_size = asizeof.asizeof(gdf)
+    logger.info(f'Creating geopandas df from {file_path}, size: {current_gdf_size:,} bytes')
+    return gdf, current_gdf_size
+
+
     # else:
     #     print(f'Getting geopandas df for {selected_state} from session state')
     #     return st.session_state.gdfs[selected_state]
@@ -2884,13 +3089,14 @@ def center_point_diagonal(diagonal):
 def town_selected():
     # st.plotly_chart(st.session_state.current_fig, config=config)
     fig = st.session_state.current_fig
-    if len(st.session_state.map_data['selection']['rows']) == 0:
+    if len(ss.town_selection.selection['rows']) == 0:
         st.plotly_chart(fig)
-        st.dataframe(st.session_state['map_gdf'], width='stretch', selection_mode='single-row'
-                     , key='map_data', on_select=town_selected)
+        show_dataframes()
+        # st.dataframe(ss.map_data_town_gdf, width='stretch', selection_mode='single-row', on_select=town_selected,
+        #                  key='town_selection')
         return
 
-    diagonal = st.session_state['map_gdf'].iloc[st.session_state.map_data['selection']['rows'][0]]['diagonal']
+    diagonal = ss.map_data_town_gdf.iloc[ss.town_selection.selection['rows'][0]]['diagonal']
     # x_center, y_center = center_point_diagonal(diagonal)
     zoom, center = calculate_mapbox_zoom_center_from_diagonal(diagonal)
     # st.write(f'{diagonal=}')
@@ -2905,6 +3111,11 @@ def town_selected():
     #                   config={'mapbox_scrollZoom':True})
 
     fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1})
+
+    fig.update_traces(visible='legendonly', selector=dict(name='State Map'))
+    fig.update_traces(visible='legendonly', selector=dict(name='County Map'))
+    fig.update_traces(visible=True, selector=dict(name='Town Map'))
+
     # fig.conf = dict(scrollZoom=True)
 
     st.plotly_chart(fig)
@@ -2915,11 +3126,113 @@ def town_selected():
         # st.sidebar.button(f'Update {county} County Miles', key="update_county_btn")
         #     # st.write('Update button clicked')
 
-    st.dataframe(st.session_state['map_gdf'], width='stretch', selection_mode='single-row'
-                 , key='map_data', on_select=town_selected)
+    show_dataframes()
+
+    # st.dataframe(ss.map_data_town_gdf, width='stretch', selection_mode='single-row', on_select=town_selected,
+    #              key='town_selection')
+
+
+def state_selected():
+    # st.dataframe(ss.map_data_state_gdf, width='stretch', selection_mode='single-row', on_select=state_selected,
+    #              key='state_selection')
+
+    fig = st.session_state.current_fig
+    if len(ss.state_selection.selection['rows']) == 0:
+        st.plotly_chart(fig)
+        show_dataframes()
+        return
+
+    print(f'{ss.state_selection=}')
+    diagonal = ss.map_data_state_gdf.iloc[ss.state_selection['selection']['rows'][0]]['diagonal']
+    # x_center, y_center = center_point_diagonal(diagonal)
+
+    zoom, center = calculate_mapbox_zoom_center_from_diagonal(diagonal)
+    fig.update_layout(map_style="carto-positron", map_zoom=zoom, map_center=center)
+
+    fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1})
+
+    fig.update_traces(visible=True, selector=dict(name='State Map'))
+    fig.update_traces(visible='legendonly', selector=dict(name='County Map'))
+    fig.update_traces(visible='legendonly', selector=dict(name='Town Map'))
+    fig.update_traces(visible='legendonly', selector=dict(name='Seacoast Map'))
+
+    st.plotly_chart(fig)
+
+    if st.session_state.logged_in:
+        st.session_state.update_county = ss.map_data_state_gdf.iloc[ss.map_data_state_gdf['selection']['rows'][0]]['County']
+        st.session_state.show_update_county_btn = True
+
+    show_dataframes()
+    # st.dataframe(ss.map_data_state_gdf, width='stretch', selection_mode='single-row', on_select=state_selected, key='state_selection')
+
+
+def county_selected():
+    # st.plotly_chart(st.session_state.current_fig, config=config)
+    fig = st.session_state.current_fig
+    if len(ss.county_selection.selection['rows']) == 0:
+        st.plotly_chart(fig)
+        show_dataframes()
+        # st.dataframe(ss.map_data_county_gdf, width='stretch', selection_mode='single-row', on_select=county_selected,
+        #                  key='county_selection')
+        return
+
+    diagonal = ss.map_data_county_gdf.iloc[ss.county_selection.selection['rows'][0]]['diagonal']
+    # x_center, y_center = center_point_diagonal(diagonal)
+    zoom, center = calculate_mapbox_zoom_center_from_diagonal(diagonal)
+    fig.update_layout(map_style="carto-positron", map_zoom=zoom, map_center=center)
+    fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1})
+
+    fig.update_traces(visible='legendonly', selector=dict(name='State Map'))
+    fig.update_traces(visible=True, selector=dict(name='County Map'))
+    fig.update_traces(visible='legendonly', selector=dict(name='Town Map'))
+    fig.update_traces(visible='legendonly', selector=dict(name='Seacoast Map'))
+
+    st.plotly_chart(fig)
+
+    if st.session_state.logged_in:
+        st.session_state.update_county = st.session_state['map_gdf'].iloc[st.session_state.map_data['selection']['rows'][0]]['County']
+        st.session_state.show_update_county_btn = True
+        # st.sidebar.button(f'Update {county} County Miles', key="update_county_btn")
+        #     # st.write('Update button clicked')
+
+    show_dataframes()
+
+    # st.dataframe(st.session_state['map_gdf'], width='stretch', selection_mode='single-row'
+    #              , key='map_data', on_select=town_selected)
     # town = st.session_state['map_gdf'].iloc[st.session_state.map_data['selection']['rows'][0]]['Town']
     # st.write(f'{town=}')
     # st.write(st.session_state.map_data)
+
+
+def park_selected():
+    # st.plotly_chart(st.session_state.current_fig, config=config)
+    fig = st.session_state.current_fig
+    if len(ss.park_selection.selection['rows']) == 0:
+        st.plotly_chart(fig)
+        show_dataframes()
+        # st.dataframe(ss.map_data_town_gdf, width='stretch', selection_mode='single-row', on_select=town_selected,
+        #                  key='town_selection')
+        return
+
+    diagonal = ss.map_data_park_gdf.iloc[ss.park_selection.selection['rows'][0]]['diagonal']
+    # x_center, y_center = center_point_diagonal(diagonal)
+    zoom, center = calculate_mapbox_zoom_center_from_diagonal(diagonal)
+    fig.update_layout(map_style="carto-positron", map_zoom=zoom, map_center=center)
+
+    fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1})
+    fig.update_traces(visible='legendonly', selector=dict(name='State Map'))
+    fig.update_traces(visible='legendonly', selector=dict(name='County Map'))
+    fig.update_traces(visible='legendonly', selector=dict(name='Town Map'))
+    fig.update_traces(visible='legendonly', selector=dict(name='Seacoast Map'))
+
+    st.plotly_chart(fig)
+
+    if st.session_state.logged_in:
+        st.session_state.update_county = st.session_state['map_gdf'].iloc[st.session_state.map_data['selection']['rows'][0]]['County']
+        st.session_state.show_update_county_btn = True
+
+    show_dataframes()
+
 
 # ss
 
@@ -3043,9 +3356,33 @@ def main():
     if 'show_update_county_btn' not in st.session_state:
         st.session_state.show_update_county_btn = False
 
-    # if 'gdfs' not in st.session_state:
-    #     # Initialize geopandas df dictionary in session state.
-    #     st.session_state.gdfs = {}
+    if 'gdfs' not in st.session_state:
+        # Initialize geopandas df dictionary in session state.
+        st.session_state.gdfs = {}
+
+    if 'map_data_state_gdf' not in st.session_state:
+        # Initialize geopandas df dictionary in session state.
+        st.session_state.map_data_state_gdf = gpd.GeoDataFrame()
+
+    if 'map_data_town_gdf' not in st.session_state:
+        # Initialize geopandas df dictionary in session state.
+        st.session_state.map_data_town_gdf = gpd.GeoDataFrame()
+
+    if 'map_data_seacoast_gdf' not in st.session_state:
+        # Initialize geopandas df dictionary in session state.
+        st.session_state.map_data_seacoast_gdf = gpd.GeoDataFrame()
+
+    if 'map_data_county_gdf' not in st.session_state:
+        # Initialize geopandas df dictionary in session state.
+        st.session_state.map_data_county_gdf = gpd.GeoDataFrame()
+
+    if 'map_data_park_gdf' not in st.session_state:
+        # Initialize geopandas df dictionary in session state.
+        st.session_state.map_data_park_gdf = gpd.GeoDataFrame()
+
+    if 'map_data_trails_gdf' not in st.session_state:
+        # Initialize geopandas df dictionary in session state.
+        st.session_state.map_data_trails_gdf = gpd.GeoDataFrame()
 
     if 'current_fig' not in st.session_state:
         st.session_state.current_fig = {}
@@ -3137,6 +3474,7 @@ def main():
         st.session_state.show_update_county_btn = False
         osm_gdf = {}
         fig = {}
+        gdf_pois = gpd.GeoDataFrame()
         # log_session_variable_size('ss.current_fig')
 
         logger.info(f"{asizeof.asizeof( ss.current_fig)=} bytes")
@@ -3147,8 +3485,10 @@ def main():
 
         if ss.hide_zero_data_state:
             fig = create_region_map_v2()
+        elif ss.selected_datavalue_for_map == 'Award Level':
+            fig, gdf_pois = include_states_with_zero_data(fig, maptype_selectbox, region_selectbox, selected_region_states, state_selectbox)
         else:
-            fig = include_states_with_zero_data(fig, maptype_selectbox, region_selectbox, selected_region_states, state_selectbox)
+            fig = pf.create_choropleth_map_with_legend(state_selectbox)
 
         # if fig:
         #     # 3. Use plotly_events to capture clicks
@@ -3182,22 +3522,14 @@ def main():
         #         st.info("Click on a section of the heatmap or colorbar to see the value.")
 
         if fig:
+
             if st.session_state.show_raw_data_state:
                 # don't need current_fig in session.state if the raw data table isn't being shwon.
                 st.session_state.current_fig = fig
 
             st.plotly_chart(fig)
             # st.plotly_chart(fig, key='plotly_chart_event', on_select=_map_selected, selection_mode="points")
-            if st.session_state.show_raw_data_state:
-                st.write(' ')
-                st.write(' ')
-                st.write(' ')
-                st.write('Raw Data')
-                # st.dataframe(osm_gdf, width='stretch')
-                st.dataframe(st.session_state['map_gdf'], width='stretch', selection_mode='single-row'
-                         ,key='map_data', on_select=town_selected)
-                # info_df = create_info_df(st.session_state['map_gdf'])
-                # st.dataframe(info_df, width='stretch')
+            show_dataframes()
         else:
             st.write(f'{maptype_selectbox} map unavailable for {state_selectbox}')
 
@@ -3219,20 +3551,54 @@ def main():
     # ss
 
 
+def show_dataframes():
+    if st.session_state.show_raw_data_state:
+
+        st.write(' ')
+        st.write(' ')
+        st.write(' ')
+        # st.dataframe(osm_gdf, width='stretch')
+        if not ss.map_data_state_gdf.empty:
+            with st.expander('State Data', expanded=False):
+                st.dataframe(ss.map_data_state_gdf, width='stretch', selection_mode='single-row', on_select=state_selected, key='state_selection')
+        # info_df = create_info_df(st.session_state['map_gdf'])
+        # st.dataframe(info_df, width='stretch')
+
+        if not ss.map_data_county_gdf.empty:
+            with st.expander('County Data', expanded=False):
+                st.dataframe(ss.map_data_county_gdf, width='stretch', selection_mode='single-row', on_select=county_selected, key='county_selection')
+
+        if not ss.map_data_town_gdf.empty:
+            with st.expander('Town Data', expanded=False):
+                st.dataframe(ss.map_data_town_gdf, width='stretch', selection_mode='single-row', on_select=town_selected, key='town_selection')
+        # info_df = create_info_df(st.session_state['map_gdf'])
+        # st.dataframe(info_df, width='stretch')
+
+        if not ss.map_data_park_gdf.empty:
+            with st.expander('Park Data', expanded=False):
+                st.dataframe(ss.map_data_park_gdf, width='stretch', selection_mode='single-row', on_select=park_selected, key='park_selection')
+
+
 def include_states_with_zero_data(fig, maptype_selectbox, region_selectbox, selected_region_states, state_selectbox):
+    gdf_pois = gpd.GeoDataFrame()
+
     if state_selectbox:
         # osm_gdf = get_geopandas_df_for_state(state_selectbox)
         osm_gdf, osm_county_gdf = get_geopandas_df_for_region(state_selectbox)
         match maptype_selectbox:
             case 'State':
                 # fig = create_state_map(osm_gdf.copy(), state_selectbox)
-                fig = create_region_map(osm_gdf.copy(), state_selectbox)
+                fig, gdf_pois = create_region_map(osm_gdf.copy(), state_selectbox)
+                # fig = pf.create_choropleth_map_with_legend(get_geojson_filename(state_selectbox[0]))
             case 'Counties':
                 # fig = create_county_map(osm_gdf.copy(), state_selectbox)
                 # fig = create_county_map_v2(osm_county_gdf.copy(), state_selectbox)
                 fig = create_county_map_v3(osm_county_gdf.copy(), state_selectbox)
             case 'Towns' | 'Seacoast Towns':
-                fig = create_town_map(osm_gdf.copy(), state_selectbox, maptype_selectbox)
+                if ss.selected_datavalue_for_map:
+                    fig = create_town_map(osm_gdf.copy(), state_selectbox, maptype_selectbox)
+                else:
+                    fig = pf.create_choropleth_map_with_legend(get_geojson_filename(state_selectbox))
     else:
         state_list = []
         if st.session_state.selected_region.startswith('All'):
@@ -3250,7 +3616,7 @@ def include_states_with_zero_data(fig, maptype_selectbox, region_selectbox, sele
                 fig = create_region_by_county_map(osm_county_gdf.copy(), region_selectbox)
             case 'Towns':
                 fig = create_region_by_town_map(osm_state_gdf.copy(), region_selectbox)
-    return fig
+    return fig, gdf_pois
 
 
 def create_info_df(source_df):
@@ -3360,7 +3726,7 @@ def display_county_map_type_totals():
 
 def display_town_map_type_totals():
     # st.write(f'Totals for {st.session_state.selected_region}')
-    map_df = ss.map_gdf
+    map_df = ss.map_data_town_gdf
     map_df['Cycled'] = np.where(map_df['ActualMiles'] < 1, 0, 1)
     info_df = map_df.groupby(['Country','State']).agg(
         # StateCount=('State', 'nunique'),

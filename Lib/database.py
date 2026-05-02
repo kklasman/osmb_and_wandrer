@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import pandas as pd
 
 def get_db_path():
     cwd = os.getcwd()
@@ -79,3 +80,19 @@ def execute_update_query(conn, query):
 
     except Exception as error:
         print(f'{error=}')
+
+
+def execute_query(query):
+    db_path = get_db_path()
+
+    try:
+        conn = sqlite3.connect(db_path)
+        wandrerer_df = pd.read_sql_query(query, conn)
+        return wandrerer_df
+    except Exception as error:
+        print(f'{error=}')
+        print(f'Unable to open {db_path}')
+
+
+def parameterize_SQL_in_statement(items):
+    return f"""('{"', '".join(items)}')"""
