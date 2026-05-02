@@ -4,7 +4,8 @@ import utilities as u
 import logging_functions as lf
 
 def get_geojson_filename(selected_state):
-    cwd = os.getcwd()
+    # cwd = os.getcwd()
+    cwd = ss.base_dir
     lf.logger.info(f'cwd: {cwd}')
 
     # file_name = st.session_state.geojson_files_dict[selected_state]

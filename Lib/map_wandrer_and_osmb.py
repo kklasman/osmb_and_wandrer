@@ -29,6 +29,7 @@ import tracemalloc
 import utilities as u
 import plotly_functions as pf
 import query as q
+from pathlib import Path
 
 # import uuid
 # from pympler import asizeof
@@ -44,6 +45,9 @@ logger = lf.logging.getLogger(__name__)
 # logger.info(f'Streamlit version: {st.__version__}')
 
 os.environ['PYOGRIO_USE_ARROW'] = '1'
+
+ss.base_dir = Path(__file__).resolve().parent
+logger.info(f'{ss.base_dir=}')
 
 st.set_page_config(page_title="Browse Wandrer Data", layout="wide")
 
