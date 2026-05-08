@@ -28,7 +28,7 @@ def get_wandrer_totals_for_towns_for_state(states):
         , round(fqtn.Pct50Deficit, 7) as Pct50Deficit, round(fqtn.Pct75Deficit, 7) as Pct75Deficit
         , round(fqtn.Pct90Deficit, 7) as Pct90Deficit
 		, fqtn.geometries_visible, fqtn.diagonal, fqtn.user_id, town.seacoast, town.osm_id, town.update_datetime
-        from vw_current_town_data town
+        from vw_current_town_data_v2 town
 		inner join vw_current_town_data fqtn on fqtn.id = town.id 
         where fqtn.state in {in_statement}
         order by 'Award Level', fqtn.region, fqtn.country, fqtn.state, fqtn.county, fqtn.name'''

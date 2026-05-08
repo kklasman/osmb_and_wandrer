@@ -12,6 +12,7 @@ import plotly.express as px
 import plotly_functions as pf
 import streamlit as st
 from streamlit import session_state as ss
+from streamlit_scroll_to_top import scroll_to_here
 from geopy import distance
 import numpy as np
 from shapely.geometry import LineString
@@ -552,7 +553,7 @@ def create_county_map_v3(source_osm_df, state):
 
     state_list = []
     state_list.extend(state)
-    wandrerer_df = get_wandrer_totals_for_counties_for_states_v3(state_list)
+    wandrerer_df = get_wandrer_totals_for_counties_for_states_v4(state_list)
     data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
 
     # # unincorporated_df = get_wandrer_unincorporated_totals_for_counties_for_states(state_list)
@@ -880,7 +881,7 @@ def create_town_map(town_gdf, state_list, maptype):
 
     # state_list = []
     # state_list.append(state)
-    wandrerer_county_df = get_wandrer_totals_for_counties_for_states_v3(state_list)
+    wandrerer_county_df = get_wandrer_totals_for_counties_for_states_v5(state_list)
     if data_value == 'ActualMiles > 1':
         data_value =  'ActualMiles'
     merged_county_df = county_gdf.merge(wandrerer_county_df, on=['State','County','long_county'])
@@ -1354,9 +1355,13 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
                                  showlegend=True,
                                  name=trace_df['Award Level'].unique()[0],
                                  colorscale=trace_color_range,
-                                 marker_opacity=0.6,
+                                 # marker_opacity=0.6,
                                  hovertemplate=trace_template,
-                                 showscale=False))
+                                    # 2. Define unselected style: Fade all unselected regions
+                                   unselected=dict(marker=dict(opacity=0.2)),
+                                   # Optional: Customize selected appearance
+                                   selected=dict(marker=dict(opacity=1.0)),
+                                showscale=False))
 
         logger.info(f"Trace name {trace_df['Award Level'].unique()[0]} has {len(trace_df)} towns")
 
@@ -1375,6 +1380,9 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
     fig = fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1}
                             , title=dict(text=f'{data_value} for Towns in {state}', x=0.5, xanchor="center")
                             )
+
+    ss.map_data_town_gdf = town_merged_sorted_df
+
     return fig
 
 
@@ -2315,7 +2323,7 @@ state_agg as (
 		, sum(town.ActualLength) as TownMilesCycled
 		, sum(town.ActualLength)/IIF(state.update_datetime > max(town.update_datetime), state.arena_mileage, sum(town.length)) as PctMilesCycled
 		, state.map_version_id
-		from vw_current_town_data town
+		from vw_current_town_data_v2 town
 		inner join arena county on county.arena_id = town.parent_arena_id
 		inner join arena state on state.arena_id = county.parent_arena_id
 		inner join arena country on country.arena_id = state.parent_arena_id
@@ -2363,7 +2371,7 @@ def get_wandrer_total_miles_for_states_v4(statelist):
                 , sum(town.ActualLength) as TownMilesCycled
                 , sum(town.ActualLength)/IIF(state.update_datetime > max(town.update_datetime), state.arena_mileage, sum(town.length)) as PctMilesCycled
                 , state.map_version_id
-                from vw_current_town_data town
+                from vw_current_town_data_v2 town
                 inner join arena county on county.arena_id = town.parent_arena_id
                 inner join arena state on state.arena_id = county.parent_arena_id
                 inner join arena country on country.arena_id = state.parent_arena_id
@@ -2624,13 +2632,90 @@ order by State, County
     return wandrerer_df
 
 
+def get_wandrer_totals_for_counties_for_states_v5(states):
+    """
+        The query in this method is complicated by the fact that I don't always load every town for a given county or state.
+        Thus the 2 CTEs.
+    """
+
+    # states_in_str = states.__str__().replace('[', '(').replace(']', ')')
+    df_list = []
+    query = ""
+
+    for state in states:
+        query = f'''
+
+with loaded_towns as (
+select vca.*
+	, LT_1_Mile_Count + LT_5Pct_Count as 'Total < 5%'
+	, vca.Pct10_Count + vca.Pct25_Count + vca.Pct50_Count + vca.Pct75_Count + vca.Pct90_Count + vca.Pct99_Count as TownsAwarded
+	, 'Town data' as Source
+	from vw_county_aggregates vca
+	where vca.State = "{state}"
+),
+not_loaded_towns as (
+select 
+	fqcn.Region, fqcn.Country, fqcn.State,
+     c.arena_name as long_county, REPLACE(c.arena_name, ' County', '') as County, c.arena_short_name
+	 , fqcn.StateArenaId, fqcn.CountyArenaId
+	 , c.total as TotalTowns
+    , 0 as 'CycledTowns', 0.0 as 'PctTownsCycled', 0 as 'AchievedTowns', 0.0 as 'PctTownsAchieved'
+    , 0 as 'Pct0_Count', 0 as 'LT_1_Mile_Count',0 as 'LT_5Pct_Count', 0 as 'Pct5_Count', 0 as 'Pct10_Count', 0 as 'Pct25_Count', 0 as 'Pct50_Count'
+    , 0 as 'Pct75_Count', 0 as 'Pct90_Count', 0 as 'Pct99_Count'
+    , c.arena_mileage as TotalTownMiles, c.arena_mileage as 'UnincorporatedMiles', 0 as 'UnincorporatedMilesCycled', 0.0 as 'PctUnincorporatedMilesCycled'
+    , c.arena_mileage as 'TotalCountyMiles', 0 as 'TotalCountyMilesCycled', 0.0 as 'PctCountyMilesCycled'
+    , c.arena_mileage * .1 as 'Pct10', c.arena_mileage * .25 as 'Pct25', c.arena_mileage *.50 as 'Pct50', c.arena_mileage * .75 as 'Pct75'
+    , 0 as 'ActualMiles', 0.0 as 'ActualPct'
+    , c.arena_mileage * .1 as 'Pct10Deficit', c.arena_mileage * .25 as 'Pct25Deficit', c.arena_mileage *.50 as 'Pct50Deficit', c.arena_mileage * .75 as 'Pct75Deficit', c.arena_mileage * .9 as 'Pct90Deficit'
+    , fqcn.StateArenaId, c.map_version_id as county_map_version_id
+	, 0 as 'Total < 5%', 0 as 'TownsAwarded', 'County data' as Source
+    from vw_arena c
+        left join vw_county_aggregates vca on vca.CountyArenaId = c.arena_id
+        inner join fq_county_name fqcn on fqcn.CountyArenaId = c.arena_id
+        where c.arena_type = 'county'
+        and fqcn.State = "{state}"
+        and vca.CountyArenaId is NULL
+    )
+    select * from loaded_towns
+    union    
+    select * from not_loaded_towns
+    order by State, County
+                '''
+        # print(query)
+        df = execute_query(query)
+
+        if df.empty:
+            # Handles the case where no towns have been fetched from Wandrer
+            query = f'''
+            select Region.arena_name as Region, Country.arena_name as Country, State.arena_name as State
+                , county.*
+            -- 	, Town.*
+                from arena as county
+                inner join arena as State on state.arena_id = county.parent_arena_id
+                inner join arena as Country on Country.arena_id = State.parent_arena_id
+                inner join arena as Region on Region.arena_id = Country.parent_arena_id
+            -- 	left join arena_badge as Town on Town.parent_arena_id = County.arena_id
+                where State == "{state}"'''
+            df = execute_query(query)
+            df.rename(columns={'arena_name': 'long_county', 'unincorporated_miles': 'UnincorporatedMiles',
+                                         'unincorporated_miles_cycled': 'UnincorporatedMilesCycled',
+                                         'unincorporated_miles_cycled_pct': 'UnincorporatedMilesCycledPct',
+                                         'arena_mileage': 'TotalCountyMiles'}, inplace=True)
+            df['County'] = df['long_county'].str.replace(' County', '')
+
+        df_list.append(df)
+
+    wandrerer_df = pd.concat(df_list, ignore_index=True)
+    return wandrerer_df
+
+
 def get_wandrer_unincorporated_totals_for_counties_for_states(states):
     states_in_str = states.__str__().replace('[', '(').replace(']', ')')
     query = f'''select Region, Country, State, County
 	, length as 'UnincorporatedMiles'
 	, percentage as 'PctUnincorporatedMilesCycled'
 	, ActualLength as 'UnincorporatedMilesCycled'
-	from vw_current_town_data
+	from vw_current_town_data_v2
 	where name = 'Unincorporated'
 	and State in {states_in_str}
 	order by region, country, State, County'''
@@ -2699,8 +2784,8 @@ def get_wandrer_totals_for_towns_for_state(states):
         , round(fqtn.Pct50Deficit, 7) as Pct50Deficit, round(fqtn.Pct75Deficit, 7) as Pct75Deficit
         , round(fqtn.Pct90Deficit, 7) as Pct90Deficit
 		, fqtn.geometries_visible, fqtn.diagonal, fqtn.user_id, town.seacoast, town.osm_id, town.update_datetime
-        from vw_current_town_data town
-		inner join vw_current_town_data fqtn on fqtn.id = town.id 
+        from vw_current_town_data_v2 town
+		inner join vw_current_town_data_v2 fqtn on fqtn.id = town.id 
         where fqtn.state in {in_statement}
         order by 'Award Level', fqtn.region, fqtn.country, fqtn.state, fqtn.county, fqtn.name'''
     # print(query)
@@ -3091,11 +3176,20 @@ def center_point_diagonal(diagonal):
 
 # @memory_profiler
 def town_selected():
+    # scroll_to_top()
+    scroll_to_here(0, key='top')
     # st.plotly_chart(st.session_state.current_fig, config=config)
     fig = st.session_state.current_fig
     if len(ss.town_selection.selection['rows']) == 0:
+        # fig.update_traces(visible=True, selectedpoints=[], selector=dict(name='Town Map'))
+        fig.update_traces(
+            visible=True,
+            selectedpoints=[],
+            unselected=dict(marker=dict(opacity=1.0)),
+            selector=dict(name='Town Map')
+        )
         st.plotly_chart(fig)
-        show_dataframes()
+        show_dataframes(fig)
         # st.dataframe(ss.map_data_town_gdf, width='stretch', selection_mode='single-row', on_select=town_selected,
         #                  key='town_selection')
         return
@@ -3118,7 +3212,14 @@ def town_selected():
 
     fig.update_traces(visible='legendonly', selector=dict(name='State Map'))
     fig.update_traces(visible='legendonly', selector=dict(name='County Map'))
-    fig.update_traces(visible=True, selector=dict(name='Town Map'))
+    fig.update_traces(
+        visible=True, selectedpoints=ss.town_selection.selection['rows'],
+        # marker=dict(size=10, opacity=0.8),
+        unselected=dict(marker=dict(opacity=0.2)),
+        selected=dict(marker=dict(opacity=1.0)),
+        selector = dict(name='Town Map')
+    )
+
 
     # fig.conf = dict(scrollZoom=True)
 
@@ -3130,7 +3231,7 @@ def town_selected():
         # st.sidebar.button(f'Update {county} County Miles', key="update_county_btn")
         #     # st.write('Update button clicked')
 
-    show_dataframes()
+    show_dataframes(fig)
 
     # st.dataframe(ss.map_data_town_gdf, width='stretch', selection_mode='single-row', on_select=town_selected,
     #              key='town_selection')
@@ -3175,7 +3276,7 @@ def county_selected():
     fig = st.session_state.current_fig
     if len(ss.county_selection.selection['rows']) == 0:
         st.plotly_chart(fig)
-        show_dataframes()
+        show_dataframes(fig)
         # st.dataframe(ss.map_data_county_gdf, width='stretch', selection_mode='single-row', on_select=county_selected,
         #                  key='county_selection')
         return
@@ -3199,7 +3300,7 @@ def county_selected():
         # st.sidebar.button(f'Update {county} County Miles', key="update_county_btn")
         #     # st.write('Update button clicked')
 
-    show_dataframes()
+    show_dataframes(fig)
 
     # st.dataframe(st.session_state['map_gdf'], width='stretch', selection_mode='single-row'
     #              , key='map_data', on_select=town_selected)
@@ -3533,7 +3634,7 @@ def main():
 
             st.plotly_chart(fig)
             # st.plotly_chart(fig, key='plotly_chart_event', on_select=_map_selected, selection_mode="points")
-            show_dataframes()
+            show_dataframes(fig)
         else:
             st.write(f'{maptype_selectbox} map unavailable for {state_selectbox}')
 
@@ -3555,7 +3656,7 @@ def main():
     # ss
 
 
-def show_dataframes():
+def show_dataframes(fig):
     if st.session_state.show_raw_data_state:
 
         st.write(' ')
@@ -3574,7 +3675,8 @@ def show_dataframes():
 
         if not ss.map_data_town_gdf.empty:
             with st.expander('Town Data', expanded=False):
-                st.dataframe(ss.map_data_town_gdf, width='stretch', selection_mode='single-row', on_select=town_selected, key='town_selection')
+                sorted_gdf = ss.map_data_town_gdf.copy()
+                st.dataframe(sorted_gdf, width='stretch', selection_mode='single-row', on_select=town_selected, key='town_selection')
         # info_df = create_info_df(st.session_state['map_gdf'])
         # st.dataframe(info_df, width='stretch')
 
@@ -3582,6 +3684,8 @@ def show_dataframes():
             with st.expander('Park Data', expanded=False):
                 st.dataframe(ss.map_data_park_gdf, width='stretch', selection_mode='single-row', on_select=park_selected, key='park_selection')
 
+    else:
+        print(f'Skipping show_dataframes')
 
 def include_states_with_zero_data(fig, maptype_selectbox, region_selectbox, selected_region_states, state_selectbox):
     gdf_pois = gpd.GeoDataFrame()

@@ -337,6 +337,7 @@ def create_choropleth_map_with_legend(state_list):
             ))
 
     # zoom, center = calculate_mapbox_zoom_center(gdf_towns.bounds)
+    # fig.update_layout(map_style="carto-positron", map_zoom=zoom, map_center=center, clickmode='event+select')
     fig.update_layout(map_style="carto-positron", map_zoom=zoom, map_center=center)
 
     fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1})
@@ -428,7 +429,8 @@ def add_town_trace(fig, gdf_towns, geojson, data_value, counties_geojson):
     template = create_template(gdf_towns, ['State', 'County','Town', data_value])
     marker_opacity = 1.0
     ss.map_data_town_gdf = gdf_towns
-
+    gdf_towns.sort_values(by=['State','Town'], inplace=True)
+    # ss.sorted_town_gdf =
     fig.add_trace(go.Choroplethmap(
         customdata=gdf_towns,
         geojson=geojson,
@@ -446,7 +448,11 @@ def add_town_trace(fig, gdf_towns, geojson, data_value, counties_geojson):
         showscale=True,  # Optional: hide color scale if not needed
         marker_line_width=1,
         marker_line_color="black",  # Custom outline color for the GPX track
-        marker_opacity=marker_opacity,
+        # marker_opacity=marker_opacity,
+        # 2. Define unselected style: Fade all unselected regions
+        unselected=dict(marker=dict(opacity=0.2)),
+        # Optional: Customize selected appearance
+        selected=dict(marker=dict(opacity=1.0)),
         hovertemplate=template,
         hoverlabel=dict(
             bgcolor="black",
