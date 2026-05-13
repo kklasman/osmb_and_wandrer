@@ -253,7 +253,8 @@ def create_choropleth_map_with_legend(state_list):
     counties_geojson = json.loads(gdf_counties.to_json())
     zoom, center = calculate_mapbox_zoom_center(gdf_counties.bounds)
     gdf_counties.drop('geometry', axis=1, inplace=True, errors='ignore')
-    template = create_template(gdf_counties, ['County','TotalTowns', data_value])
+    # template = create_template(gdf_counties, ['County','TotalTowns', data_value])
+    template = create_template(gdf_counties, ['State', 'County','Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Award Level'])
 
     add_county_trace(counties_geojson, fig, gdf_counties, max_val, min_val, template, data_value)
     # ss.gdfs['county_gdf'] = gdf_counties
@@ -268,7 +269,8 @@ def create_choropleth_map_with_legend(state_list):
     town_merged_df.drop('geometry', axis=1, inplace=True, errors='ignore')
     # template = create_template(gdf_towns, ['State', 'County','Town'])
     # fig = go.Figure()
-    add_town_trace(fig, town_merged_df, geojson, data_value, counties_geojson)
+    template = create_template(town_merged_df, ['State', 'County','Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Award Level'])
+    add_town_trace(fig, town_merged_df, geojson, data_value, template, counties_geojson)
     # ss.gdfs['town_gdf'] = town_merged_df
 
     seacoast_geojson = json.loads(seacoast_df.to_json())
@@ -425,8 +427,8 @@ def update_layout_legends(fig):
     # )
 
 
-def add_town_trace(fig, gdf_towns, geojson, data_value, counties_geojson):
-    template = create_template(gdf_towns, ['State', 'County','Town', data_value])
+def add_town_trace(fig, gdf_towns, geojson, data_value, template, counties_geojson):
+    # template = create_template(gdf_towns, ['State', 'County','Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Award Level'])
     marker_opacity = 1.0
     ss.map_data_town_gdf = gdf_towns
     gdf_towns.sort_values(by=['State','Town'], inplace=True)

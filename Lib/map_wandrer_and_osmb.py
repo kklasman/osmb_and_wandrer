@@ -30,6 +30,7 @@ import tracemalloc
 import utilities as u
 import plotly_functions as pf
 import query as q
+import wandrer_database as wd
 from pathlib import Path
 
 # import uuid
@@ -919,7 +920,7 @@ def create_town_map(town_gdf, state_list, maptype):
     # else:
     #     county_template = create_template(merged_county_df, ['County', 'TotalTownMiles', 'ActualMiles', 'ActualPct'])
 
-    wandrerer_df = get_wandrer_totals_for_towns_for_state(state_list)
+    wandrerer_df = wd.get_wandrer_totals_for_towns_for_state(state_list)
     if (maptype == 'Seacoast Towns'):
         wandrerer_df = wandrerer_df[wandrerer_df['seacoast'] == 1]
 
