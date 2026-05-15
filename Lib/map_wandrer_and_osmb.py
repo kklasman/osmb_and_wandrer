@@ -873,6 +873,7 @@ def create_town_map(town_gdf, state_list, maptype):
 
     state_gdf = county_gdf.dissolve('State')
     state_gdf.reset_index(inplace=True)
+
     data_value = ss['selected_datavalue_for_map']
 
     dissolved_town_gdf = town_gdf.dissolve(by='long_name')
@@ -3190,7 +3191,7 @@ def town_selected():
             selector=dict(name='Town Map')
         )
         st.plotly_chart(fig)
-        show_dataframes(fig)
+        show_dataframes()
         # st.dataframe(ss.map_data_town_gdf, width='stretch', selection_mode='single-row', on_select=town_selected,
         #                  key='town_selection')
         return
@@ -3232,7 +3233,7 @@ def town_selected():
         # st.sidebar.button(f'Update {county} County Miles', key="update_county_btn")
         #     # st.write('Update button clicked')
 
-    show_dataframes(fig)
+    show_dataframes()
 
     # st.dataframe(ss.map_data_town_gdf, width='stretch', selection_mode='single-row', on_select=town_selected,
     #              key='town_selection')
@@ -3277,7 +3278,7 @@ def county_selected():
     fig = st.session_state.current_fig
     if len(ss.county_selection.selection['rows']) == 0:
         st.plotly_chart(fig)
-        show_dataframes(fig)
+        show_dataframes()
         # st.dataframe(ss.map_data_county_gdf, width='stretch', selection_mode='single-row', on_select=county_selected,
         #                  key='county_selection')
         return
@@ -3301,7 +3302,7 @@ def county_selected():
         # st.sidebar.button(f'Update {county} County Miles', key="update_county_btn")
         #     # st.write('Update button clicked')
 
-    show_dataframes(fig)
+    show_dataframes()
 
     # st.dataframe(st.session_state['map_gdf'], width='stretch', selection_mode='single-row'
     #              , key='map_data', on_select=town_selected)
@@ -3311,6 +3312,7 @@ def county_selected():
 
 
 def park_selected():
+    scroll_to_here(0, key='top')
     # st.plotly_chart(st.session_state.current_fig, config=config)
     fig = st.session_state.current_fig
     if len(ss.park_selection.selection['rows']) == 0:
@@ -3328,8 +3330,16 @@ def park_selected():
     fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1})
     fig.update_traces(visible='legendonly', selector=dict(name='State Map'))
     fig.update_traces(visible='legendonly', selector=dict(name='County Map'))
-    fig.update_traces(visible='legendonly', selector=dict(name='Town Map'))
+    # fig.update_traces(visible='legendonly', selector=dict(name='Town Map'))
     fig.update_traces(visible='legendonly', selector=dict(name='Seacoast Map'))
+
+    fig.update_traces(
+        visible=True, selectedpoints=ss.town_selection.selection['rows'],
+        # marker=dict(size=10, opacity=0.8),
+        unselected=dict(marker=dict(opacity=0.5)),
+        selected=dict(marker=dict(opacity=1.0)),
+        selector = dict(name='Town Map')
+    )
 
     st.plotly_chart(fig)
 
@@ -3635,7 +3645,7 @@ def main():
 
             st.plotly_chart(fig)
             # st.plotly_chart(fig, key='plotly_chart_event', on_select=_map_selected, selection_mode="points")
-            show_dataframes(fig)
+            show_dataframes()
         else:
             st.write(f'{maptype_selectbox} map unavailable for {state_selectbox}')
 
@@ -3657,7 +3667,7 @@ def main():
     # ss
 
 
-def show_dataframes(fig):
+def show_dataframes():
     if st.session_state.show_raw_data_state:
 
         st.write(' ')
@@ -3837,15 +3847,31 @@ def display_town_map_type_totals():
     # st.write(f'Totals for {st.session_state.selected_region}')
     map_df = ss.map_data_town_gdf
     map_df['Cycled'] = np.where(map_df['ActualMiles'] < 1, 0, 1)
+    map_df['10% + Cycled'] = np.where(map_df['ActualMiles'] <= .1, 0, 1)
+
     info_df = map_df.groupby(['Country','State']).agg(
-        # StateCount=('State', 'nunique'),
+        # CountryCount=('Country', 'count'),
+         # StateCount=('State', 'nunique'),
         TownsTotal=('Town', 'nunique'),
         CycledTownsTotal=('Cycled', 'sum'),
+        Pct10CycledTownsTotal=('10% + Cycled', 'sum'),
         AwardedTownsTotal=('awarded', 'sum'))
-    st.dataframe(info_df, width='content', column_config={
+
+    data = [[info_df['TownsTotal'].sum(), info_df['CycledTownsTotal'].sum(), info_df['Pct10CycledTownsTotal'].sum(), int(info_df['AwardedTownsTotal'].sum())]]
+
+    tuples = [('', 'Grand Totals')]
+    index = pd.MultiIndex.from_tuples(tuples, names=['Country', 'State'])
+    total_row = pd.DataFrame(data,
+                             columns=['TownsTotal', 'CycledTownsTotal', 'Pct10CycledTownsTotal', 'AwardedTownsTotal'],
+                             index=index)
+
+    info_df_with_total = pd.concat([info_df, total_row])
+
+    st.dataframe(info_df_with_total, width='content', column_config={
         # "StateCount": "States"
         "TownsTotal": "Total Towns"
         , "CycledTownsTotal": "Cycled Towns"
+        , "Pct10CycledTownsTotal": "10%+ Cycled Towns"
         , "AwardedTownsTotal": "Awarded Towns"
         }
     )

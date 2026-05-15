@@ -42,6 +42,12 @@ def create_template(data, col_names):
             elif name == 'Town':
                 template += "<b>Town:</b> %{" + f"customdata[{data.columns.get_loc('Town')}]" + "}<br>"
 
+            elif name == 'Location':
+                template += "<b>Location:</b> %{" + f"customdata[{data.columns.get_loc('Location')}]" + "}<br>"
+
+            elif name == 'StateMiles':
+                template += "<b>Total State Miles:</b> %{" + f"customdata[{data.columns.get_loc('StateMiles')}]:,.2f" + "}<br>"
+
             elif name == 'TotalMiles':
                 template += "<b>Total Town Miles:</b> %{" + f"customdata[{data.columns.get_loc('TotalMiles')}]:,.2f" + "}<br>"
 
@@ -54,8 +60,14 @@ def create_template(data, col_names):
             elif name == 'PctCountyMilesCycled':
                 template += "<b>Pct County Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('PctCountyMilesCycled')}]:,.2%" + "}<br>"
 
+            elif name == 'PctMilesCycled':
+                template += "<b>Pct Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('PctMilesCycled')}]:,.2%" + "}<br>"
+
             elif name == 'TotalTownMiles':
                 template += "<b>Total Town Miles:</b> %{" + f"customdata[{data.columns.get_loc('TotalTownMiles')}]:,.2f" + "}<br>"
+
+            elif name == 'LocationMiles':
+                template += "<b>Location Miles:</b> %{" + f"customdata[{data.columns.get_loc('LocationMiles')}]:,.2f" + "}<br>"
 
             elif name == 'UnincorporatedMiles':
                 template += "<b>Unincorporated Miles:</b> %{" + f"customdata[{data.columns.get_loc('UnincorporatedMiles')}]:,.2f" + "}<br>"
@@ -73,13 +85,13 @@ def create_template(data, col_names):
                 template += "<b>25% Unincorporated Miles Target</b> %{" + f"customdata[{data.columns.get_loc('Pct25Unincorporated')}]:,.2f" + "}<br>"
 
             elif name == 'ActualMiles':
-                template += "<b>Town Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('ActualMiles')}]:,.2f" + "}<br>"
+                template += "<b>Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('ActualMiles')}]:,.2f" + "}<br>"
 
             elif name == 'MilesRidden':
                 template += "<b>Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('MilesRidden')}]:,.2f" + "}<br>"
 
             elif name == 'ActualPct':
-                template += "<b>Pct Town Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('ActualPct')}]:.2%" + "}<br>"
+                template += "<b>Pct Miles Cycled:</b> %{" + f"customdata[{data.columns.get_loc('ActualPct')}]:.2%" + "}<br>"
 
             elif name == 'Pct10':
                 template += "<b>10% Miles Target</b> %{" + f"customdata[{data.columns.get_loc('Pct10')}]:,.2f" + "}<br>"
@@ -114,6 +126,9 @@ def create_template(data, col_names):
             elif name == 'TownsAwarded':
                 template += "<b>Towns Awarded:</b> %{" + f"customdata[{data.columns.get_loc('TownsAwarded')}]" + "}<br>"
 
+            elif name == 'Pct10Achieved':
+                template += "<b>10%+ Towns Achieved:</b> %{" + f"customdata[{data.columns.get_loc('Pct10Achieved')}]" + "}<br>"
+
             elif name == 'Pct5_Count':
                 template += "<b>5% Count:</b> %{" + f"customdata[{data.columns.get_loc('Pct5_Count')}]" + "}<br>"
 
@@ -143,6 +158,9 @@ def create_template(data, col_names):
 
             elif name == 'PctTownsAchieved':
                 template += "<b>Pct Towns Achieved:</b> %{" + f"customdata[{data.columns.get_loc('PctTownsAchieved')}" + "]:.2%}<br>"
+
+            elif name == 'PctTownsAwarded':
+                template += "<b>Pct Towns Awarded:</b> %{" + f"customdata[{data.columns.get_loc('PctTownsAwarded')}" + "]:.2%}<br>"
 
             else:
                 print(f'Column {name} not found')
@@ -189,24 +207,106 @@ def create_choropleth_map_with_legend(state_list):
     # st.write("filename:", geojson_file)
     # ss.gdfs = {}
 
+    fig = go.Figure()
+
     data_value = ss.selected_datavalue_for_map
 
     gdf = gf.get_geopandas_df_for_region(state_list)
     gdf.set_crs("EPSG:4326", inplace=True)
 
     if 'leisure' in gdf.columns:
+        mask = (gdf['leisure'].isna()) & (gdf.geom_type.isin(['Polygon', 'MultiPolygon']))
+        gdf_towns = gdf[mask]
+        gdf_leisure = gdf[~mask]
+
+        mask2 = gdf_leisure.geom_type.isin(['Polygon', 'MultiPolygon'])
+        gdf_parks = gdf_leisure[mask2]
+        gdf_trails = gdf_leisure[~mask2]
         # gdf_leisure = gdf.query('leisure.notna()')
-        gdf_towns = gdf[(gdf['leisure'].isna()) & (gdf.geom_type.isin(['Polygon', 'MultiPolygon']))]
+        # gdf_towns = gdf[(gdf['leisure'].isna()) & (gdf.geom_type.isin(['Polygon', 'MultiPolygon']))]
     else:
         gdf_towns = gdf[(gdf.geom_type.isin(['Polygon', 'MultiPolygon']))]
+
+    # # state_list = gdf_towns['State'].unique().tolist()
+    # wandrerer_df = wd.get_wandrer_totals_for_towns_for_state(state_list)
+    # if wandrerer_df['osm_id'].isnull().all():
+    #     # old format towns without osm_id values
+    #     # town_merged_df = dissolved_town_gdf.merge(wandrerer_df, on=['State','County', 'Town','long_name'])
+    #     wandrerer_df['long_name'] = wandrerer_df['long_name'].str.replace('_', '-')
+    #     gdf_towns['long_name'] = gdf_towns['long_name'].str.replace('_', '-')
+    #     # town_merged_df = gdf_towns.merge(wandrerer_df, on=['long_name', 'State','County', 'Town'])
+    #     # prefer fields from left df because right has null osm_id. Both have diagonal.
+    #     town_merged_df = pd.merge(gdf_towns, wandrerer_df, on=['long_name', 'State','County', 'Town'], how='left', suffixes=(None, '_r'))
+    #     town_merged_df.drop('osm_id', axis=1, inplace=True, errors='ignore')
+    #     suffix_to_drop = '_r'
+    #     cols_to_drop = [col for col in town_merged_df.columns if col.endswith(suffix_to_drop)]
+    #     town_merged_df.drop(columns=cols_to_drop, inplace=True)
+    # else:
+    #     # new format towns with osm_id values
+    #     wandrerer_df['osm_id'] = wandrerer_df['osm_id'].astype('Int64')
+    #     gdf_towns['osm_id'] = gdf_towns['osm_id'].astype('Int64')
+    #     # town_merged_df = pd.merge(wandrerer_df, dissolved_town_gdf, on='osm_id', how='left')
+    #     # town_merged_df = pd.merge(wandrerer_df, dissolved_town_gdf, on=['osm_id', 'Town', 'County', 'State', 'long_name'],
+    #     #                       how='left')
+    #     town_merged_df = gdf_towns.merge(wandrerer_df, on=['State', 'County', 'Town', 'long_name', 'osm_id'])
+    #
+
+    # min_val = 1
+    # max_val = 200
+    # gdf_towns[data_value] = np.random.randint(min_val, max_val + 1, size=len(gdf_towns))
+
+    # gdf_counties = town_merged_df.dissolve(by=['State','County'], aggfunc={'Town': 'count', data_value: "sum"})
+    # gdf_counties = town_merged_df.dissolve(by=['State','County'])
+
+    gdf_counties = gdf_towns.dissolve(by=['State', 'County'])
+    gdf_counties.reset_index(inplace=True)
+    gdf_states = gdf_counties.dissolve(by='State')
+    gdf_states.reset_index(inplace=True)
+
+    gf.convert_bounds_to_linestrings(gdf_states)
+    gdf_states.drop(['County', 'long_county','diagonal'], axis=1, inplace=True, errors='ignore')
+    gf.convert_bounds_to_linestrings(gdf_states)
+    states_geojson = json.loads(gdf_states.to_json())
+    gdf_states.drop('geometry', axis=1, inplace=True, errors='ignore')
+    wandrerer_states_df = wd.get_wandrer_totals_for_states(state_list)
+    gdf_states_merged = gdf_states.merge(wandrerer_states_df, on=['State'])
+    gdf_states_merged.rename(columns={"TownMilesCycled": "ActualMiles"}, inplace=True)
+    # state_template = create_template(gdf_states_merged, ['State','TotalTowns', data_value])
+    gdf_states_merged['Pct10Achieved'] = gdf_states_merged['Pct10_Count'] + gdf_states_merged['Pct25_Count'] + \
+                                         gdf_states_merged['Pct50_Count'] + gdf_states_merged['Pct75_Count'] + \
+                                         gdf_states_merged['Pct90_Count'] + gdf_states_merged['Pct99_Count']
+
+    add_state_trace(fig, gdf_states_merged, states_geojson, data_value)
+    # ss.gdfs['state_gdf'] = gdf_states
+
+    gdf_counties.drop(['wandrer_id','wandrer_parent_id','Town','long_name','leisure','county','state','name','wikipedia','diagonal'], axis=1, inplace=True, errors='ignore')
+    gf.convert_bounds_to_linestrings(gdf_counties)
+    counties_geojson = json.loads(gdf_counties.to_json())
+    wandrerer_county_df = wd.get_wandrer_totals_for_counties_for_states(state_list)
+    gdf_counties_merged = gdf_counties.merge(wandrerer_county_df, on=['State', 'County'])
+    gdf_counties_merged.rename(columns={"Town": "TotalTowns"}, inplace=True)
+    min_val = min(gdf_counties_merged[data_value])
+    max_val = max(gdf_counties_merged[data_value])
+    # gdf['value'] = np.random.randint(min_val, max_val + 1, size=len(gdf))
+    zoom, center = calculate_mapbox_zoom_center(gdf_counties.bounds)
+    gdf_counties_merged.drop('geometry', axis=1, inplace=True, errors='ignore')
+    # template = create_template(gdf_counties, ['County','TotalTowns', data_value])
+    # county_template = create_template(gdf_counties_merged, ['State', 'County','Town', 'TotalMiles', 'ActualMiles', 'ActualPct'])
+
+    gdf_counties_merged['Pct10Achieved'] = gdf_counties_merged['10%'] + gdf_counties_merged['25%'] + \
+                                           gdf_counties_merged['50%'] + gdf_counties_merged['75%'] + \
+                                           gdf_counties_merged['90%'] + gdf_counties_merged['99%']
+
+    add_county_trace(counties_geojson, fig, gdf_counties_merged, max_val, min_val, data_value)
+    # ss.gdfs['county_gdf'] = gdf_counties
 
     # state_list = gdf_towns['State'].unique().tolist()
     wandrerer_df = wd.get_wandrer_totals_for_towns_for_state(state_list)
     if wandrerer_df['osm_id'].isnull().all():
         # old format towns without osm_id values
         # town_merged_df = dissolved_town_gdf.merge(wandrerer_df, on=['State','County', 'Town','long_name'])
-        wandrerer_df['long_name'] = wandrerer_df['long_name'].str.replace('_', '-')
-        gdf_towns['long_name'] = gdf_towns['long_name'].str.replace('_', '-')
+        # wandrerer_df['long_name'] = wandrerer_df['long_name'].str.replace('_', '-')
+        # gdf_towns['long_name'] = gdf_towns['long_name'].str.replace('_', '-')
         # town_merged_df = gdf_towns.merge(wandrerer_df, on=['long_name', 'State','County', 'Town'])
         # prefer fields from left df because right has null osm_id. Both have diagonal.
         town_merged_df = pd.merge(gdf_towns, wandrerer_df, on=['long_name', 'State','County', 'Town'], how='left', suffixes=(None, '_r'))
@@ -223,41 +323,16 @@ def create_choropleth_map_with_legend(state_list):
         #                       how='left')
         town_merged_df = gdf_towns.merge(wandrerer_df, on=['State', 'County', 'Town', 'long_name', 'osm_id'])
 
-    # min_val = 1
-    # max_val = 200
-    # gdf_towns[data_value] = np.random.randint(min_val, max_val + 1, size=len(gdf_towns))
 
-    gdf_counties = town_merged_df.dissolve(by=['State','County'], aggfunc={'Town': 'count', data_value: "sum"})
-    gdf_counties.reset_index(inplace=True)
-    gdf_counties.rename(columns={"Town": "TotalTowns"}, inplace=True)
-    gf.convert_bounds_to_linestrings(gdf_counties)
+
     # gdf_counties[data_value] = np.random.randint(min_val, max_val + 1, size=len(gdf_towns))
 
     # gdf_trails = gdf[gdf.geom_type.isin(['LineString'])]
 
-    gdf_states = gdf_counties.dissolve(by='State', aggfunc={'County': 'count', data_value: "sum"})
-    gdf_states.reset_index(inplace=True)
-    gf.convert_bounds_to_linestrings(gdf_states)
+    # gdf_states = gdf_counties.dissolve(by='State', aggfunc={'County': 'count', data_value: "sum"})
+    # gdf_states.reset_index(inplace=True)
 
-    states_geojson = json.loads(gdf_states.to_json())
-    gdf_states.drop('geometry', axis=1, inplace=True, errors='ignore')
-    template = create_template(gdf_states, ['State','TotalTowns', data_value])
 
-    fig = go.Figure()
-    add_state_trace(fig, gdf_states, states_geojson, data_value)
-    # ss.gdfs['state_gdf'] = gdf_states
-
-    min_val = min(gdf_counties[data_value])
-    max_val = max(gdf_counties[data_value])
-    # gdf['value'] = np.random.randint(min_val, max_val + 1, size=len(gdf))
-    counties_geojson = json.loads(gdf_counties.to_json())
-    zoom, center = calculate_mapbox_zoom_center(gdf_counties.bounds)
-    gdf_counties.drop('geometry', axis=1, inplace=True, errors='ignore')
-    # template = create_template(gdf_counties, ['County','TotalTowns', data_value])
-    template = create_template(gdf_counties, ['State', 'County','Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Award Level'])
-
-    add_county_trace(counties_geojson, fig, gdf_counties, max_val, min_val, template, data_value)
-    # ss.gdfs['county_gdf'] = gdf_counties
 
     # gdf_towns['value']=1
     # geojson = json.loads(gdf_towns.to_json())
@@ -269,8 +344,7 @@ def create_choropleth_map_with_legend(state_list):
     town_merged_df.drop('geometry', axis=1, inplace=True, errors='ignore')
     # template = create_template(gdf_towns, ['State', 'County','Town'])
     # fig = go.Figure()
-    template = create_template(town_merged_df, ['State', 'County','Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Award Level'])
-    add_town_trace(fig, town_merged_df, geojson, data_value, template, counties_geojson)
+    add_town_trace(fig, town_merged_df, geojson, data_value, counties_geojson)
     # ss.gdfs['town_gdf'] = town_merged_df
 
     seacoast_geojson = json.loads(seacoast_df.to_json())
@@ -279,20 +353,28 @@ def create_choropleth_map_with_legend(state_list):
     # ss.gdfs['seacoast_gdf'] = seacoast_df
 
     if 'leisure' in gdf.columns:
-        gdf_leisure = gdf.query('leisure.notna()')
-        gdf_leisure['value']=10
-        leisure_geojson = json.loads(gdf_leisure.to_json())
-        gdf_leisure.drop('geometry', axis=1, inplace=True, errors='ignore')
-        ss.map_data_park_gdf = gdf
+        # gdf_leisure = gdf.query('leisure.notna()')
+        wandrerer_leisure_df = wd.get_wandrer_totals_for_towns_for_state(state_list)
+        parks_merged_df = pd.merge(gdf_parks, wandrerer_df, on=['long_name', 'State', 'County', 'Town'], how='left', suffixes=(None, '_r'))
+        parks_merged_df.rename(columns={"Town": "Location", "TotalMiles": "LocationMiles"}, inplace=True)
+
+        gdf_parks['value']=10
+        leisure_geojson = json.loads(parks_merged_df.to_json())
+        parks_merged_df.drop('geometry', axis=1, inplace=True, errors='ignore')
+        ss.map_data_park_gdf = parks_merged_df
         # template = create_template(town_no_geom_gdf, ['State', 'County','Town'])
-        template = create_template(gdf_leisure, ['State', 'County','Town'])
+        template = create_template(parks_merged_df,
+                                   ['State', 'County', 'Location', 'LocationMiles', 'ActualMiles', 'ActualPct', 'Award Level'])
+
         fig.add_trace(go.Choroplethmap(
-            customdata=gdf_leisure,
+            customdata=parks_merged_df,
             geojson=leisure_geojson,
-            locations=gdf_leisure['long_name'],
+            locations=parks_merged_df['long_name'],
             featureidkey='properties.long_name',
-            z=gdf_leisure['value'],
-            colorscale=["green", "green"],
+            z=parks_merged_df[data_value],
+            # colorscale=["green", "green"],
+            colorscale=["#B8FFB8", "#00D100"],
+            # colorscale="greens",
             colorbar=dict(x=-0.15, xanchor='left'),
             # coloraxis='coloraxis',
             marker_line_width=1,
@@ -304,8 +386,8 @@ def create_choropleth_map_with_legend(state_list):
                 bgcolor="black",
                 font_size=16),
             # name = 'Town Data Values',
-            zmin = gdf_leisure['value'].min(),
-            zmax = gdf_leisure['value'].max(),
+            zmin = parks_merged_df[data_value].min(),
+            zmax = parks_merged_df[data_value].max(),
             legendgroup="legend2",  # this can be any string, not just "group"
             legendgrouptitle_text="POI Layers",
             name='Leisure Map',
@@ -427,18 +509,20 @@ def update_layout_legends(fig):
     # )
 
 
-def add_town_trace(fig, gdf_towns, geojson, data_value, template, counties_geojson):
+def add_town_trace(fig, gdf_towns, geojson, data_value, counties_geojson):
     # template = create_template(gdf_towns, ['State', 'County','Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Award Level'])
     marker_opacity = 1.0
     ss.map_data_town_gdf = gdf_towns
     gdf_towns.sort_values(by=['State','Town'], inplace=True)
+    template = create_template(gdf_towns, ['State', 'County','Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Award Level'])
     # ss.sorted_town_gdf =
+
     fig.add_trace(go.Choroplethmap(
         customdata=gdf_towns,
         geojson=geojson,
         locations=gdf_towns['long_name'],
         featureidkey='properties.long_name',
-        z=gdf_towns[data_value],
+        z=gdf_towns[data_value] * 100 if data_value == 'ActualPct' else gdf_towns[data_value],
         # colorscale=["white", "white"],
         colorscale=max_50_pct_color_scale,
         # colorbar_title=data_value,
@@ -483,13 +567,14 @@ def add_seacoast_trace(fig, gdf_towns, geojson, data_value, counties_geojson):
     template = create_template(gdf_towns, ['State', 'County','Town', data_value])
     marker_opacity = 1.0
     ss.map_data_seacoast_gdf = gdf_towns
+    template = create_template(gdf_towns, ['State', 'County','Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Award Level'])
 
     fig.add_trace(go.Choroplethmap(
         customdata=gdf_towns,
         geojson=geojson,
         locations=gdf_towns['long_name'],
         featureidkey='properties.long_name',
-        z=gdf_towns[data_value] * 100,
+        z=gdf_towns[data_value] * 100 if data_value == 'ActualPct' else gdf_towns[data_value],
         # colorscale=["white", "white"],
         colorscale=max_50_pct_color_scale,
         # colorbar_title=data_value,
@@ -519,8 +604,12 @@ def add_seacoast_trace(fig, gdf_towns, geojson, data_value, counties_geojson):
 
 
 def add_state_trace(fig, gdf, geojson, data_value):
-    template = create_template(gdf, ['State', 'County', data_value])
+    template = create_template(gdf, ['State', 'TotalTowns', 'TownsCycled','PctTownsCycled', 'TownsAwarded','PctTownsAwarded',
+                                     'Pct10Achieved', 'StateMiles', 'ActualMiles', 'PctMilesCycled'])
     marker_opacity = 0.5
+    colorbar_x = 1.2
+    d_v = 'PctMilesCycled' if data_value == 'ActualPct' else data_value
+    z_max = math.ceil(gdf[d_v].max() / 100) * 100
     ss.map_data_state_gdf = gdf
 
     fig.add_trace(go.Choroplethmap(
@@ -528,14 +617,14 @@ def add_state_trace(fig, gdf, geojson, data_value):
         geojson=geojson,
         locations=gdf['State'],
         featureidkey='properties.State',
-        z=gdf[data_value],
+        z=gdf[d_v] * 100 if data_value == 'ActualPct' else gdf[d_v],
         # colorscale=["white", "white"],
         colorscale=max_50_pct_color_scale,
         # colorbar_title=data_value,
         # colorbar=dict(x=-0.15, xanchor='left'),
         # colorbar=dict(x=1.15),
-        colorbar=dict(x=1.0),
-        colorbar_title=f'State<br>{data_value}',
+        colorbar=dict(x=colorbar_x),
+        colorbar_title=f'State<br>{d_v}',
         # coloraxis='coloraxis',
         showscale=True,  # Optional: hide color scale if not needed
         marker_line_width=1,
@@ -548,7 +637,7 @@ def add_state_trace(fig, gdf, geojson, data_value):
         # name = 'Town Data Values',
         # zmin=gdf[data_value].min(),
         # zmax=gdf_towns[data_value].max(),
-        zmax=math.ceil(gdf[data_value].max() / 200) * 200,
+        zmax=z_max,
         zmin=1,
         showlegend=True,
         # legendgroup='legend',  # this can be any string, not just "group"
@@ -568,17 +657,22 @@ def add_state_trace(fig, gdf, geojson, data_value):
     #                                       )]);
 
 
-def add_county_trace(counties_geojson, fig, gdf_counties, max_val, min_val, template, data_value):
+def add_county_trace(counties_geojson, fig, gdf, max_val, min_val, data_value):
     line_width = 1
     marker_opacity = 1.0
-    ss.map_data_county_gdf = gdf_counties
-
+    # d_v = 'PctMilesCycled' if data_value == 'ActualPct' else data_value
+    # z_max = math.ceil(gdf[data_value].max() / 100) * 100
+    z_max = math.ceil(gdf[data_value].max() * 2) / 2
+    ss.map_data_county_gdf = gdf
+    template = create_template(gdf, ['State', 'County', 'TotalTowns', 'CycledTowns', 'PctTownsCycled', 'AchievedTowns',
+                                     'PctTownsAchieved', 'Pct10Achieved', 'TotalCountyMiles', 'ActualMiles', 'ActualPct'])
+    colorbar_x = 1.2
     fig.add_trace(go.Choroplethmap(
-        customdata=gdf_counties,
+        customdata=gdf,
         geojson=counties_geojson,
-        locations=gdf_counties['County'],
+        locations=gdf['County'],
         featureidkey='properties.County',
-        z=gdf_counties[data_value],
+        z=gdf[data_value],
         colorscale=max_50_pct_color_scale,
         # colorbar_title=data_value,
         showscale=True,  # Optional: hide color scale if not needed
@@ -587,16 +681,16 @@ def add_county_trace(counties_geojson, fig, gdf_counties, max_val, min_val, temp
         marker_opacity=marker_opacity,
         # colorbar=dict(x=-0.15, xanchor='left'),
         colorbar_title=f'County<br>{data_value}',
-        colorbar=dict(x=1.0),
+        colorbar=dict(x=colorbar_x),
         # coloraxis='coloraxis',
         hovertemplate=template,
         hoverlabel=dict(
             bgcolor="black",
             font_size=16),
         # name = 'Town Data Values',
-        zmin=gdf_counties[data_value].min(),
+        zmin=gdf[data_value].min(),
         # zmax=gdf_counties[data_value].max(),
-        zmax=math.ceil(gdf_counties[data_value].max() / 200) * 200,
+        zmax=z_max,
         # legendgroup="legend",  # this can be any string, not just "group"
         showlegend=True,
         name='County Map',
