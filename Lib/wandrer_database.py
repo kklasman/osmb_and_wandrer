@@ -48,7 +48,7 @@ def get_wandrer_totals_for_counties_for_states(states):
     query = f'''select Region, Country, State, long_county as LongCounty
 		, County
 		, StateArenaId, CountyArenaId, arena_short_name
-        , TotalTowns, CycledTowns, PctTownsCycled, TotalTownMiles, ActualPct, ActualMiles, AchievedTowns
+        , TotalTowns, CycledTowns, PctTownsCycled, TotalTownMiles, PctTownMilesCycled as ActualPct, TotalCountyMilesCycled as ActualMiles, AchievedTowns
         , PctTownsAchieved
  		, Pct0_Count as '0%', LT_1_Mile_Count as '< 1 mile', LT_5Pct_Count as '< 5%', Pct5_Count as '5%', Pct10_Count as '10%'
  		, Pct25_Count as '25%', Pct50_Count as '50%', Pct75_Count as '75%', Pct90_Count as '90%', Pct99_Count as '99%'
@@ -56,10 +56,12 @@ def get_wandrer_totals_for_counties_for_states(states):
         , CASE WHEN Pct10Deficit < 0 THEN 0 ELSE Pct10Deficit END as Pct10Deficit
         , CASE WHEN Pct25Deficit < 0 THEN 0 ELSE Pct25Deficit END as Pct25Deficit
         , Pct50Deficit, Pct75Deficit, Pct90Deficit
-        , UnincorporatedMiles, PctUnincorporatedMilesCycled, UnincorporatedMilesCycled
+        , unincorporated_miles
+		, unincorporated_miles_cycled
+		, unincorporated_miles_cycled_pct
         , TotalCountyMiles
 -- 		, TotalCountyMilesCycled, PctCountyMilesCycled
-		from vw_county_aggregates 
+		from vw_county_aggregates_v2 
     	where State in {states_in_str}
     	order by region, country, State, County'''
     # print(query)
@@ -75,14 +77,14 @@ def get_wandrer_totals_for_state(state):
         , sum(TotalCountyMilesCycled) as 'TownMilesCycled', sum(TotalCountyMilesCycled)/sum(TotalTownMiles) as 'PctMilesCycled'
         , CASE WHEN sum(Pct10Deficit) < 0 THEN 0 ELSE sum(Pct10Deficit) END as 'Pct10Deficit'
         , CASE WHEN sum(Pct25Deficit) < 0 THEN 0 ELSE sum(Pct25Deficit) END as 'Pct25Deficit'
-		, sum(UnincorporatedMiles) as UnincorporatedMiles
-		, sum(UnincorporatedMilesCycled) as UnincorporatedMilesCycled
-		, sum(UnincorporatedMilesCycled) / sum(UnincorporatedMiles) as PctUnincorporatedMilesCycled
+		, sum(Unincorporated_miles) as UnincorporatedMiles
+		, sum(Unincorporated_miles_Cycled) as UnincorporatedMilesCycled
+		, sum(Unincorporated_miles_Cycled) / sum(Unincorporated_miles) as PctUnincorporatedMilesCycled
  		, sum(Pct0_Count) as 'Pct0_Count', sum(LT_1_Mile_Count) + sum(LT_5Pct_Count) as '< Pct5_Count'
  		, sum(Pct5_Count) as 'Pct5_Count', sum(Pct10_Count) as 'Pct10_Count', sum(Pct25_Count) as 'Pct25_Count'
  		, sum(Pct50_Count) as 'Pct50_Count', sum(Pct75_Count) as 'Pct75_Count', sum(Pct90_Count) as 'Pct90_Count'
  		, sum(Pct99_Count) as 'Pct99_Count'
-    	from vw_county_aggregates
+    	from vw_county_aggregates_v2
     	where State = "{state}"'''
     # print(query)
     wandrerer_df = db.execute_query(query)
