@@ -1,3 +1,5 @@
+import logging
+
 import pandas as pd
 import streamlit as st
 from streamlit import session_state as ss
@@ -227,6 +229,8 @@ def create_choropleth_map_with_legend(state_list):
     nf = 'New England National Forests.geojson'
     # nf = 'GMNF-edited_split_to_file.geojson'
     nf_filename = os.path.join('POIs', nf)
+    print(ss.base_dir)
+    print(f'{nf_filename}')
     # nf_filename = os.path.join('POIs', 'WMNT-edited_split-2nd-feature.geojson')
     national_forests_filepath = u.get_filepath_for_filename(nf_filename)
     gdf_national_forests, nf_size = gf.get_geopandas_df_for_state(ss.selected_state, national_forests_filepath)
