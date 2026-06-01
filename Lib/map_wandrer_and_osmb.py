@@ -959,7 +959,7 @@ def create_town_map(town_gdf, state_list, maptype):
         # town_merged_df = pd.merge(wandrerer_df, dissolved_town_gdf, on='osm_id', how='left')
         # town_merged_df = pd.merge(wandrerer_df, dissolved_town_gdf, on=['osm_id', 'Town', 'County', 'State', 'long_name'],
         #                       how='left')
-        town_merged_df = dissolved_town_gdf.merge(wandrerer_df, on=['State', 'County', 'Town', 'long_name', 'osm_id'])
+        town_merged_df = dissolved_town_gdf.merge(wandrerer_df, on=['State', 'County', 'Town', 'long_name', 'osm_id', 'diagonal'])
 
     # Counties with unincorporated miles have geojson rows with county geometries and town geometries.
     # Remove the county rows for this scenario.
@@ -3239,6 +3239,69 @@ def town_selected():
     #              key='town_selection')
 
 
+def national_forest_town_selected():
+    # scroll_to_top()
+    scroll_to_here(0, key='top')
+    # st.plotly_chart(st.session_state.current_fig, config=config)
+    fig = st.session_state.current_fig
+    if len(ss.town_intersection_selection.selection['rows']) == 0:
+        # fig.update_traces(visible=True, selectedpoints=[], selector=dict(name='Town Map'))
+        fig.update_traces(
+            visible=True,
+            selectedpoints=[],
+            unselected=dict(marker=dict(opacity=1.0)),
+            selector=dict(name='Town Map')
+        )
+        st.plotly_chart(fig)
+        show_dataframes()
+        # st.dataframe(ss.map_data_town_gdf, width='stretch', selection_mode='single-row', on_select=town_selected,
+        #                  key='town_selection')
+        return
+
+    diagonal = ss.town_intersection_gdf.iloc[ss.town_intersection_selection.selection['rows'][0]]['diagonal_2']
+    # x_center, y_center = center_point_diagonal(diagonal)
+    zoom, center = calculate_mapbox_zoom_center_from_diagonal(diagonal)
+    # st.write(f'{diagonal=}')
+    # st.write(f'{zoom=}')
+    # st.write(f'{center=}')
+    # center = dict(lat=(min_lat + max_lat) / 2, lon=(min_lon + max_lon) / 2)
+    fig.update_layout(map_style="carto-positron",
+                      map_zoom=zoom, map_center=center)
+
+    # fig.update_layout(mapbox_style="carto-positron",
+    #                   mapbox_zoom=zoom, mapbox_center=center,
+    #                   config={'mapbox_scrollZoom':True})
+
+    fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1})
+
+    fig.update_traces(visible='legendonly', selector=dict(name='State Map'))
+    fig.update_traces(visible='legendonly', selector=dict(name='County Map'))
+    fig.update_traces(visible=True, selector=dict(name='Town Map'))
+    fig.update_traces(
+        visible=True, selectedpoints=ss.town_intersection_selection.selection['rows'],
+        # marker=dict(size=10, opacity=0.8),
+        unselected=dict(marker=dict(opacity=0.2)),
+        selected=dict(marker=dict(opacity=1.0)),
+        selector = dict(name='National Forests')
+    )
+
+
+    # fig.conf = dict(scrollZoom=True)
+
+    st.plotly_chart(fig)
+
+    if st.session_state.logged_in:
+        st.session_state.update_county = st.session_state['map_gdf'].iloc[st.session_state.map_data['selection']['rows'][0]]['County']
+        st.session_state.show_update_county_btn = True
+        # st.sidebar.button(f'Update {county} County Miles', key="update_county_btn")
+        #     # st.write('Update button clicked')
+
+    show_dataframes()
+
+    # st.dataframe(ss.map_data_town_gdf, width='stretch', selection_mode='single-row', on_select=town_selected,
+    #              key='town_selection')
+
+
 def state_selected():
     # st.dataframe(ss.map_data_state_gdf, width='stretch', selection_mode='single-row', on_select=state_selected,
     #              key='state_selection')
@@ -3500,6 +3563,14 @@ def main():
         # Initialize geopandas df dictionary in session state.
         st.session_state.map_data_trails_gdf = gpd.GeoDataFrame()
 
+    if 'county_intersection_gdf' not in st.session_state:
+        # Initialize geopandas df dictionary in session state.
+        ss.county_intersection_gdf = gpd.GeoDataFrame()
+
+    if 'town_intersection_gdf' not in st.session_state:
+        # Initialize geopandas df dictionary in session state.
+        ss.town_intersection_gdf = gpd.GeoDataFrame()
+
     if 'current_fig' not in st.session_state:
         st.session_state.current_fig = {}
 
@@ -3694,6 +3765,14 @@ def show_dataframes():
         if not ss.map_data_park_gdf.empty:
             with st.expander('Park Data', expanded=False):
                 st.dataframe(ss.map_data_park_gdf, width='stretch', selection_mode='single-row', on_select=park_selected, key='park_selection')
+
+        if not ss.county_intersection_gdf.empty:
+            with st.expander('County/NF Intersection Data', expanded=False):
+                st.dataframe(ss.county_intersection_gdf, width='stretch', selection_mode='single-row', on_select=county_selected, key='county_intersection_selection')
+
+        if not ss.town_intersection_gdf.empty:
+            with st.expander('Town/NF Intersection Data', expanded=False):
+                st.dataframe(ss.town_intersection_gdf, width='stretch', selection_mode='single-row', on_select=national_forest_town_selected, key='town_intersection_selection')
 
     else:
         print(f'Skipping show_dataframes')

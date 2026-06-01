@@ -9,7 +9,10 @@ import json
 import logging_functions as lf
 import math
 import numpy as np
+import os
+import utilities as u
 import wandrer_database as wd
+from area import area
 
 max_50_pct_color_scale = ['white', 'gold', 'red']
 
@@ -41,6 +44,9 @@ def create_template(data, col_names):
 
             elif name == 'Town':
                 template += "<b>Town:</b> %{" + f"customdata[{data.columns.get_loc('Town')}]" + "}<br>"
+
+            elif name == 'name':
+                template += "<b>Name:</b> %{" + f"customdata[{data.columns.get_loc('name')}]" + "}<br>"
 
             elif name == 'Location':
                 template += "<b>Location:</b> %{" + f"customdata[{data.columns.get_loc('Location')}]" + "}<br>"
@@ -203,6 +209,10 @@ def calculate_mapbox_zoom_center(bounds) -> (float, dict):
     return zoom, center
 
 
+def sq_m_to_sq_miles(sq_m):
+    return sq_m / 2589988.11
+
+
 def create_choropleth_map_with_legend(state_list):
     # st.write("filename:", geojson_file)
     # ss.gdfs = {}
@@ -213,6 +223,14 @@ def create_choropleth_map_with_legend(state_list):
 
     gdf = gf.get_geopandas_df_for_region(state_list)
     gdf.set_crs("EPSG:4326", inplace=True)
+
+    nf = 'New England National Forests.geojson'
+    # nf = 'GMNF-edited_split_to_file.geojson'
+    nf_filename = os.path.join('POIs', nf)
+    # nf_filename = os.path.join('POIs', 'WMNT-edited_split-2nd-feature.geojson')
+    national_forests_filepath = u.get_filepath_for_filename(nf_filename)
+    gdf_national_forests, nf_size = gf.get_geopandas_df_for_state(ss.selected_state, national_forests_filepath)
+    gdf_national_forests['value'] = 10
 
     if 'leisure' in gdf.columns:
         mask = (gdf['leisure'].isna()) & (gdf.geom_type.isin(['Polygon', 'MultiPolygon']))
@@ -281,7 +299,7 @@ def create_choropleth_map_with_legend(state_list):
 
     gdf_counties.drop(['wandrer_id','wandrer_parent_id','Town','long_name','leisure','county','state','name','wikipedia','diagonal'], axis=1, inplace=True, errors='ignore')
     gf.convert_bounds_to_linestrings(gdf_counties)
-    counties_geojson = json.loads(gdf_counties.to_json())
+    # counties_geojson = json.loads(gdf_counties.to_json())
     wandrerer_county_df = wd.get_wandrer_totals_for_counties_for_states(state_list)
     gdf_counties_merged = gdf_counties.merge(wandrerer_county_df, on=['State', 'County'])
     gdf_counties_merged.rename(columns={"Town": "TotalTowns"}, inplace=True)
@@ -289,7 +307,7 @@ def create_choropleth_map_with_legend(state_list):
     max_val = max(gdf_counties_merged[data_value])
     # gdf['value'] = np.random.randint(min_val, max_val + 1, size=len(gdf))
     zoom, center = calculate_mapbox_zoom_center(gdf_counties.bounds)
-    gdf_counties_merged.drop('geometry', axis=1, inplace=True, errors='ignore')
+    # gdf_counties_merged.drop('geometry', axis=1, inplace=True, errors='ignore')
     # template = create_template(gdf_counties, ['County','TotalTowns', data_value])
     # county_template = create_template(gdf_counties_merged, ['State', 'County','Town', 'TotalMiles', 'ActualMiles', 'ActualPct'])
 
@@ -297,7 +315,16 @@ def create_choropleth_map_with_legend(state_list):
                                            gdf_counties_merged['50%'] + gdf_counties_merged['75%'] + \
                                            gdf_counties_merged['90%'] + gdf_counties_merged['99%']
 
-    add_county_trace(counties_geojson, fig, gdf_counties_merged, max_val, min_val, data_value)
+    add_county_trace(fig, gdf_counties_merged, max_val, min_val, data_value)
+    county_intersection_gdf = gpd.overlay(gdf_national_forests, gdf_counties, how='intersection')
+    min_area = 0.00001  # Define your own tolerance threshold based on your CRS units
+    county_intersection_gdf = county_intersection_gdf[county_intersection_gdf.geometry.area > min_area]
+    county_intersection_gdf['intersection_area'] = county_intersection_gdf.geometry.area
+    county_intersection_gdf = county_intersection_gdf.drop(
+        columns=[col for col in county_intersection_gdf.columns if col.endswith('_1')])
+    county_intersection_gdf.reset_index(inplace=True)
+    ss.county_intersection_gdf = county_intersection_gdf
+
     # ss.gdfs['county_gdf'] = gdf_counties
 
     # state_list = gdf_towns['State'].unique().tolist()
@@ -323,8 +350,6 @@ def create_choropleth_map_with_legend(state_list):
         #                       how='left')
         town_merged_df = gdf_towns.merge(wandrerer_df, on=['State', 'County', 'Town', 'long_name', 'osm_id'])
 
-
-
     # gdf_counties[data_value] = np.random.randint(min_val, max_val + 1, size=len(gdf_towns))
 
     # gdf_trails = gdf[gdf.geom_type.isin(['LineString'])]
@@ -332,7 +357,8 @@ def create_choropleth_map_with_legend(state_list):
     # gdf_states = gdf_counties.dissolve(by='State', aggfunc={'County': 'count', data_value: "sum"})
     # gdf_states.reset_index(inplace=True)
 
-
+    # Load nation forests trace
+    add_national_forests_trace(fig, gdf_national_forests.copy())
 
     # gdf_towns['value']=1
     # geojson = json.loads(gdf_towns.to_json())
@@ -341,15 +367,30 @@ def create_choropleth_map_with_legend(state_list):
     geojson = json.loads(town_merged_df.to_json())
     zoom, center = calculate_mapbox_zoom_center(town_merged_df.bounds)
     seacoast_df = town_merged_df[town_merged_df['seacoast'] == 1]
+
+    if 'Wandrer_id' in town_merged_df.columns:
+        gdf_towns_subset = town_merged_df[['Wandrer_id', 'Wandrer_Parent_id', 'geometry']]
+        town_intersection_gdf = gpd.overlay(gdf_national_forests, gdf_towns_subset, how='intersection')
+        # town_intersection_gdf = gpd.overlay(gdf_national_forests, gdf_towns, how='intersection')
+        town_intersection_gdf['intersection_area'] = town_intersection_gdf.geometry.area
+        town_intersection_gdf = town_intersection_gdf[town_intersection_gdf.geometry.area > min_area]
+        town_intersection_gdf = town_intersection_gdf.drop(
+            columns=[col for col in town_intersection_gdf.columns if col.endswith('_1')])
+        town_intersection_gdf.reset_index(inplace=True)
+        ss.town_intersection_gdf = town_intersection_gdf
+
     town_merged_df.drop('geometry', axis=1, inplace=True, errors='ignore')
     # template = create_template(gdf_towns, ['State', 'County','Town'])
     # fig = go.Figure()
-    add_town_trace(fig, town_merged_df, geojson, data_value, counties_geojson)
+    # add_town_trace(fig, town_merged_df, geojson, data_value, counties_geojson)
+    add_town_trace(fig, town_merged_df, geojson, data_value)
+
+
     # ss.gdfs['town_gdf'] = town_merged_df
 
     seacoast_geojson = json.loads(seacoast_df.to_json())
     seacoast_df.drop('geometry', axis=1, inplace=True, errors='ignore')
-    add_seacoast_trace(fig, seacoast_df, seacoast_geojson, data_value, counties_geojson)
+    add_seacoast_trace(fig, seacoast_df, seacoast_geojson, data_value)
     # ss.gdfs['seacoast_gdf'] = seacoast_df
 
     if 'leisure' in gdf.columns:
@@ -390,7 +431,7 @@ def create_choropleth_map_with_legend(state_list):
             zmax = parks_merged_df[data_value].max(),
             legendgroup="legend2",  # this can be any string, not just "group"
             legendgrouptitle_text="POI Layers",
-            name='Leisure Map',
+            name='Parks',
             # visible='legendonly'
             showlegend=True
             )
@@ -420,6 +461,10 @@ def create_choropleth_map_with_legend(state_list):
                 showlegend=True
             ))
 
+
+    # # Load nation forests trace
+    # add_national_forests_trace(fig, gdf_national_forests)
+
     # zoom, center = calculate_mapbox_zoom_center(gdf_towns.bounds)
     # fig.update_layout(map_style="carto-positron", map_zoom=zoom, map_center=center, clickmode='event+select')
     fig.update_layout(map_style="carto-positron", map_zoom=zoom, map_center=center)
@@ -441,6 +486,40 @@ def create_choropleth_map_with_legend(state_list):
     st.session_state.gdf_choropleth = gdf_towns
 
     return fig
+
+
+def add_national_forests_trace(fig, gdf):
+    nf_geojson = json.loads(gdf.to_json())
+    gdf.drop('geometry', axis=1, inplace=True, errors='ignore')
+    nf_template = create_template(gdf, ['State', 'name'])
+    fig.add_trace(go.Choroplethmap(
+        customdata=gdf,
+        geojson=nf_geojson,
+        locations=gdf['name'],
+        featureidkey='properties.name',
+        z=gdf['value'],
+        # colorscale=["green", "green"],
+        # colorscale=["#B8FFB8", "#00D100"],
+        colorscale="purples",
+        colorbar=dict(x=-0.15, xanchor='left'),
+        # coloraxis='coloraxis',
+        marker_line_width=1,
+        marker_line_color="black",  # Custom outline color for the GPX track
+        marker_opacity=0.5,
+        showscale=False,  # Optional: hide color scale if not needed
+        hovertemplate=nf_template,
+        hoverlabel=dict(
+            bgcolor="black",
+            font_size=16),
+        # name = 'Town Data Values',
+        zmin=gdf['value'].min(),
+        zmax=gdf['value'].max(),
+        legendgroup="legend2",  # this can be any string, not just "group"
+        legendgrouptitle_text="POI Layers",
+        name='National Forests',
+        # visible='legendonly'
+        showlegend=True
+    ))
 
 
 def update_layout_legends(fig):
@@ -509,13 +588,15 @@ def update_layout_legends(fig):
     # )
 
 
-def add_town_trace(fig, gdf_towns, geojson, data_value, counties_geojson):
+def add_town_trace(fig, gdf_towns, geojson, data_value):
     # template = create_template(gdf_towns, ['State', 'County','Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Award Level'])
     marker_opacity = 1.0
     ss.map_data_town_gdf = gdf_towns
     gdf_towns.sort_values(by=['State','Town'], inplace=True)
     template = create_template(gdf_towns, ['State', 'County','Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Award Level'])
     # ss.sorted_town_gdf =
+
+    selected_marker_opacity = 0.5
 
     fig.add_trace(go.Choroplethmap(
         customdata=gdf_towns,
@@ -534,11 +615,12 @@ def add_town_trace(fig, gdf_towns, geojson, data_value, counties_geojson):
         showscale=True,  # Optional: hide color scale if not needed
         marker_line_width=1,
         marker_line_color="black",  # Custom outline color for the GPX track
+        marker_opacity=selected_marker_opacity,
         # marker_opacity=marker_opacity,
         # 2. Define unselected style: Fade all unselected regions
         unselected=dict(marker=dict(opacity=0.2)),
         # Optional: Customize selected appearance
-        selected=dict(marker=dict(opacity=1.0)),
+        selected=dict(marker=dict(opacity=selected_marker_opacity)),
         hovertemplate=template,
         hoverlabel=dict(
             bgcolor="black",
@@ -547,7 +629,7 @@ def add_town_trace(fig, gdf_towns, geojson, data_value, counties_geojson):
         zmin=gdf_towns[data_value].min(),
         # zmax=gdf_towns[data_value].max(),
         zmax=math.ceil(gdf_towns[data_value].max() / 100) * 100,
-        # legendgroup="legend",  # this can be any string, not just "group"
+        legendgroup="legend",  # this can be any string, not just "group"
         name='Town Map',
         showlegend=True,
         visible='legendonly'
@@ -563,7 +645,7 @@ def add_town_trace(fig, gdf_towns, geojson, data_value, counties_geojson):
     #                                       )]);
 
 
-def add_seacoast_trace(fig, gdf_towns, geojson, data_value, counties_geojson):
+def add_seacoast_trace(fig, gdf_towns, geojson, data_value):
     template = create_template(gdf_towns, ['State', 'County','Town', data_value])
     marker_opacity = 1.0
     ss.map_data_seacoast_gdf = gdf_towns
@@ -596,7 +678,7 @@ def add_seacoast_trace(fig, gdf_towns, geojson, data_value, counties_geojson):
         # zmax=gdf_towns[data_value].max(),
         # zmax=math.ceil(gdf_towns[data_value].max() / 100) * 100,
         zmax=gdf_towns[data_value].max() * 100,
-        # legendgroup="legend",  # this can be any string, not just "group"
+        legendgroup="legend",  # this can be any string, not just "group"
         name='Seacoast Map',
         showlegend=True,
         visible='legendonly'
@@ -640,7 +722,7 @@ def add_state_trace(fig, gdf, geojson, data_value):
         zmax=z_max,
         zmin=1,
         showlegend=True,
-        # legendgroup='legend',  # this can be any string, not just "group"
+        legendgroup='legend',  # this can be any string, not just "group"
         # legendgrouptitle_text='Admin Layers',
         # legend_groupclick='toggleothers',
         name='State Map'
@@ -657,13 +739,15 @@ def add_state_trace(fig, gdf, geojson, data_value):
     #                                       )]);
 
 
-def add_county_trace(counties_geojson, fig, gdf, max_val, min_val, data_value):
+def add_county_trace(fig, gdf, max_val, min_val, data_value):
     line_width = 1
     marker_opacity = 1.0
     # d_v = 'PctMilesCycled' if data_value == 'ActualPct' else data_value
     # z_max = math.ceil(gdf[data_value].max() / 100) * 100
     z_max = math.ceil(gdf[data_value].max() * 2) / 2
     ss.map_data_county_gdf = gdf
+    counties_geojson = json.loads(gdf.to_json())
+    gdf.drop('geometry', axis=1, inplace=True, errors='ignore')
     template = create_template(gdf, ['State', 'County', 'TotalTowns', 'CycledTowns', 'PctTownsCycled', 'AchievedTowns',
                                      'PctTownsAchieved', 'Pct10Achieved', 'TotalCountyMiles', 'ActualMiles', 'ActualPct'])
     colorbar_x = 1.2
@@ -691,7 +775,7 @@ def add_county_trace(counties_geojson, fig, gdf, max_val, min_val, data_value):
         zmin=gdf[data_value].min(),
         # zmax=gdf_counties[data_value].max(),
         zmax=z_max,
-        # legendgroup="legend",  # this can be any string, not just "group"
+        legendgroup="legend",  # this can be any string, not just "group"
         showlegend=True,
         name='County Map',
         visible='legendonly'

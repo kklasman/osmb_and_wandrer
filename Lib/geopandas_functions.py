@@ -56,18 +56,20 @@ def convert_bounds_to_linestrings(source_gdf):
     #     print(item['geometry'])
 
 
-def get_geopandas_df_for_state(selected_state):
+def get_geopandas_df_for_state(selected_state, file_path=None):
     # if selected_state not in st.session_state.gdfs.keys():
-        file_path = fu.get_geojson_filename(selected_state)
-        if len(file_path) == 0:
-            return gpd.GeoDataFrame(),  -1
+        if file_path is None:
+            file_path = fu.get_geojson_filename(selected_state)
+            if len(file_path) == 0:
+                return gpd.GeoDataFrame(),  -1
 
         gdf = gpd.read_file(f'{file_path}')
         if 'id' in gdf.columns:
             if 'osm_id' not in gdf.columns:
                 gdf['osm_id'] = None
 
-            gdf['osm_id'] = gdf['osm_id'].fillna(gdf['id'].str.split('/').str[-1])
+            gdf['osm_id'] = gdf['osm_id'].fillna(gdf['id'].str.split('/').str[-1]) if '/' in gdf['id'] else gdf['id']
+            # gdf['osm_id'] = gdf['osm_id'].fillna(gdf['id'].str.split('/').str[-1])
         else:
             lf.logger.info(f'id column missing in {selected_state} geojson')
 
