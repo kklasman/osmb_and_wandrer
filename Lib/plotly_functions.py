@@ -14,7 +14,7 @@ import numpy as np
 import os
 import utilities as u
 import wandrer_database as wd
-from area import area
+# from area import area
 
 max_50_pct_color_scale = ['white', 'gold', 'red']
 
