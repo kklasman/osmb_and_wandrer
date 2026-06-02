@@ -234,7 +234,7 @@ def create_choropleth_map_with_legend(state_list):
     # nf_filename = os.path.join('POIs', 'WMNT-edited_split-2nd-feature.geojson')
     national_forests_filepath = u.get_filepath_for_filename(nf_filename)
     gdf_national_forests, nf_size = gf.get_geopandas_df_for_state(ss.selected_state, national_forests_filepath)
-    gdf_national_forests['value'] = 10
+    gdf_national_forests['value'] = 10 # TO DO: Replace with real Wandrer value when/if available.
 
     if 'leisure' in gdf.columns:
         mask = (gdf['leisure'].isna()) & (gdf.geom_type.isin(['Polygon', 'MultiPolygon']))
@@ -372,14 +372,17 @@ def create_choropleth_map_with_legend(state_list):
     zoom, center = calculate_mapbox_zoom_center(town_merged_df.bounds)
     seacoast_df = town_merged_df[town_merged_df['seacoast'] == 1]
 
-    if 'Wandrer_id' in town_merged_df.columns:
-        gdf_towns_subset = town_merged_df[['Wandrer_id', 'Wandrer_Parent_id', 'geometry']]
-        town_intersection_gdf = gpd.overlay(gdf_national_forests, gdf_towns_subset, how='intersection')
-        # town_intersection_gdf = gpd.overlay(gdf_national_forests, gdf_towns, how='intersection')
+    if 'Wandrer_Id' in town_merged_df.columns:
+        town_merged_df_copy = town_merged_df.copy()
+        gdf_towns_subset = town_merged_df_copy[['County','Town','Wandrer_Id', 'Wandrer_Parent_Id', 'geometry','diagonal']]
+        gdf_national_forests_copy = gdf_national_forests.copy()
+        gdf_national_forests_subset = gdf_national_forests_copy[['name', 'State', 'long_name', 'REGION', 'FORESTNUMB', 'GIS_ACRES', 'value','geometry']]
+        town_intersection_gdf = gpd.overlay(gdf_national_forests_subset, gdf_towns_subset, how='intersection')
         town_intersection_gdf['intersection_area'] = town_intersection_gdf.geometry.area
         town_intersection_gdf = town_intersection_gdf[town_intersection_gdf.geometry.area > min_area]
         town_intersection_gdf = town_intersection_gdf.drop(
             columns=[col for col in town_intersection_gdf.columns if col.endswith('_1')])
+        town_intersection_gdf.drop('geometry', axis=1, inplace=True, errors='ignore')
         town_intersection_gdf.reset_index(inplace=True)
         ss.town_intersection_gdf = town_intersection_gdf
 

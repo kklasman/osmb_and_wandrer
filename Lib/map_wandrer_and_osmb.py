@@ -3258,7 +3258,7 @@ def national_forest_town_selected():
         #                  key='town_selection')
         return
 
-    diagonal = ss.town_intersection_gdf.iloc[ss.town_intersection_selection.selection['rows'][0]]['diagonal_2']
+    diagonal = ss.town_intersection_gdf.iloc[ss.town_intersection_selection.selection['rows'][0]]['diagonal']
     # x_center, y_center = center_point_diagonal(diagonal)
     zoom, center = calculate_mapbox_zoom_center_from_diagonal(diagonal)
     # st.write(f'{diagonal=}')
