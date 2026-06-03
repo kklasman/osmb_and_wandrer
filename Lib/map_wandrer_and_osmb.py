@@ -1,6 +1,7 @@
 import gc
 import string
 import sys
+import file_utils as fu
 import geopandas as gpd
 import plotly.graph_objects as go
 import pandas as pd
@@ -13,6 +14,8 @@ import plotly_functions as pf
 import streamlit as st
 from streamlit import session_state as ss
 from streamlit_scroll_to_top import scroll_to_here
+from streamlit_cookies_controller import CookieController
+
 from geopy import distance
 import numpy as np
 from shapely.geometry import LineString
@@ -27,11 +30,21 @@ from pympler import asizeof
 # from streamlit-tree-select2 import streamlit_tree_select
 import math
 import tracemalloc
+import user_settings as us
 import utilities as u
 import plotly_functions as pf
 import query as q
 import wandrer_database as wd
 from pathlib import Path
+
+# # Initialize the cookie controller
+# cookie_controller = CookieController()
+# ss['cookie_controller'] = cookie_controller
+
+# saved_show_raw_data_state = cookie_controller.get('show_raw_data_state')
+#
+# if not saved_show_raw_data_state is None:
+#     ss.show_raw_data_state = saved_show_raw_data_state
 
 # import uuid
 # from pympler import asizeof
@@ -1241,6 +1254,9 @@ def create_town_map_discrete_color(center, county_location_json, data_value, mer
                                          , xanchor="center")
                             )
     return fig
+
+
+
 def create_town_map_discrete_color_go(center, county_location_json, data_value, merged_county_df, location_json, state,
                                      town_merged_df, zoom):
 
@@ -1369,6 +1385,10 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
 
 
     logger.info(f"{trace_dictionary_size_total=} bytes")
+
+    campground_csv_file = fu.get_POI_file('NH State Parks.csv')
+    if campground_csv_file:
+        fig = pf.create_trace_from_csv(fig, campground_csv_file)
 
     fig.update_layout(map_layers=[dict(sourcetype='geojson',
                                           source=county_location_json,
@@ -3239,6 +3259,73 @@ def town_selected():
     #              key='town_selection')
 
 
+def campground_selected():
+    # scroll_to_top()
+    scroll_to_here(0, key='top')
+    # st.plotly_chart(st.session_state.current_fig, config=config)
+    fig = st.session_state.current_fig
+    if len(ss.campground_selection.selection['rows']) == 0:
+        # fig.update_traces(visible=True, selectedpoints=[], selector=dict(name='Town Map'))
+        fig.update_traces(
+            visible=True,
+            selectedpoints=[],
+            unselected=dict(marker=dict(opacity=1.0)),
+            selector=dict(name='Town Map')
+        )
+        st.plotly_chart(fig)
+        show_dataframes()
+        # st.dataframe(ss.map_data_town_gdf, width='stretch', selection_mode='single-row', on_select=town_selected,
+        #                  key='town_selection')
+        return
+
+    # diagonal = ss.map_data_town_gdf.iloc[ss.campground_selection.selection['rows'][0]]['diagonal']
+    # center = ss.state_park_campgrounds.iloc[ss.campground_selection.selection['rows'][0]]['diagonal']
+    lat = ss.state_park_campgrounds.iloc[ss.campground_selection.selection['rows'][0]]['lat']
+    lon = ss.state_park_campgrounds.iloc[ss.campground_selection.selection['rows'][0]]['lon']
+    center = {'lat': lat, 'lon': lon}
+    zoom = 10
+    # x_center, y_center = center_point_diagonal(diagonal)
+    # zoom, center = calculate_mapbox_zoom_center_from_diagonal(diagonal)
+    # st.write(f'{diagonal=}')
+    # st.write(f'{zoom=}')
+    # st.write(f'{center=}')
+    # center = dict(lat=(min_lat + max_lat) / 2, lon=(min_lon + max_lon) / 2)
+    fig.update_layout(map_style="carto-positron",
+                      map_zoom=zoom, map_center=center)
+
+    # fig.update_layout(mapbox_style="carto-positron",
+    #                   mapbox_zoom=zoom, mapbox_center=center,
+    #                   config={'mapbox_scrollZoom':True})
+
+    fig.update_layout(margin={"r": 10, "t": 30, "l": 1, "b": 1})
+
+    fig.update_traces(visible='legendonly', selector=dict(name='State Map'))
+    fig.update_traces(visible='legendonly', selector=dict(name='County Map'))
+    fig.update_traces(
+        visible=True, selectedpoints=ss.town_selection.selection['rows'],
+        # marker=dict(size=10, opacity=0.8),
+        unselected=dict(marker=dict(opacity=0.2)),
+        selected=dict(marker=dict(opacity=1.0)),
+        selector = dict(name='Town Map')
+    )
+
+
+    # fig.conf = dict(scrollZoom=True)
+
+    st.plotly_chart(fig)
+
+    if st.session_state.logged_in:
+        st.session_state.update_county = st.session_state['map_gdf'].iloc[st.session_state.map_data['selection']['rows'][0]]['County']
+        st.session_state.show_update_county_btn = True
+        # st.sidebar.button(f'Update {county} County Miles', key="update_county_btn")
+        #     # st.write('Update button clicked')
+
+    show_dataframes()
+
+    # st.dataframe(ss.map_data_town_gdf, width='stretch', selection_mode='single-row', on_select=town_selected,
+    #              key='town_selection')
+
+
 def national_forest_town_selected():
     # scroll_to_top()
     scroll_to_here(0, key='top')
@@ -3468,27 +3555,6 @@ def login():
         st.session_state.login_dismissed = True
         st.rerun()
 
-@st.dialog("Settings")
-def settings():
-    # ss
-    st.write("User Settings")
-    st.checkbox('Show raw data grid', key='show_raw_data', value=st.session_state.show_raw_data_state)
-    st.checkbox('Hide locations with 0 values', key='hide_zero_data', value=st.session_state.hide_zero_data_state)
-
-    st.write('About:')
-    with st.container(height=100, gap=None):
-        st.write(f'Plotly version: {plotly.__version__}')
-        st.write(f'python version: {sys.version.split(" ")[0]}')
-        st.write(f'Streamlit version: {st.__version__}')
-
-    # st.write(f"Checkbox value from session state: {st.session_state.show_raw_data_state}")
-
-    if st.button('Close', key='close'):
-        st.session_state.show_raw_data_state = st.session_state.show_raw_data
-        st.session_state.hide_zero_data_state = st.session_state.hide_zero_data
-        st.session_state.settings_dismissed = True
-        st.rerun()
-
 
 def logged_in():
     st.session_state.logged_in = True
@@ -3525,6 +3591,17 @@ def clear_selection_callback():
 
 
 def main():
+    # Initialize the cookie controller
+    cookie_controller = CookieController('map_wandrercookies')
+    ss['cookie_controller'] = cookie_controller
+
+    saved_show_raw_data_state = ss.cookie_controller.get('show_raw_data_state')
+    # print(f"{saved_show_raw_data_state=}")
+    print(f"{ss.cookie_controller.get('show_raw_data_state')=}")
+
+    if not saved_show_raw_data_state is None:
+        ss.show_raw_data_state = saved_show_raw_data_state
+
     # ss
     if 'show_raw_data_state' not in st.session_state:
         st.session_state.show_raw_data_state = False
@@ -3570,6 +3647,10 @@ def main():
     if 'town_intersection_gdf' not in st.session_state:
         # Initialize geopandas df dictionary in session state.
         ss.town_intersection_gdf = gpd.GeoDataFrame()
+
+    if 'state_park_campgrounds' not in st.session_state:
+        # Initialize geopandas df dictionary in session state.
+        ss.state_park_campgrounds = gpd.GeoDataFrame()
 
     if 'current_fig' not in st.session_state:
         st.session_state.current_fig = {}
@@ -3617,7 +3698,7 @@ def main():
 
     with st.sidebar:
         if st.button('Settings'):
-            settings()
+            us.settings()
 
         maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
         st.session_state.selected_maptype = maptype_selectbox
@@ -3773,6 +3854,10 @@ def show_dataframes():
         if not ss.town_intersection_gdf.empty:
             with st.expander('Town/NF Intersection Data', expanded=False):
                 st.dataframe(ss.town_intersection_gdf, width='stretch', selection_mode='single-row', on_select=national_forest_town_selected, key='town_intersection_selection')
+
+        if not ss.state_park_campgrounds.empty:
+            with st.expander('Campground Data', expanded=False):
+                st.dataframe(ss.state_park_campgrounds, width='stretch', selection_mode='single-row', on_select=campground_selected, key='campground_selection')
 
     else:
         print(f'Skipping show_dataframes')
@@ -4119,6 +4204,16 @@ if "logged_in" not in st.session_state and "login_dismissed" not in st.session_s
     login()
 # else:
 #     f"You voted for {st.session_state.vote['item']} because {st.session_state.vote['reason']}"
+
+# Initialize the cookie controller
+# cookie_controller = CookieController('map_wandrercookies')
+# ss['cookie_controller'] = cookie_controller
+#
+# saved_show_raw_data_state = cookie_controller.get('show_raw_data_state')
+#
+# if not saved_show_raw_data_state is None:
+#     ss.show_raw_data_state = saved_show_raw_data_state
+
 
 # if "logged_in" in st.session_state and "login_dismissed" in st.session_state:
 if not st.session_state.startup_msg_displayed:

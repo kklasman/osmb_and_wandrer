@@ -29,3 +29,14 @@ def get_geojson_filename(selected_state):
 
     filesize = os.path.getsize(file_path)
     return file_path
+
+
+def get_POI_file(file_name):
+    file_path = os.path.join(ss.base_dir, 'data', 'boundaries', 'POIs', file_name)
+    print(f'{ss.base_dir=}')
+    print(f'{file_path=}')
+
+    if os.path.exists(file_path):
+        return file_path
+    else:
+        return False

@@ -12,6 +12,7 @@ import logging_functions as lf
 import math
 import numpy as np
 import os
+from shapely.geometry import Point
 import utilities as u
 import wandrer_database as wd
 # from area import area
@@ -49,6 +50,9 @@ def create_template(data, col_names):
 
             elif name == 'name':
                 template += "<b>Name:</b> %{" + f"customdata[{data.columns.get_loc('name')}]" + "}<br>"
+
+            elif name == 'Name':
+                template += "<b>Name:</b> %{" + f"customdata[{data.columns.get_loc('Name')}]" + "}<br>"
 
             elif name == 'Location':
                 template += "<b>Location:</b> %{" + f"customdata[{data.columns.get_loc('Location')}]" + "}<br>"
@@ -790,5 +794,51 @@ def add_county_trace(fig, gdf, max_val, min_val, data_value):
     )
 
 
+def create_trace_from_csv(base_fig, csv_file):
+    # bytes_data = csv_file.read()
+    #
+    # # Wrap bytes in a stream buffer and read it
+    # bytes_io = io.BytesIO(bytes_data)
+    #
+    # # 1. Read bytes into a Pandas DataFrame
+    df = pd.read_csv(csv_file)
 
+    # 2. Convert lat/lon columns to Shapely Point objects
+    geometry = [Point(xy) for xy in zip(df['lon'], df['lat'])]
 
+    # 3. Create the GeoDataFrame
+    gdf = gpd.GeoDataFrame(df, geometry=geometry, crs="EPSG:4326")
+    ss.state_park_campgrounds = gdf
+    # template = create_template(gdf, ['Name'])
+    template = '%{customdata[0]}<extra></extra>'
+    trace_name = 'Campgrounds'
+    # 2. Create the Scattermap trace
+    # mode = "lines+markers" draws both the path and individual coordinate points
+    marker_size = 14
+    marker_color = 'green'
+    trace = go.Scattermap(
+        customdata=gdf[['Name']].values,
+        mode="markers",
+        lon=gdf['lon'],
+        lat=gdf['lat'],
+        # marker=dict(size=marker_size, color='green',symbol='campsite'),
+        marker=dict(size=marker_size, color=marker_color),
+        # line=dict(width=2, color='blue'),
+        # text=[f"Name: {n}" for n in gdf['Name']],  # Shows on hover
+        hovertemplate=template,
+        hoverlabel=dict(
+            bgcolor="white",
+            font=dict(
+                color=marker_color,  # Foreground (text) color
+                weight="bold",
+                family="Arial",
+                size=14
+            )),
+    name=trace_name
+    )
+
+    # # Remove the trace named trace_name
+    # base_fig.data = [trace for trace in fig.data if trace.name != trace_name]
+    base_fig.add_trace(trace)
+
+    return base_fig
