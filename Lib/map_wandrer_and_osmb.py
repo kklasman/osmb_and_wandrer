@@ -1388,7 +1388,10 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
 
     campground_csv_file = fu.get_POI_file('NH State Parks.csv')
     if campground_csv_file:
-        fig = pf.create_trace_from_csv(fig, campground_csv_file)
+        fig = pf.add_campgrounds_trace_from_csv(fig, campground_csv_file)
+
+    # df_town_names = town_merged_df[['Town', 'diagonal']].copy()
+    # fig = pf.add_town_names_trace(fig, df_town_names)
 
     fig.update_layout(map_layers=[dict(sourcetype='geojson',
                                           source=county_location_json,

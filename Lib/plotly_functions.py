@@ -215,6 +215,67 @@ def calculate_mapbox_zoom_center(bounds) -> (float, dict):
     return zoom, center
 
 
+def calculate_mapbox_zoom_center_from_diagonal(diagonal) -> (float, dict):
+    """calc zoom and center for plotly mapbox functions
+
+    Temporary solution awaiting official implementation, see:
+    https://github.com/plotly/plotly.js/issues/3434
+    """
+
+    diagonal_json = json.loads(diagonal)
+    point1 = diagonal_json['coordinates'][0]
+    point2 = diagonal_json['coordinates'][1]
+    x1, y1 = point1
+    x2, y2 = point2
+    x_center = (x1 + x2) / 2
+    y_center = (y1 + y2) / 2
+    center = dict(lat=y_center, lon=x_center)
+
+    min_lon = min(x1, x2)
+    max_lon = max(x1, x2)
+    min_lat = min(y1, y2)
+    max_lat = max(y1, y2)
+
+    # zoom = 10
+    y_range = distance.geodesic((min_lat, min_lon), (max_lat, min_lon)).kilometers
+    x_range = distance.geodesic((min_lat, min_lon), (min_lat, max_lon)).kilometers
+    #
+    # # does this work across the international date line?
+    # center = dict(lat=(min_lat + max_lat) / 2, lon=(min_lon + max_lon) / 2)
+    #
+    # figure out zoom
+    bound_by_y = y_range > x_range
+    if bound_by_y:
+        # in mercator the world's height is ~20,000 km
+        zoom = np.log2(20_000 / y_range)
+    else:
+        # in mercator the world's "width" is ~40,000km at the equator but shrinks as you near the poles
+        circumference_at_latitude = 40_000 * np.cos(np.abs(center['lat']) * np.pi / 180)
+        zoom = np.log2(circumference_at_latitude / x_range)
+
+    print(f'Reducing zoom by 10%')
+    zoom = zoom - .1 * zoom
+    return zoom, center
+
+
+def calculate_mapbox_center_from_diagonal(diagonal):
+    """calc zoom and center for plotly mapbox functions
+
+    Temporary solution awaiting official implementation, see:
+    https://github.com/plotly/plotly.js/issues/3434
+    """
+
+    diagonal_json = json.loads(diagonal)
+    point1 = diagonal_json['coordinates'][0]
+    point2 = diagonal_json['coordinates'][1]
+    x1, y1 = point1
+    x2, y2 = point2
+    x_center = (x1 + x2) / 2
+    y_center = (y1 + y2) / 2
+    # center = dict(lat=y_center, lon=x_center)
+
+    return pd.Series([y_center, x_center ], index=['lat', 'lon'])
+
 def sq_m_to_sq_miles(sq_m):
     return sq_m / 2589988.11
 
@@ -794,7 +855,7 @@ def add_county_trace(fig, gdf, max_val, min_val, data_value):
     )
 
 
-def create_trace_from_csv(base_fig, csv_file):
+def add_campgrounds_trace_from_csv(base_fig, csv_file):
     # bytes_data = csv_file.read()
     #
     # # Wrap bytes in a stream buffer and read it
@@ -842,3 +903,29 @@ def create_trace_from_csv(base_fig, csv_file):
     base_fig.add_trace(trace)
 
     return base_fig
+
+
+def add_town_names_trace(fig, df):
+    diagonal = df['diagonal'][0]
+    zoom, center = calculate_mapbox_zoom_center_from_diagonal(diagonal)
+    result = calculate_mapbox_center_from_diagonal(diagonal)
+    df[['lat', 'lon']] = df['diagonal'].apply(calculate_mapbox_center_from_diagonal)
+
+    text_size = 10
+    text_color = 'black'
+    fig.add_trace(go.Scattermap(
+        lat=df['lat'],
+        lon=df['lon'],
+        mode='text+markers',
+        text=df['Town'],
+        textposition='top center',
+        textfont=dict(
+            size=text_size,     # Font size in pixels
+            color=text_color,   # Text color
+            family='Arial'      # Font family
+        ),
+        visible=True,
+        name='Town Names'
+    ))
+
+    return fig
