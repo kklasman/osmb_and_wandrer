@@ -2901,8 +2901,7 @@ def clear_state_selectbox():
 
 def enable_make_map():
     if 'selected_map_type' in st.session_state:
-        if (ss['selected_state'] != None or ss['selected_region'] != None)\
-            and ss['selected_map_type'] != None and ss['selected_datavalue_for_map'] != None:
+        if (len(ss.selected_state) > 0 and ss['selected_region'] is not None) and ss.selected_map_type is not None:
             make_map_disable(False)
         else:
             make_map_disable(True)
@@ -3661,10 +3660,10 @@ def main():
     options = ['State', 'Counties', 'Towns', 'Seacoast Towns']
 
     if 'selected_region' not in st.session_state:
-        st.session_state.selected_region = 'All'
+        st.session_state.selected_region = ''
 
     if 'current_region' not in st.session_state:
-        st.session_state['current_region'] = 'All'
+        st.session_state['current_region'] = ''
 
     if 'wandrer_regions' not in st.session_state:
         ss.wandrer_regions = get_wandrer_regions()
@@ -3684,9 +3683,6 @@ def main():
     if 'current_fig' not in st.session_state:
         st.session_state.current_fig = {}
 
-    if 'selected_region' not in st.session_state:
-        st.session_state.selected_region = 'All'
-
     if 'update_county_btn' not in st.session_state:
         st.session_state.update_county_btn = False
 
@@ -3703,7 +3699,10 @@ def main():
         if st.button('Settings'):
             us.settings()
 
-        maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
+        if 'selected_map_type' not in st.session_state:
+            ss['selected_map_type'] = 'Towns'
+
+        maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type')
         st.session_state.selected_maptype = maptype_selectbox
         match maptype_selectbox:
             case 'State':
@@ -3726,14 +3725,27 @@ def main():
         # selection = tree_select(nodes=nodes)
         # st.write("Selected values:", selection['checked'])
 
-        region_selectbox = st.selectbox('Select a region:', region_list, key='selected_region', index=0, on_change=region_selected())
+        if len(ss.selected_region) ==  0:
+            ss.selected_region = 'New England Region (US)'
+
+        region_selected()
+        region_selectbox = st.selectbox('Select a region:', region_list, key='selected_region', on_change=region_selected())
 
         # state_selectbox = st.selectbox('Select a location (US State):', get_geojson_filenames_for_region().keys(), key='selected_state', index=None)
         selected_region_states = get_geojson_filenames_for_region()
+
+        if len(ss.selected_state) == 0 and ss.selected_region == 'New England Region (US)':
+            # only true at startup?
+            ss.selected_state = ['New Hampshire']
+
         state_selectbox = st.multiselect('Select a location (US State):', selected_region_states,
                                          key='selected_state', on_change=clear_selection_callback)
         # preserve_map_selection = st.checkbox('Clear map type selection on state change', key='preserve_map_selection')
         # maptype_selectbox = st.selectbox('Select a map type:', options, key='selected_map_type', index=None)
+
+        if 'selected_datavalue_for_map' not in st.session_state:
+            ss.selected_datavalue_for_map = 'Award Level'
+
         datavalue_selectbox = st.selectbox('Select a data value', data_values, key='selected_datavalue_for_map', index=None, on_change=enable_make_map())
         make_map = st.button('Generate map', key='make_map_btn', disabled=st.session_state.get("make_map_disable", True))
         if st.session_state.show_update_county_btn:
