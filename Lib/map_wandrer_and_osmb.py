@@ -10,7 +10,6 @@ import os
 import sqlite3
 import plotly
 import plotly.express as px
-import plotly_functions as pf
 import streamlit as st
 from streamlit import session_state as ss
 from streamlit_scroll_to_top import scroll_to_here
@@ -30,6 +29,7 @@ from pympler import asizeof
 # from streamlit-tree-select2 import streamlit_tree_select
 import math
 import tracemalloc
+import cache_to_disk_decorator as ctdd
 import user_settings as us
 import utilities as u
 import plotly_functions as pf
@@ -872,7 +872,8 @@ def convert_bounds_to_linestrings(source_gdf):
     #     print(item['geometry'])
 
 
-def create_town_map(town_gdf, state_list, maptype):
+@ctdd.cache_to_disk_session
+def create_town_map(town_gdf, state_list, maptype, data_value):
     # town_gdf = clean_gdf(town_gdf)
     # county_gdf = town_gdf.dissolve(by='County')
 
@@ -887,7 +888,7 @@ def create_town_map(town_gdf, state_list, maptype):
     state_gdf = county_gdf.dissolve('State')
     state_gdf.reset_index(inplace=True)
 
-    data_value = ss['selected_datavalue_for_map']
+    # data_value = ss['selected_datavalue_for_map']
 
     dissolved_town_gdf = town_gdf.dissolve(by='long_name')
     dissolved_town_gdf.reset_index(inplace=True)
@@ -3771,7 +3772,7 @@ def main():
         elif ss.selected_datavalue_for_map == 'Award Level':
             fig, gdf_pois = include_states_with_zero_data(fig, maptype_selectbox, region_selectbox, selected_region_states, state_selectbox)
         else:
-            fig = pf.create_choropleth_map_with_legend(state_selectbox)
+            fig = pf.create_choropleth_map_with_legend(state_selectbox, ss.selected_datavalue_for_map)
 
         # if fig:
         #     # 3. Use plotly_events to capture clicks
@@ -3894,9 +3895,9 @@ def include_states_with_zero_data(fig, maptype_selectbox, region_selectbox, sele
                 fig = create_county_map_v3(osm_county_gdf.copy(), state_selectbox)
             case 'Towns' | 'Seacoast Towns':
                 if ss.selected_datavalue_for_map:
-                    fig = create_town_map(osm_gdf.copy(), state_selectbox, maptype_selectbox)
+                    fig = create_town_map(osm_gdf.copy(), state_selectbox, maptype_selectbox, ss.selected_datavalue_for_map)
                 else:
-                    fig = pf.create_choropleth_map_with_legend(get_geojson_filename(state_selectbox))
+                    fig = pf.create_choropleth_map_with_legend(get_geojson_filename(state_selectbox), ss.selected_datavalue_for_map)
     else:
         state_list = []
         if st.session_state.selected_region.startswith('All'):

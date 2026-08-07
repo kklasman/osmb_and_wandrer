@@ -16,6 +16,7 @@ from shapely.geometry import Point
 import utilities as u
 import wandrer_database as wd
 # from area import area
+import cache_to_disk_decorator as ctdd
 
 max_50_pct_color_scale = ['white', 'gold', 'red']
 
@@ -280,16 +281,20 @@ def sq_m_to_sq_miles(sq_m):
     return sq_m / 2589988.11
 
 
-def create_choropleth_map_with_legend(state_list):
+@ctdd.cache_to_disk_session
+def create_choropleth_map_with_legend(state_list, data_value):
     # st.write("filename:", geojson_file)
     # ss.gdfs = {}
 
     fig = go.Figure()
 
-    data_value = ss.selected_datavalue_for_map
+    # data_value = ss.selected_datavalue_for_map
 
     gdf = gf.get_geopandas_df_for_region(state_list)
     gdf.set_crs("EPSG:4326", inplace=True)
+
+    if gdf.geom_type.isin(['LineString']).any():
+        gdf = gf.combine_linestrings_into_polygons(gdf, 'Town')
 
     nf = 'New England National Forests.geojson'
     # nf = 'GMNF-edited_split_to_file.geojson'
@@ -405,7 +410,8 @@ def create_choropleth_map_with_legend(state_list):
         # gdf_towns['long_name'] = gdf_towns['long_name'].str.replace('_', '-')
         # town_merged_df = gdf_towns.merge(wandrerer_df, on=['long_name', 'State','County', 'Town'])
         # prefer fields from left df because right has null osm_id. Both have diagonal.
-        town_merged_df = pd.merge(gdf_towns, wandrerer_df, on=['long_name', 'State','County', 'Town'], how='left', suffixes=(None, '_r'))
+        town_merged_df = pd.merge(gdf_towns, wandrerer_df, on=['long_name'], how='left', suffixes=(None, '_r'))
+        # town_merged_df = pd.merge(gdf_towns, wandrerer_df, on=['long_name', 'State','County', 'Town'], how='left', suffixes=(None, '_r'))
         town_merged_df.drop('osm_id', axis=1, inplace=True, errors='ignore')
         suffix_to_drop = '_r'
         cols_to_drop = [col for col in town_merged_df.columns if col.endswith(suffix_to_drop)]
