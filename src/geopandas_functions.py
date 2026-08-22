@@ -158,7 +158,7 @@ def get_geopandas_df_for_state(selected_state, file_path=None):
         #     county_gdf, gdf = normalize_geojson(selected_state, gdf)
 
         columns_to_drop = gdf.select_dtypes(include=['datetime64']).columns
-        gdf.drop(columns=columns_to_drop, axis=1, inplace=True)
+        gdf.drop(columns=columns_to_drop, inplace=True)
 
         current_gdf_size = asizeof.asizeof(gdf)
         lf.logger.info(f'Creating geopandas df for {selected_state}, size: {current_gdf_size:,} bytes from {file_path}')

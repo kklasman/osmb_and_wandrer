@@ -8,7 +8,7 @@ def get_wandrer_totals_for_towns_for_state(states):
         , CASE WHEN town.Town = "Unincorporated" THEN town.Town || " " || town.County ELSE town.Town END as Town
 		, town.County as LongCounty, town.long_name, town.long_county
 		--, town.detail_parent_arena_id as CountyParentArenaId
-		, town.arena_id as Wandrer_Id, town.detail_parent_arena_id as Wandrer_Parent_Id
+		, town.detail_id as Wandrer_Id, town.detail_parent_arena_id as Wandrer_Parent_Id
 		, round(town.length, 7) as TotalMiles
 		, round(town.percentage, 7) as ActualPct, round(town.ActualLength, 7) as ActualMiles
 		, round(town.Pct10, 7) as Pct10, round(town.Pct25, 7) as Pct25, round(town.Pct50, 7) as Pct50
@@ -33,7 +33,7 @@ def get_wandrer_totals_for_towns_for_state(states):
         , round(town.Pct90Deficit, 7) as Pct90Deficit
 		, abh.geometries_visible, abh.diagonal, town.user_id, abh.seacoast, abh.osm_id, abh.update_datetime
         from vw_current_town_data_v2 town
-		inner join arena_badge_header abh on abh.id = town.arena_id 
+		inner join arena_badge_header abh on abh.id = town.detail_id 
         where town.state in {in_statement}
         order by 'Award Level', town.region, town.country, town.state, town.county, town.Town
     '''

@@ -451,11 +451,11 @@ def create_county_map_v2(source_osm_df, state):
 
     convert_bounds_to_linestrings(county_gdf)
 
-# source_osm_df.drop(list(source_osm_df.filter(regex='NHD:')), axis=1, inplace=True)
+# source_osm_df.drop(list(source_osm_df.filter(regex='NHD:')), inplace=True)
 
     state_gdf = source_osm_df.dissolve(by='State')
     columns_to_drop = state_gdf.select_dtypes(include=['datetime64']).columns
-    state_gdf.drop(columns=columns_to_drop, axis=1, inplace=True)
+    state_gdf.drop(columns=columns_to_drop, inplace=True)
     state_boundary_json = json.loads(state_gdf.to_json())
 
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
@@ -481,14 +481,14 @@ def create_county_map_v2(source_osm_df, state):
     merged_raw_df = county_gdf.merge(wandrerer_df, on=['long_county'], suffixes=('', '_r'))
     cols_to_drop = [col for col in merged_raw_df.columns if col.endswith('_r')]
     merged_df = merged_raw_df.drop(columns=cols_to_drop)
-    merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
-    # merged_df.drop(list(merged_df.filter(regex='NHD:')), axis=1, inplace=True)
+    merged_df.drop(get_unneeded_column_names(), inplace=True, errors='ignore')
+    # merged_df.drop(list(merged_df.filter(regex='NHD:')), inplace=True)
     # columns_to_drop = merged_df.select_dtypes(include=['datetime64']).columns
-    # merged_df.drop(columns=columns_to_drop, axis=1, inplace=True)
-    # final_df = merged_df.drop(['County'], axis=1, errors='ignore')
+    # merged_df.drop(columns=columns_to_drop, inplace=True)
+    # final_df = merged_df.drop(['County'], errors='ignore')
     # final_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
     location_json = json.loads(merged_df.to_json())
-    merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+    merged_df.drop(['geometry'], inplace=True, errors='ignore')
     # template = create_template(merged_df, ['County', 'TotalTowns', 'TotalCountyMiles', 'TotalTownMiles', 'CountyUnincorporatedMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     template_fields = get_template_field_list_for_county_scope_map(merged_df)
 
@@ -556,11 +556,11 @@ def create_county_map_v3(source_osm_df, state):
 
     convert_bounds_to_linestrings(county_gdf)
 
-# source_osm_df.drop(list(source_osm_df.filter(regex='NHD:')), axis=1, inplace=True)
+# source_osm_df.drop(list(source_osm_df.filter(regex='NHD:')), inplace=True)
 
     state_gdf = source_osm_df.dissolve(by='State')
     columns_to_drop = state_gdf.select_dtypes(include=['datetime64']).columns
-    state_gdf.drop(columns=columns_to_drop, axis=1, inplace=True)
+    state_gdf.drop(columns=columns_to_drop, inplace=True)
     state_boundary_json = json.loads(state_gdf.to_json())
 
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
@@ -581,14 +581,14 @@ def create_county_map_v3(source_osm_df, state):
     # wandrerer_df.rename(columns={'County': 'long_county'}, inplace=True)
     # wandrerer_df['County'] = wandrerer_df['long_county'].str.replace(' County', '')
     merged_df = county_gdf.merge(wandrerer_df, on=['State','County', 'long_county'])
-    merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
-    # merged_df.drop(list(merged_df.filter(regex='NHD:')), axis=1, inplace=True)
+    merged_df.drop(get_unneeded_column_names(), inplace=True, errors='ignore')
+    # merged_df.drop(list(merged_df.filter(regex='NHD:')), inplace=True)
     # columns_to_drop = merged_df.select_dtypes(include=['datetime64']).columns
-    # merged_df.drop(columns=columns_to_drop, axis=1, inplace=True)
-    # final_df = merged_df.drop(['County'], axis=1, errors='ignore')
+    # merged_df.drop(columns=columns_to_drop, inplace=True)
+    # final_df = merged_df.drop(['County'], errors='ignore')
     # final_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
     location_json = json.loads(merged_df.to_json())
-    merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+    merged_df.drop(['geometry'], inplace=True, errors='ignore')
     # template = create_template(merged_df, ['County', 'TotalTowns', 'TotalCountyMiles', 'TotalTownMiles', 'CountyUnincorporatedMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     template_fields = get_template_field_list_for_county_scope_map(merged_df)
 
@@ -656,11 +656,11 @@ def create_county_trace(fig, source_osm_df, state):
 
     convert_bounds_to_linestrings(county_gdf)
 
-# source_osm_df.drop(list(source_osm_df.filter(regex='NHD:')), axis=1, inplace=True)
+# source_osm_df.drop(list(source_osm_df.filter(regex='NHD:')), inplace=True)
 
     state_gdf = source_osm_df.dissolve(by='State')
     columns_to_drop = state_gdf.select_dtypes(include=['datetime64']).columns
-    state_gdf.drop(columns=columns_to_drop, axis=1, inplace=True)
+    state_gdf.drop(columns=columns_to_drop, inplace=True)
     state_boundary_json = json.loads(state_gdf.to_json())
 
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
@@ -671,9 +671,9 @@ def create_county_trace(fig, source_osm_df, state):
     data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
 
     merged_df = county_gdf.merge(wandrerer_df, on=['State','County', 'long_county'])
-    merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+    merged_df.drop(get_unneeded_column_names(), inplace=True, errors='ignore')
     location_json = json.loads(merged_df.to_json())
-    merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+    merged_df.drop(['geometry'], inplace=True, errors='ignore')
     # template = create_template(merged_df, ['County', 'TotalTowns', 'TotalCountyMiles', 'TotalTownMiles', 'CountyUnincorporatedMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
     template_fields = get_template_field_list_for_county_scope_map(merged_df)
 
@@ -741,11 +741,11 @@ def create_county_trace(fig, source_osm_df, state):
 #
 #     convert_bounds_to_linestrings(county_gdf)
 #
-#     source_osm_df.drop(list(source_osm_df.filter(regex='NHD:')), axis=1, inplace=True)
+#     source_osm_df.drop(list(source_osm_df.filter(regex='NHD:')), inplace=True)
 #
 #     state_gdf = source_osm_df.dissolve(by='State')
 #     columns_to_drop = state_gdf.select_dtypes(include=['datetime64']).columns
-#     state_gdf.drop(columns=columns_to_drop, axis=1, inplace=True)
+#     state_gdf.drop(columns=columns_to_drop, inplace=True)
 #     state_boundary_json = json.loads(state_gdf.to_json())
 #
 #     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
@@ -763,14 +763,14 @@ def create_county_trace(fig, source_osm_df, state):
 #
 #     # print(wandrerer_df)
 #     merged_df = county_gdf.merge(unincorporated_df, on=['State','County'])
-#     # merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
-#     merged_df.drop(list(merged_df.filter(regex='NHD:')), axis=1, inplace=True)
+#     # merged_df.drop(get_unneeded_column_names(), inplace=True, errors='ignore')
+#     merged_df.drop(list(merged_df.filter(regex='NHD:')), inplace=True)
 #     columns_to_drop = merged_df.select_dtypes(include=['datetime64']).columns
-#     merged_df.drop(columns=columns_to_drop, axis=1, inplace=True)
-#     final_df = merged_df.drop(['County'], axis=1, errors='ignore')
+#     merged_df.drop(columns=columns_to_drop, inplace=True)
+#     final_df = merged_df.drop(['County'], errors='ignore')
 #     final_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
 #     location_json = json.loads(merged_df.to_json())
-#     merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+#     merged_df.drop(['geometry'], inplace=True, errors='ignore')
 #     # template = create_template(merged_df, ['County', 'TotalTowns', 'TotalCountyMiles', 'TotalTownMiles', 'CountyUnincorporatedMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
 #     template_fields = get_template_field_list_for_county_scope_map(merged_df)
 #
@@ -901,11 +901,11 @@ def create_town_map(town_gdf, state_list, maptype, data_value):
     if data_value == 'ActualMiles > 1':
         data_value =  'ActualMiles'
     merged_county_df = county_gdf.merge(wandrerer_county_df, on=['State','County','long_county'])
-    merged_county_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+    merged_county_df.drop(get_unneeded_column_names(), inplace=True, errors='ignore')
     columns_to_drop = merged_county_df.select_dtypes(include=['datetime64']).columns
-    merged_county_df.drop(columns=columns_to_drop, axis=1, inplace=True)
+    merged_county_df.drop(columns=columns_to_drop, inplace=True)
     county_location_json = json.loads(merged_county_df.to_json())
-    merged_county_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+    merged_county_df.drop(['geometry'], inplace=True, errors='ignore')
     merged_county_df['always_zero'] = 0
     template_fields = ['State', 'County', 'TotalTowns', 'TotalTownMiles', 'ActualMiles', 'ActualPct']
     if any(merged_county_df['UnincorporatedMiles'] > 0):
@@ -948,9 +948,9 @@ def create_town_map(town_gdf, state_list, maptype, data_value):
     # town_merged_df = dissolved_town_gdf.merge(wandrerer_df, on=['State','County','Town','long_name'])
 
     if wandrerer_df['diagonal'].isnull().any():
-        wandrerer_df.drop('diagonal', axis=1, inplace=True, errors='ignore')
+        wandrerer_df.drop('diagonal', inplace=True, errors='ignore')
     elif dissolved_town_gdf['diagonal'].isnull().any():
-        dissolved_town_gdf.drop('diagonal', axis=1, inplace=True, errors='ignore')
+        dissolved_town_gdf.drop('diagonal', inplace=True, errors='ignore')
     else:
         logger.info(f'Both wandrerer_df and dissolved_town_gdf have diagonal values for {state_list} towns')
 
@@ -962,7 +962,7 @@ def create_town_map(town_gdf, state_list, maptype, data_value):
         town_merged_df = dissolved_town_gdf.merge(wandrerer_df, on=['long_name', 'State','County', 'Town'])
         # prefer fields from left df because right has null osm_id. Both have diagonal.
         town_merged_df = pd.merge(dissolved_town_gdf, wandrerer_df, on=['long_name', 'State','County', 'Town'], how='left', suffixes=(None, '_r'))
-        town_merged_df.drop('osm_id', axis=1, inplace=True, errors='ignore')
+        town_merged_df.drop('osm_id', inplace=True, errors='ignore')
         suffix_to_drop = '_r'
         cols_to_drop = [col for col in town_merged_df.columns if col.endswith(suffix_to_drop)]
         town_merged_df.drop(columns=cols_to_drop, inplace=True)
@@ -983,14 +983,14 @@ def create_town_map(town_gdf, state_list, maptype, data_value):
 
     # # unincorporated_df = wandrerer_df[wandrerer_df['Town'] == 'Unincorporated']
     # unincorporated_df = wandrerer_df[wandrerer_df['Town'].str.startswith('Unincorporated')]
-    # unincorporated_df.drop(['diagonal', 'osm_id'], axis=1, inplace=True, errors='ignore')
+    # unincorporated_df.drop(['diagonal', 'osm_id'], inplace=True, errors='ignore')
     # county_filtered_gdf = county_gdf.copy()
-    # county_filtered_gdf.drop(['Town', 'long_name'], axis=1, inplace=True, errors='ignore')
+    # county_filtered_gdf.drop(['Town', 'long_name'], inplace=True, errors='ignore')
     #
     # # town_unincorporated_merged_df = town_merged_df.merge(unincorporated_merged_df, on=['State','County'])
     # # unincorporated_merged_df = unincorporated_df.merge(county_filtered_gdf, on=['State','County'])
     # unincorporated_merged_df = unincorporated_df.merge(county_filtered_gdf, on=['State', 'County'])
-    # # unincorporated_merged_df.drop(['diagonal_x'], axis=1, inplace=True, errors='ignore')
+    # # unincorporated_merged_df.drop(['diagonal_x'], inplace=True, errors='ignore')
     # # rename_column_case_insensitive(unincorporated_merged_df, 'diagonal_y', 'diagonal')
     #
     # # town_unincorporated_appended_df = pd.concat([town_merged_df, unincorporated_merged_df])
@@ -998,7 +998,7 @@ def create_town_map(town_gdf, state_list, maptype, data_value):
     # # county_z_max = float(town_merged_df[data_value].max()) if float(town_merged_df[data_value].max()) > 0 else float(town_merged_df['TotalMiles'].max())
     # # if len(unincorporated_merged_df) > 0:
     # #     county_location_json = json.loads(unincorporated_merged_df.to_json())
-    # #     unincorporated_merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+    # #     unincorporated_merged_df.drop(['geometry'], inplace=True, errors='ignore')
     # #     unincorporated_merged_df['always_zero'] = 0
     # #     merged_county_df = unincorporated_merged_df
     # #     county_template = create_template(merged_county_df, ['County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
@@ -1052,14 +1052,14 @@ def create_town_map(town_gdf, state_list, maptype, data_value):
 
     # # location_json = json.loads(town_merged_df.to_json())
     # columns_to_drop = town_unincorporated_appended_df.select_dtypes(include=['datetime64']).columns
-    # town_unincorporated_appended_df.drop(columns=columns_to_drop, axis=1, inplace=True)
+    # town_unincorporated_appended_df.drop(columns=columns_to_drop, inplace=True)
     # town_unincorporated_appended_df.reset_index(drop=True, inplace=True)
-    location_df = town_merged_df.drop('diagonal', axis=1, errors='ignore')
+    location_df = town_merged_df.drop('diagonal', errors='ignore')
     location_json = json.loads(location_df.to_json())
     # location_json = json.loads(town_merged_df.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
-    town_merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
-    # town_unincorporated_appended_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+    town_merged_df.drop(['geometry'], inplace=True, errors='ignore')
+    # town_unincorporated_appended_df.drop(['geometry'], inplace=True, errors='ignore')
     # # z_max = float(town_merged_df[data_value].max()) if float(town_merged_df[data_value].max()) > 0 else float(town_merged_df['TotalMiles'].max())
     # # z_max_raw = float(town_unincorporated_appended_df[data_value].max()) \
     # #     if float(town_unincorporated_appended_df[data_value].max()) > 0 \
@@ -1489,9 +1489,9 @@ def dump_town_misses_and_matches(state, town_gdf, wandrerer_df):
 #     wandrerer_county_df = get_wandrer_totals_for_counties_for_states(state_list)
 #     data_value, wandrerer_county_df = filter_wandrerer_df(wandrerer_county_df)
 #     merged_county_df = county_gdf.merge(wandrerer_county_df, on=['State','County'])
-#     merged_county_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+#     merged_county_df.drop(get_unneeded_column_names(), inplace=True, errors='ignore')
 #     county_location_json = json.loads(merged_county_df.to_json())
-#     merged_county_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+#     merged_county_df.drop(['geometry'], inplace=True, errors='ignore')
 #     merged_county_df['always_zero'] = 0
 #     # county_template = create_template(merged_county_df, ['County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
 #     if any(merged_county_df['UnincorporatedMiles'] > 0):
@@ -1539,23 +1539,23 @@ def dump_town_misses_and_matches(state, town_gdf, wandrerer_df):
 #     unincorporated_df = wandrerer_df[wandrerer_df['Town'] == 'Unincorporated']
 #     # county_filtered_gdf = county_gdf[county_gdf['state_county'] == 'south_carolina_georgetown']
 #     county_filtered_gdf = county_gdf.copy()
-#     county_filtered_gdf.drop(['Town', 'long_name'], axis=1, inplace=True, errors='ignore')
+#     county_filtered_gdf.drop(['Town', 'long_name'], inplace=True, errors='ignore')
 #     # county_filtered_gdf.reset_index(inplace=True)
 #     # unincorporated_df.reset_index(inplace=True)
 #     # unincorporated_merged_df = county_filtered_gdf.merge(unincorporated_df, on=['State','County','Town','long_name'])
 #     unincorporated_merged_df = county_filtered_gdf.merge(unincorporated_df, on=['State','County'])
 #     if len(unincorporated_merged_df) > 0:
 #         county_location_json = json.loads(unincorporated_merged_df.to_json())
-#         unincorporated_merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+#         unincorporated_merged_df.drop(['geometry'], inplace=True, errors='ignore')
 #         unincorporated_merged_df['always_zero'] = 0
 #         merged_county_df = unincorporated_merged_df
 #         county_template = create_template(merged_county_df, ['County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
 #
 #     location_json = json.loads(town_merged_df.to_json())
 #     # county_location_json = json.loads(county_gdf.to_json())
-#     # county_gdf.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+#     # county_gdf.drop(['geometry'] inplace=True, errors='ignore')
 #     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
-#     town_merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+#     town_merged_df.drop(['geometry'] inplace=True, errors='ignore')
 #     # town_merged_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
 #     # county_template = create_template(county_gdf, ['County', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit', 'Pct25Deficit'])
 #     # county_gdf['TotalMiles'] = 0
@@ -1632,7 +1632,7 @@ def create_region_by_town_map(source_osm_df, region):
     state_gdf = {}
     # data_value = ss['selected_datavalue_for_map']
 
-    source_osm_df.drop(['tags'], axis=1, inplace=True, errors='ignore')
+    source_osm_df.drop(['tags'], inplace=True, errors='ignore')
     state_list = source_osm_df['State'].unique().tolist()
     for item in state_list:
         print(f'{item=}')
@@ -1667,7 +1667,7 @@ def create_region_by_town_map(source_osm_df, region):
     # Drop non columns from Vermont geojson file
     towns_gdf['lcase_town'] = towns_gdf['Town'].str.lower() # required for merge with Wandrer data
     # towns_gdf['long_name'] = towns_gdf['Town'].str.lower() # required for merge with Wandrer data
-    towns_gdf.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+    towns_gdf.drop(get_unneeded_column_names(), inplace=True, errors='ignore')
 
     wandrerer_df = get_wandrer_totals_for_towns_for_state(state_gdf['State'].to_list())
     data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
@@ -1704,19 +1704,19 @@ def create_region_by_town_map(source_osm_df, region):
         town_merged_df.rename(columns={'diagonal_x': 'diagonal'}, inplace=True)
 
     town_merged_df.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng', 'Town_y', 'diagonal_y'
-                            ,'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'], axis=1, inplace=True, errors='ignore')
+                            ,'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'], inplace=True, errors='ignore')
 
     county_gdf.drop(['name_en', 'label_node_id', 'label_node_lat', 'label_node_lng'
-                        ,'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'], axis=1, inplace=True, errors='ignore')
+                        ,'admin_centre_node_id', 'admin_centre_node_lat', 'admin_centre_node_lng'], inplace=True, errors='ignore')
     # location_json = json.loads(town_merged_df.to_json())
     # county_location_json = json.loads(county_gdf.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
-    # town_merged_df.drop(['tags', 'geometry','lcase_town','arena_id','County','COUNTY'], axis=1, inplace=True, errors='ignore')
+    # town_merged_df.drop(['tags', 'geometry','lcase_town','arena_id','County','COUNTY'], inplace=True, errors='ignore')
     # town_merged_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
 
     location_gdf = town_merged_df.drop(['TotalMiles','ActualPct','ActualMiles','Pct10','Pct25','Pct50','Pct75','Pct90','awarded'
                                            ,'Pct10Deficit','Pct25Deficit','Pct50Deficit','Pct75Deficit','Pct90Deficit', 'diagonal']
-                                       , axis=1, errors='ignore')
+                                       , errors='ignore')
     location_json = json.loads(location_gdf.to_json())
     # location_json = location_gdf.to_json()
     with open("location.json", "w") as f:
@@ -1740,7 +1740,7 @@ def create_region_by_town_map(source_osm_df, region):
         z_max = float(town_merged_df[data_value].max()) if float(town_merged_df[data_value].max()) > 0 else float(town_merged_df['TotalMiles'].max())
 
     county_location_json = json.loads(county_gdf.to_json())
-    town_merged_df.drop(['tags','lcase_town','arena_id','COUNTY','geometry'], axis=1, inplace=True, errors='ignore')
+    town_merged_df.drop(['tags','lcase_town','arena_id','COUNTY','geometry'], inplace=True, errors='ignore')
     template = create_template(town_merged_df, ['State','County','Town','TotalMiles','ActualMiles','ActualPct','Pct10Deficit','Pct25Deficit'])
 
     st.session_state['map_gdf'] = town_merged_df
@@ -1793,15 +1793,15 @@ def create_state_map(source_osm_df, state):
 
     wandrerer_df = get_wandrer_totals_for_state(state)
     state_merged_df = state_gdf.merge(wandrerer_df, on='State')
-    # state_merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
-    state_merged_df.drop(['County','Town'], axis=1, inplace=True, errors='ignore')
-    state_merged_df.drop(list(state_merged_df.filter(regex='NHD:')), axis=1, inplace=True)
+    # state_merged_df.drop(get_unneeded_column_names(), inplace=True, errors='ignore')
+    state_merged_df.drop(['County','Town'], inplace=True, errors='ignore')
+    state_merged_df.drop(list(state_merged_df.filter(regex='NHD:')), inplace=True)
     columns_to_drop = state_merged_df.select_dtypes(include=['datetime64']).columns
-    state_merged_df.drop(columns=columns_to_drop, axis=1, inplace=True)
+    state_merged_df.drop(columns=columns_to_drop, inplace=True)
     location_json = json.loads(state_merged_df.to_json())
     # county_location_json = json.loads(county_gdf.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
-    state_merged_df.drop(['geometry'], axis=1, inplace=True, errors='ignore')
+    state_merged_df.drop(['geometry'], inplace=True, errors='ignore')
     # template = create_template(state_merged_df, ['State', 'TotalTowns', 'TotalTownMiles', 'ActualTownMiles', 'ActualTownPct', 'Pct10Deficit', 'Pct25Deficit'])
 
     template_fields = ['State', 'TotalTowns', 'CycledTowns', 'PctTownsCycled',
@@ -1890,7 +1890,7 @@ def add_poi_trace(fig, state, filename):
     gdf = polygons_only(gdf)
     # location_json =gdf.to_json()
     location_json = json.loads(gdf.to_json())
-    gdf_no_geometry = gdf.drop(['geometry'], axis=1, errors='ignore')
+    gdf_no_geometry = gdf.drop(['geometry'], errors='ignore')
 
     gdf_no_geometry['z_value'] = 2
 
@@ -1956,11 +1956,11 @@ def create_region_map(source_osm_df, region):
 
     data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
     state_merged_df = state_gdf.merge(wandrerer_df, on='State')
-    # state_merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+    # state_merged_df.drop(get_unneeded_column_names(), inplace=True, errors='ignore')
 
     location_json = json.loads(state_merged_df.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_merged_df.bounds)
-    state_merged_df.drop(['tags', 'geometry','COUNTY','name','Town'], axis=1, inplace=True, errors='ignore')
+    state_merged_df.drop(['tags', 'geometry','COUNTY','name','Town'], inplace=True, errors='ignore')
 
     template_fields = get_template_field_list_for_state_scope_map(state_merged_df)
     template = create_template(state_merged_df, template_fields)
@@ -2063,11 +2063,11 @@ def create_region_map_v2():
 
     data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
     state_merged_df = states_gdf.merge(wandrerer_df, on='State')
-    # state_merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+    # state_merged_df.drop(get_unneeded_column_names(), inplace=True, errors='ignore')
 
     location_json = json.loads(state_merged_df.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_merged_df.bounds)
-    state_merged_df.drop(['tags', 'geometry','COUNTY','name','Town'], axis=1, inplace=True, errors='ignore')
+    state_merged_df.drop(['tags', 'geometry','COUNTY','name','Town'], inplace=True, errors='ignore')
 
     template_fields = get_template_field_list_for_state_scope_map(state_merged_df)
     template = create_template(state_merged_df, template_fields)
@@ -2135,12 +2135,12 @@ def create_region_by_county_map(source_osm_df, region):
     data_value, wandrerer_df = filter_wandrerer_df(wandrerer_df)
 
     merged_df = source_osm_df.merge(wandrerer_df, on=['State', 'County'])
-    merged_df.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+    merged_df.drop(get_unneeded_column_names(), inplace=True, errors='ignore')
     state_location_json = json.loads(state_gdf.to_json())
     location_json = json.loads(merged_df.to_json())
     zoom, center = calculate_mapbox_zoom_center(state_gdf.bounds)
-    # merged_df.drop(['tags', 'geometry','Town','County'], axis=1, inplace=True, errors='ignore')
-    merged_df.drop(['tags', 'geometry'], axis=1, inplace=True, errors='ignore')
+    # merged_df.drop(['tags', 'geometry','Town','County'], inplace=True, errors='ignore')
+    merged_df.drop(['tags', 'geometry'], inplace=True, errors='ignore')
     # merged_df.rename(columns={'ShortCounty': 'County'}, inplace=True)
     template_fields = get_template_field_list_for_county_scope_map(merged_df)
 
@@ -2967,7 +2967,7 @@ def get_geopandas_df_for_state(selected_state):
             county_gdf, gdf = normalize_geojson(selected_state, gdf)
 
         columns_to_drop = gdf.select_dtypes(include=['datetime64']).columns
-        gdf.drop(columns=columns_to_drop, axis=1, inplace=True)
+        gdf.drop(columns=columns_to_drop, inplace=True)
 
         current_gdf_size = asizeof.asizeof(gdf)
         logger.info(f'Creating geopandas df for {selected_state}, size: {current_gdf_size:,} bytes from {file_path}')
@@ -2995,7 +2995,7 @@ def get_poi_gdf_for_filename(file_path):
     #     county_gdf, gdf = normalize_geojson(selected_state, gdf)
 
     columns_to_drop = gdf.select_dtypes(include=['datetime64']).columns
-    gdf.drop(columns=columns_to_drop, axis=1, inplace=True)
+    gdf.drop(columns=columns_to_drop, inplace=True)
 
     current_gdf_size = asizeof.asizeof(gdf)
     logger.info(f'Creating geopandas df from {file_path}, size: {current_gdf_size:,} bytes')
@@ -3028,7 +3028,7 @@ def get_geopandas_df_for_region(state_list):
                 county_gdf = create_county_gdf(gdf)
 
             # county_gdf['state_county'] = state + '_' + county_gdf['County'].str.replace(' County', '')
-            # county_gdf.drop(['Town'], axis=1, inplace=True, errors='ignore')
+            # county_gdf.drop(['Town'], inplace=True, errors='ignore')
             # if ~column_exists_case_insensitive(gdf, 'normalized'):
             #     gdf['normalized'] = 'Y'
             # outfile = f'{state}_location.json'
@@ -3070,22 +3070,22 @@ def normalize_geojson(state, gdf):
     if not column_exists_case_insensitive(gdf, 'admin_level'):
         rename_column_case_insensitive(gdf, 'COUNTY', 'County')
         rename_column_case_insensitive(gdf, 'TOWN', 'Town')
-        gdf['Town'] = gdf.apply(lambda x: to_jaden_case(x['Town']), axis=1)
-        gdf['County'] = gdf.apply(lambda x: to_jaden_case(x['County']), axis=1)
+        gdf['Town'] = gdf.apply(lambda x: to_jaden_case(x['Town']))
+        gdf['County'] = gdf.apply(lambda x: to_jaden_case(x['County']))
         # gdf['Town'] = gdf['Town'].apply(to_jaden_case(gdf['Town']))
         # gdf['County'] = gdf['County'].apply(to_jaden_case(gdf['County']))
 
         gdf_none = gdf[gdf['County'].isnull()]
         gdf_not_none = gdf[~gdf['County'].isnull()]
 
-        gdf.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
+        gdf.drop(get_unneeded_column_names(), inplace=True, errors='ignore')
         # if not column_exists_case_insensitive(gdf, 'long_name'):
         # It's OK ot overwrite long_name as we've changed the inputs to it.
 
         if len(gdf_none) > 0:
             wandrer_df = get_wandrer_data_for_county_merge(state)
             wandrer_df_merged = gdf_none.merge(wandrer_df, on=['State','Town'])
-            wandrer_df_merged.drop(['County_x', 'long_name_x', 'long_county_x', 'long_county_y'], axis=1, inplace=True,
+            wandrer_df_merged.drop(['County_x', 'long_name_x', 'long_county_x', 'long_county_y'], inplace=True,
                                    errors='ignore')
             rename_column_case_insensitive(wandrer_df_merged, 'County_y', 'County')
             rename_column_case_insensitive(wandrer_df_merged, 'long_name_y', 'long_name')
@@ -3115,7 +3115,7 @@ def normalize_geojson(state, gdf):
 
         county_gdf = create_county_gdf(gdf)
         county_gdf['state_county'] = state + '_' + county_gdf['County'].str.replace(' County', '')
-        county_gdf.drop(['Town'], axis=1, inplace=True, errors='ignore')
+        county_gdf.drop(['Town'], inplace=True, errors='ignore')
     else:
         # gdf['State'] = state
         df_dict = {sale_v: gdf[gdf['admin_level'] == sale_v] for sale_v in gdf['admin_level'].unique()}
@@ -3137,9 +3137,9 @@ def normalize_geojson(state, gdf):
             # wandrer_df['County'] = wandrer_df['County'].str.replace(' County', '')
             # rename_column_case_insensitive(wandrer_df_merged, 'State_x', 'State')
 
-            wandrer_df_merged.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
-            wandrer_df_merged.drop(['tags', 'admin_level', 'State_y'], axis=1, inplace=True, errors='ignore')
-            # wandrer_df_merged.drop('admin_level', axis=1, inplace=True, errors='ignore')
+            wandrer_df_merged.drop(get_unneeded_column_names(), inplace=True, errors='ignore')
+            wandrer_df_merged.drop(['tags', 'admin_level', 'State_y'], inplace=True, errors='ignore')
+            # wandrer_df_merged.drop('admin_level', inplace=True, errors='ignore')
             # rename_column_case_insensitive(wandrer_df_merged, 'name', 'Town')
             if ~column_exists_case_insensitive(wandrer_df_merged, 'normalized'):
                 wandrer_df_merged['normalized'] = 'Y'
@@ -3153,9 +3153,9 @@ def normalize_geojson(state, gdf):
         # wandrer_df = get_wandrer_totals_for_towns_for_state(state)
         # wandrer_df_merged = wandrer_df.merge(df_dict[8], on='Town')
         # wandrer_df_merged = df_dict[8].merge(wandrer_df, on='Town')
-        # wandrer_df_merged.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
-        # wandrer_df_merged.drop(['tags','admin_level'], axis=1, inplace=True, errors='ignore')
-        # wandrer_df_merged.drop('admin_level', axis=1, inplace=True, errors='ignore')
+        # wandrer_df_merged.drop(get_unneeded_column_names(), inplace=True, errors='ignore')
+        # wandrer_df_merged.drop(['tags','admin_level'], inplace=True, errors='ignore')
+        # wandrer_df_merged.drop('admin_level', inplace=True, errors='ignore')
         # location_json = orjson.loads(wandrer_df_merged.to_json())
         # outfile = f'{state}_location.json'
         # wandrer_df_merged.to_file(outfile, driver="GeoJSON")
@@ -3166,8 +3166,8 @@ def normalize_geojson(state, gdf):
         rename_column_case_insensitive(county_gdf, 'name', 'County')
         county_gdf['State'] = state
         county_gdf['state_county'] = state + '_' + county_gdf['County'].str.replace(' County', '')
-        county_gdf.drop(get_unneeded_column_names(), axis=1, inplace=True, errors='ignore')
-        county_gdf.drop(['admin_level'], axis=1, inplace=True, errors='ignore')
+        county_gdf.drop(get_unneeded_column_names(), inplace=True, errors='ignore')
+        county_gdf.drop(['admin_level'], inplace=True, errors='ignore')
     return county_gdf, gdf
 
 
@@ -3530,8 +3530,9 @@ st.html(
     '''
 )
 
+
 @st.dialog("Login")
-def login():
+def login_dialog():
     st.write("Login for full access or Cancel to for normal access.")
     password = st.text_input('password', autocomplete="off", type='password', )
     col1, col2 = st.columns(2)
@@ -4178,7 +4179,7 @@ def update_county_data():
     #                                                                                       county_parent_arena_id,
     #                                                                                       'town', athlete_id)
     # town_df.drop_duplicates()
-    town_df.drop('icon', axis=1, inplace=True)
+    town_df.drop('icon', inplace=True)
     town_df['parent_arena_id'] = county_parent_arena_id
     town_message = f'Upserting towns for {county_row["County"]} County'
 
@@ -4217,7 +4218,7 @@ if "startup_msg_displayed" not in st.session_state:
 
 if "logged_in" not in st.session_state and "login_dismissed" not in st.session_state:
     st.session_state.logged_in = False
-    login()
+    login_dialog()
 # else:
 #     f"You voted for {st.session_state.vote['item']} because {st.session_state.vote['reason']}"
 
