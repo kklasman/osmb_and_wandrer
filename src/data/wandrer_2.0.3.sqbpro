@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="" readonly="0" foreign_keys="" case_sensitive_like="" temp_store="" wal_autocheckpoint="" synchronous=""/><attached/><window><main_tabs open="browser pragmas query structure" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="28433"/><column_width id="4" width="0"/></tab_structure><tab_browse><table title="." custom_title="0" dock_id="4" table="0,0:"/><dock_state state="000000ff00000000fd000000010000000200000772000003f1fc0100000003fb000000160064006f0063006b00420072006f00770073006500310100000000000007720000000000000000fb000000160064006f0063006b00420072006f00770073006500320100000000000007720000000000000000fb000000160064006f0063006b00420072006f00770073006500340100000000000007720000011700ffffff000007720000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="SQL 1*">
+    select distinct town.Region, town.Country, town.State, REPLACE(town.County, ' County', '') as County
+        , CASE WHEN town.Town = &quot;Unincorporated&quot; THEN town.Town || &quot; &quot; || town.County ELSE town.Town END as Town
+		, town.County as LongCounty, town.long_name, town.long_county
+		--, town.detail_parent_arena_id as CountyParentArenaId
+		, town.detail_id as Wandrer_Id, town.detail_parent_arena_id as Wandrer_Parent_Id
+		, round(town.length, 7) as TotalMiles
+		, round(town.percentage, 7) as ActualPct, round(town.ActualLength, 7) as ActualMiles
+		, round(town.Pct10, 7) as Pct10, round(town.Pct25, 7) as Pct25, round(town.Pct50, 7) as Pct50
+        , round(town.Pct75, 7) as Pct75, round(town.Pct90, 7) as Pct90, town.awarded
+ 		, CASE 
+			WHEN town.percentage &lt;= 0 then '0%' 
+	-- 		WHEN town.percentage &gt; 0 and town.percentage &lt;= .10 then '0%' 
+			WHEN town.percentage &gt; 0 and town.ActualLength &lt; 1 then '&lt; 1 mile'
+			WHEN town.percentage &lt; .05 and town.ActualLength &gt; 1 then '&lt; 5%'
+			WHEN town.percentage &lt;= .10 and town.ActualLength &gt;= 1 then '5%' 
+			WHEN town.percentage &gt; .10 and town.percentage &lt; .25 then '10%'
+			WHEN town.percentage &gt;= .25 and town.percentage &lt; .50 then '25%'
+			WHEN town.percentage &gt;= .50 and town.percentage &lt; .75 then '50%'
+			WHEN town.percentage &gt;= .75 and town.percentage &lt; .90 then '75%'
+			WHEN town.percentage &gt;= .90 and town.percentage &lt; .99 then '90%'
+			WHEN town.percentage &gt;= .99 then '99%'
+--			ELSE '0%'
+		END as 'Award Level'
+        , CASE WHEN town.Pct10Deficit &lt; 0 THEN 0 ELSE round(town.Pct10Deficit, 7) END as Pct10Deficit
+        , CASE WHEN town.Pct25Deficit &lt; 0 THEN 0 ELSE round(town.Pct25Deficit, 7) END as Pct25Deficit
+        , round(town.Pct50Deficit, 7) as Pct50Deficit, round(town.Pct75Deficit, 7) as Pct75Deficit
+        , round(town.Pct90Deficit, 7) as Pct90Deficit
+		, abh.geometries_visible, abh.diagonal, town.user_id, abh.seacoast, abh.osm_id, abh.update_datetime
+        from vw_current_town_data_v2 town
+		inner join arena_badge_header abh on abh.id = town.detail_id 
+        where town.state in ('New Hampshire')
+		and town.county = 'Cheshire'
+        order by 'Award Level', town.region, town.country, town.state, town.county, town.Town
+    </sql><sql name="SQL 2*">select Region, Country, State, sum(TotalTowns) as TotalTowns
+		, sum(CycledTowns) as 'TownsCycled', sum(cast(CycledTowns as real))/sum(cast(TotalTowns as real)) as 'PctTownsCycled'
+		, sum(AchievedTowns) as 'TownsAwarded', sum(cast(AchievedTowns as real))/sum(cast(TotalTowns as real)) as 'PctTownsAwarded'
+		, sum(TotalTownMiles) as StateMiles
+        , sum(TotalCountyMilesCycled) as 'TownMilesCycled', sum(TotalCountyMilesCycled)/sum(TotalTownMiles) as 'PctMilesCycled'
+        , CASE WHEN sum(Pct10Deficit) &lt; 0 THEN 0 ELSE sum(Pct10Deficit) END as 'Pct10Deficit'
+        , CASE WHEN sum(Pct25Deficit) &lt; 0 THEN 0 ELSE sum(Pct25Deficit) END as 'Pct25Deficit'
+		, sum(Unincorporated_miles) as UnincorporatedMiles
+		, sum(Unincorporated_miles_Cycled) as UnincorporatedMilesCycled
+		, sum(Unincorporated_miles_Cycled) / sum(Unincorporated_miles) as PctUnincorporatedMilesCycled
+ 		, sum(Pct0_Count) as 'Pct0_Count', sum(LT_1_Mile_Count) + sum(LT_5Pct_Count) as '&lt; Pct5_Count'
+ 		, sum(Pct5_Count) as 'Pct5_Count', sum(Pct10_Count) as 'Pct10_Count', sum(Pct25_Count) as 'Pct25_Count'
+ 		, sum(Pct50_Count) as 'Pct50_Count', sum(Pct75_Count) as 'Pct75_Count', sum(Pct90_Count) as 'Pct90_Count'
+ 		, sum(Pct99_Count) as 'Pct99_Count'
+    	from vw_county_aggregates_v2
+    	where State = &quot;New Hampshire&quot;</sql><sql name="Edit View vw_county_aggregates_v2*">DROP VIEW IF EXISTS &quot;main&quot;.&quot;vw_county_aggregates_v2&quot;;
+CREATE VIEW vw_county_aggregates_v2 as 
+select town.Region, town.Country, town.State, town.County
+	, count(*) as TotalTowns
+	, sum(town.ActualLength &gt; 0) as 'CycledTowns'
+	, sum(town.awarded) as 'AchievedTowns'
+	, sum(town.percentage &gt;= 0.1) as 'Pct10_AchievedTowns'
+-- 	, sum(ctd.percentage &gt;= 0.25) as 'Pct25_AchievedTowns' -- verifies AchievedTowns above
+	, round(cast(sum(town.ActualLength &gt; 0) as real) / count(*), 4) as 'PctTownsCycled'
+	, round(cast(sum(town.awarded) as real) / count(*), 4) as 'PctTownsAchieved'
+-- 	, round(cast(sum(town.awarded) as real) / count(*), 4) as 'PctTownsAchieved'
+	, sum(vwvt.AwardLevel = '0%') as Pct0_Count
+	, sum(vwvt.AwardLevel = '&lt; 1 mile') as LT_1_Mile_Count
+	, sum(vwvt.AwardLevel = '&lt; 5%') as LT_5Pct_Count
+	, sum(vwvt.AwardLevel = '5%') as Pct5_Count
+	, sum(vwvt.AwardLevel = '10%') as Pct10_Count
+	, sum(vwvt.AwardLevel = '25%') as Pct25_Count
+	, sum(vwvt.AwardLevel = '50%') as Pct50_Count
+	, sum(vwvt.AwardLevel = '75%') as Pct75_Count
+	, sum(vwvt.AwardLevel = '90%') as Pct90_Count
+	, sum(vwvt.AwardLevel = '99%') as Pct99_Count
+	, round(sum(town.length), 2) as 'TotalTownMiles'
+	, round(sum(town.ActualLength), 2) as 'TotalTownMilesCycled'
+	, round(sum(town.ActualLength) / sum(town.length), 4) as PctTownMilesCycled
+-- 	, cast(ccd.arena_mileage as INTEGER)
+-- 	, cast(sum(town.length) as INTEGER) as sum_town_length
+-- 	, abs(cast(sum(town.length) as INTEGER) - cast(ccd.arena_mileage as INTEGER)) as 'UnincorporatedMiles'
+	, ccd.unincorporated_miles
+	, ccd.unincorporated_miles_cycled
+	, ccd.unincorporated_miles_cycled_pct
+	, round(sum(town.length) + ccd.unincorporated_miles, 2) as TotalCountyMiles
+	, round(sum(town.ActualLength + ccd.unincorporated_miles_cycled), 2) as TotalCountyMilesCycled
+	, round(((sum(town.ActualLength) + ccd.unincorporated_miles_cycled)/ (sum(town.length) + ccd.unincorporated_miles)), 4) as PctCountyMilesCycled
+	, round(sum(town.Pct10), 2) as 'Pct10'
+	, round(sum(town.Pct25), 2) as 'Pct25'
+	, round(sum(town.Pct50), 2) as 'Pct50'
+	, round(sum(town.Pct75), 2) as 'Pct75'
+	, round(sum(town.Pct10Deficit), 2) as 'Pct10Deficit'
+	, round(sum(town.Pct25Deficit), 2) as 'Pct25Deficit'
+	, round(sum(town.Pct50Deficit), 2) as 'Pct50Deficit'
+	, round(sum(town.Pct75Deficit), 2) as 'Pct75Deficit'
+	, round(sum(town.Pct90Deficit), 2) as 'Pct90Deficit'
+	, ccd.map_version_id as county_map_version_id
+	, ccd.long_county, ccd.StateArenaId, ccd.arena_id as CountyArenaId, ccd.arena_short_name
+
+	from vw_current_town_data_v2 town
+	inner join vw_visible_towns vt on town.detail_id = vt.detail_id
+	inner join vw_visible_towns vwvt on vwvt.detail_id = vt.detail_id
+	inner join vw_current_county_data_v2 ccd on ccd.CountyArenaId = vwvt.detail_parent_arena_id
+-- 	where town.State = 'New Hampshire'
+-- 	and town.County = 'Cheshire'
+	group by town.region, town.country, town.State, town.County
+	--, town.parent_arena_id
+	order by town.region, town.country, town.State, town.County
+/*
+select * from vw_visible_towns vt
+*/</sql><sql name="get_wandrer_totals_for_towns_for_state*">
+    select distinct town.Region, town.Country, town.State, REPLACE(town.County, ' County', '') as County
+        , CASE WHEN town.Town = &quot;Unincorporated&quot; THEN town.Town || &quot; &quot; || town.County ELSE town.Town END as Town
+		, town.County as LongCounty, town.long_name, town.long_county
+		--, town.detail_parent_arena_id as CountyParentArenaId
+		, town.detail_id as Wandrer_Id, town.detail_parent_arena_id as Wandrer_Parent_Id
+		, round(town.length, 7) as TotalMiles
+		, round(town.percentage, 7) as ActualPct, round(town.ActualLength, 7) as ActualMiles
+		, round(town.Pct10, 7) as Pct10, round(town.Pct25, 7) as Pct25, round(town.Pct50, 7) as Pct50
+        , round(town.Pct75, 7) as Pct75, round(town.Pct90, 7) as Pct90, town.awarded
+ 		, CASE 
+			WHEN town.percentage &lt;= 0 then '0%' 
+	-- 		WHEN town.percentage &gt; 0 and town.percentage &lt;= .10 then '0%' 
+			WHEN town.percentage &gt; 0 and town.ActualLength &lt; 1 then '&lt; 1 mile'
+			WHEN town.percentage &lt; .05 and town.ActualLength &gt; 1 then '&lt; 5%'
+			WHEN town.percentage &lt;= .10 and town.ActualLength &gt;= 1 then '5%' 
+			WHEN town.percentage &gt; .10 and town.percentage &lt; .25 then '10%'
+			WHEN town.percentage &gt;= .25 and town.percentage &lt; .50 then '25%'
+			WHEN town.percentage &gt;= .50 and town.percentage &lt; .75 then '50%'
+			WHEN town.percentage &gt;= .75 and town.percentage &lt; .90 then '75%'
+			WHEN town.percentage &gt;= .90 and town.percentage &lt; .99 then '90%'
+			WHEN town.percentage &gt;= .99 then '99%'
+--			ELSE '0%'
+		END as 'Award Level'
+        , CASE WHEN town.Pct10Deficit &lt; 0 THEN 0 ELSE round(town.Pct10Deficit, 7) END as Pct10Deficit
+        , CASE WHEN town.Pct25Deficit &lt; 0 THEN 0 ELSE round(town.Pct25Deficit, 7) END as Pct25Deficit
+        , round(town.Pct50Deficit, 7) as Pct50Deficit, round(town.Pct75Deficit, 7) as Pct75Deficit
+        , round(town.Pct90Deficit, 7) as Pct90Deficit
+		, abh.geometries_visible, abh.diagonal, town.user_id, abh.seacoast, abh.osm_id, abh.update_datetime
+        from vw_current_town_data_v2 town
+		inner join arena_badge_header abh on abh.id = town.detail_id 
+        where town.state in ('New Hampshire')
+        order by 'Award Level', town.region, town.country, town.state, town.county, town.Town
+    </sql><current_tab id="3"/></tab_sql></sqlb_project>
