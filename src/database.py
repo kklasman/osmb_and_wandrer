@@ -1,16 +1,24 @@
 import sqlite3
 import os
 import pandas as pd
+from pathlib import Path
 
 def get_db_path():
-    cwd = os.getcwd()
-    # print(f'cwd = {cwd}')
-    db_path = os.path.join(cwd, 'Lib', 'data', 'wandrer_2.0.db')
-    # print(f'db_path {db_path} exists {os.path.exists(db_path)}')
-    if not os.path.exists(db_path):
-        # file lives in different location in development
-        db_path = os.path.join(cwd, r'data', 'wandrer_2.0.db')
-        # print(f'db_path {db_path} exists {os.path.exists(db_path)}')
+    # 1. Get the absolute path of the directory where this current script lives
+    current_dir = Path(__file__).parent.resolve()
+
+    # 2. Build the absolute path to your database file
+    # (If your script is inside 'src/', it just goes into 'data/wandrer_2.0.db')
+    db_path = current_dir / "data" / "wandrer_2.0.db"
+
+    # cwd = os.getcwd()
+    # # print(f'cwd = {cwd}')
+    # db_path = os.path.join(cwd, 'Lib', 'data', 'wandrer_2.0.db')
+    # # print(f'db_path {db_path} exists {os.path.exists(db_path)}')
+    # if not os.path.exists(db_path):
+    #     # file lives in different location in development
+    #     db_path = os.path.join(cwd, r'data', 'wandrer_2.0.db')
+    #     # print(f'db_path {db_path} exists {os.path.exists(db_path)}')
     return db_path
 
 
