@@ -20,6 +20,36 @@ import cache_to_disk_decorator as ctdd
 
 max_50_pct_color_scale = ['white', 'gold', 'red']
 
+def constrain_hoverlabels():
+    st.markdown(
+        """
+        <style>
+        /* 1. Globally hide all plotly hover labels by default */
+        .js-plotly-plot .hoverlayer {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+
+        /* 2. ONLY reveal the hover layer when the mouse is actively inside the actual map visualization container */
+        .js-plotly-plot:has(.nsewdrag:hover) .hoverlayer,
+        .js-plotly-plot:has(.gl-container:hover) .hoverlayer {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        /* 3. Explicitly kill it if the mouse drifts over any part of the legend wrapper */
+        .js-plotly-plot:has(.legendlayer:hover) .hoverlayer {
+            display: none !important;
+            opacity: 0 !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+
 
 def create_template(data, col_names):
     template = ''
@@ -293,8 +323,9 @@ def create_choropleth_map_with_legend(state_list, data_value):
     gdf = gf.get_geopandas_df_for_region(state_list)
     gdf.set_crs("EPSG:4326", inplace=True)
 
-    if gdf.geom_type.isin(['LineString']).any():
-        gdf = gf.combine_linestrings_into_polygons(gdf, 'Town')
+    # I don't remember why this was added. It is preventing Appalachian Trail from being displayed in NH.
+    # if gdf.geom_type.isin(['LineString']).any():
+    #     gdf = gf.combine_linestrings_into_polygons(gdf, 'Town')
 
     nf = 'New England National Forests.geojson'
     # nf = 'GMNF-edited_split_to_file.geojson'

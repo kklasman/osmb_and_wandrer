@@ -180,6 +180,9 @@ def create_template(data, col_names):
             elif name == 'Town':
                 template += "<b>Town:</b> %{" + f"customdata[{data.columns.get_loc('Town')}]" + "}<br>"
 
+            elif name == 'MapVersion':
+                template += "<b>Map Version:</b> %{" + f"customdata[{data.columns.get_loc('MapVersion')}]" + "}<br>"
+
             elif name == 'StateMiles':
                 template += "<b>State Miles:</b> %{" + f"customdata[{data.columns.get_loc('StateMiles')}]:,.2f" + "}<br>"
 
@@ -1262,7 +1265,7 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
                                      town_merged_df, zoom):
 
     # Template columns covers all award level trace templates
-    template_columns = ['State', 'County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct',
+    template_columns = ['State', 'County', 'Town', 'MapVersion', 'TotalMiles', 'ActualMiles', 'ActualPct',
                                      'awarded', 'Award Level']
     # template_columns = ['State', 'County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit',
     #                                  'Pct25Deficit', 'awarded', 'Award Level',
@@ -1297,7 +1300,7 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
 
     logger.info(f"{asizeof.asizeof(location_json)=} bytes")
 
-    element_to_find = 'Town'
+    element_to_find = 'MapVersion'
     if element_to_find in template_columns:
         index = template_columns.index(element_to_find)
         template_columns.insert(index + 1, 'blank line')
@@ -3247,7 +3250,7 @@ def town_selected():
 
 
     # fig.conf = dict(scrollZoom=True)
-
+    pf.constrain_hoverlabels()
     st.plotly_chart(fig)
 
     if st.session_state.logged_in:
@@ -3315,6 +3318,7 @@ def campground_selected():
 
     # fig.conf = dict(scrollZoom=True)
 
+    pf.constrain_hoverlabels()
     st.plotly_chart(fig)
 
     if st.session_state.logged_in:
@@ -3378,6 +3382,7 @@ def national_forest_town_selected():
 
     # fig.conf = dict(scrollZoom=True)
 
+    pf.constrain_hoverlabels()
     st.plotly_chart(fig)
 
     if st.session_state.logged_in:
@@ -3416,6 +3421,7 @@ def state_selected():
     fig.update_traces(visible='legendonly', selector=dict(name='Town Map'))
     fig.update_traces(visible='legendonly', selector=dict(name='Seacoast Map'))
 
+    pf.constrain_hoverlabels()
     st.plotly_chart(fig)
 
     if st.session_state.logged_in:
@@ -3447,6 +3453,7 @@ def county_selected():
     fig.update_traces(visible='legendonly', selector=dict(name='Town Map'))
     fig.update_traces(visible='legendonly', selector=dict(name='Seacoast Map'))
 
+    pf.constrain_hoverlabels()
     st.plotly_chart(fig)
 
     if st.session_state.logged_in:
@@ -3494,6 +3501,7 @@ def park_selected():
         selector = dict(name='Town Map')
     )
 
+    pf.constrain_hoverlabels()
     st.plotly_chart(fig)
 
     if st.session_state.logged_in:
@@ -3812,6 +3820,7 @@ def main():
                 # don't need current_fig in session.state if the raw data table isn't being shwon.
                 st.session_state.current_fig = fig
 
+            pf.constrain_hoverlabels()
             st.plotly_chart(fig)
             # st.plotly_chart(fig, key='plotly_chart_event', on_select=_map_selected, selection_mode="points")
             show_dataframes()

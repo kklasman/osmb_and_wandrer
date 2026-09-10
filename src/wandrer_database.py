@@ -31,6 +31,7 @@ def get_wandrer_totals_for_towns_for_state(states):
         , CASE WHEN town.Pct25Deficit < 0 THEN 0 ELSE round(town.Pct25Deficit, 7) END as Pct25Deficit
         , round(town.Pct50Deficit, 7) as Pct50Deficit, round(town.Pct75Deficit, 7) as Pct75Deficit
         , round(town.Pct90Deficit, 7) as Pct90Deficit
+        , town.detail_map_version_id as MapVersion
 		, abh.geometries_visible, abh.diagonal, town.user_id, abh.seacoast, abh.osm_id, abh.update_datetime
         from vw_current_town_data_v2 town
 		inner join arena_badge_header abh on abh.id = town.detail_id 
