@@ -50,7 +50,6 @@ def constrain_hoverlabels():
     )
 
 
-
 def create_template(data, col_names):
     template = ''
     for idx, name in enumerate(col_names):
@@ -213,6 +212,152 @@ def create_template(data, col_names):
     template += "<extra></extra>"
 
     return template
+
+
+def get_hover_assets(
+        df: pd.DataFrame,
+        hover_cols: list,
+        float_cols: list = None,
+        pct_cols: list = None,
+        date_time_cols: list = None,
+        custom_titles: dict = None,
+        metadata_end_col: str = 'detail_update_datetime'  # Track where metadata ends
+) -> tuple[np.ndarray, str]:
+    """
+    Returns a tuple of (customdata_matrix, hovertemplate) optimized for Plotly traces.
+    Dynamically injects a text separator whose length perfectly matches the longest
+    string in the target metadata column.
+    """
+    plot_df = df[hover_cols].copy()
+
+    date_time_cols = date_time_cols or []
+    float_cols = float_cols or []
+    pct_cols = pct_cols or []
+    custom_titles = custom_titles or {}
+
+    # 1. Apply string transformations
+    for col in hover_cols:
+        if col in date_time_cols:
+            plot_df[col] = plot_df[col].astype(str).str.split('.').str[0]
+        elif col in pct_cols:
+            plot_df[col] = plot_df[col].multiply(100).map('{:.2f}%'.format, na_action='ignore')
+        elif col in float_cols or pd.api.types.is_float_dtype(plot_df[col]):
+            plot_df[col] = plot_df[col].map('{:.2f}'.format, na_action='ignore')
+
+        # 2. Calculate separator width based entirely on the column value length
+        if metadata_end_col in plot_df.columns:
+            max_val_length = int(plot_df[metadata_end_col].astype(str).str.len().max())
+            display_label = custom_titles.get(metadata_end_col, metadata_end_col)
+
+            # Calculate the total length of the rendered timestamp line:
+            # "Label: YYYY-MM-DD HH:MM:SS" -> label length + 2 (for ": ") + value length
+            # total_timestamp_line_length = len(display_label) + 1 + max_val_length
+            total_timestamp_line_length = len(display_label) - 2 + max_val_length
+
+            # Create your raw separator line (e.g., 19 characters)
+            raw_separator = "─" * max_val_length
+
+            # Center the separator line inside a block of spaces matching the full line width
+            separator_line = raw_separator.center(total_timestamp_line_length)
+        else:
+            separator_line = "────────────────────────"
+
+        # # 2. Dynamically calculate separator width based on the longest value in that column
+        # # Fallback to a default width of 20 if the column isn't present or is entirely empty
+        # if metadata_end_col in plot_df.columns:
+        #     max_length = int(plot_df[metadata_end_col].astype(str).str.len().max())
+        #     # Add a tiny buffer (like +2) if your custom title header string is longer than the values
+        #     separator_line = "─" * max_length
+        # else:
+        #     separator_line = "────────────────────"
+
+    # if metadata_end_col in plot_df.columns:
+    #     max_val_length = int(plot_df[metadata_end_col].astype(str).str.len().max())
+    #     display_label = custom_titles.get(metadata_end_col, metadata_end_col)
+    #
+    #     # Add the length of the label plus 2 characters for the colon and trailing space
+    #     # We multiply the label length by 1.15 to account for bold text taking up more physical width
+    #     label_buffer = int(len(display_label) * 1.15) + 2
+    #     total_line_length = max_val_length + label_buffer
+    #
+    #     separator_line = "─" * total_line_length
+    # else:
+    #     separator_line = "──────────────────────────────"
+
+    # 3. Extract the memory-lean 2D matrix
+    custom_data_matrix = np.column_stack([plot_df[col] for col in hover_cols])
+
+    # 4. Construct the template layout
+    hover_lines = []
+    for index, col in enumerate(hover_cols):
+        display_label = custom_titles.get(col, col)
+        hover_lines.append(f"<b>{display_label}:</b> %{{customdata[{index}]}}")
+
+        # Inject the dynamic separator right after your metadata boundary column
+        if col == metadata_end_col:
+            hover_lines.append(separator_line)
+            # hover_lines.append(f"<span style='color:gray;'>{separator_line}</span>")
+            # # Using HTML center alignment ensures it stays theme-safe and balanced
+            # hover_lines.append(f"<p align='center'>{separator_line}</p>")
+            # Using style text-align ensures Plotly converts the tag correctly
+            # hover_lines.append(f"<div style='text-align: center;'>{separator_line}</div>")
+
+    template = "<br>".join(hover_lines) + "<extra></extra>"
+
+    return custom_data_matrix, template
+
+
+# def get_hover_assets(
+#         df: pd.DataFrame,
+#         hover_cols: list,
+#         float_cols: list = None,
+#         pct_cols: list = None,
+#         date_time_cols: list = None,
+#         custom_titles: dict = None
+# ) -> tuple[np.ndarray, str]:
+#     """
+#     Returns a tuple of (customdata_matrix, hovertemplate) optimized for Plotly traces.
+#     Saves memory by filtering data down *only* to the columns explicitly shown.
+#     """
+#     # 1. Isolate and copy only the required columns to save memory footprint
+#     plot_df = df[hover_cols].copy()
+#
+#     float_cols = float_cols or []
+#     pct_cols = pct_cols or []
+#     custom_titles = custom_titles or {}
+#
+#     # 2. Apply explicit string transformations to the isolated columns
+#     for col in hover_cols:
+#         # Datetime formatting (Removes decimal seconds)
+#         # if pd.api.types.is_datetime64_any_dtype(plot_df[col]):
+#         #     plot_df[col] = plot_df[col].dt.strftime('%Y-%m-%d %H:%M:%S')
+#         if col in date_time_cols:
+#             plot_df[col] = plot_df[col].astype(str).str.split('.').str[0]
+#             # date_length = len(plot_df[col][0])
+#
+#         # Percentage formatting (Converts fractions: 0.0125 -> "1.25%")
+#         elif col in pct_cols:
+#             plot_df[col] = plot_df[col].multiply(100).map('{:.2f}%'.format, na_action='ignore')
+#
+#         # Standard Float formatting (2 decimal places)
+#         elif col in float_cols or pd.api.types.is_float_dtype(plot_df[col]):
+#             plot_df[col] = plot_df[col].map('{:.2f}'.format, na_action='ignore')
+#
+#     # 3. Extract the memory-lean 2D matrix
+#     custom_data_matrix = np.column_stack([plot_df[col] for col in hover_cols])
+#
+#     # 4. Construct the template corresponding to the array indices
+#     hover_lines = []
+#     for index, col in enumerate(hover_cols):
+#         display_label = custom_titles.get(col, col)
+#         hover_lines.append(f"<b>{display_label}:</b> %{{customdata[{index}]}}")
+#         if col in date_time_cols:
+#             divider_line = f"{'-' * (len(display_label) + 10)}"
+#             hover_lines.append(divider_line)
+#
+#     template = "<br>".join(hover_lines) + "<extra></extra>"
+#
+#     return custom_data_matrix, template
 
 
 def calculate_mapbox_zoom_center(bounds) -> (float, dict):

@@ -1265,7 +1265,7 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
                                      town_merged_df, zoom):
 
     # Template columns covers all award level trace templates
-    template_columns = ['State', 'County', 'Town', 'MapVersion', 'TotalMiles', 'ActualMiles', 'ActualPct',
+    template_columns = ['State', 'County', 'Town', 'MapVersion', 'detail_update_datetime', 'TotalMiles', 'ActualMiles', 'ActualPct',
                                      'awarded', 'Award Level']
     # template_columns = ['State', 'County', 'Town', 'TotalMiles', 'ActualMiles', 'ActualPct', 'Pct10Deficit',
     #                                  'Pct25Deficit', 'awarded', 'Award Level',
@@ -1299,11 +1299,6 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
     town_merged_sorted_df = town_merged_df.sort_values(by='z_value')
 
     logger.info(f"{asizeof.asizeof(location_json)=} bytes")
-
-    element_to_find = 'MapVersion'
-    if element_to_find in template_columns:
-        index = template_columns.index(element_to_find)
-        template_columns.insert(index + 1, 'blank line')
 
     trace_dictionary_size_total = 0
     for i, level in enumerate(town_merged_sorted_df['z_value'].sort_values().unique()):
@@ -1367,11 +1362,21 @@ def create_town_map_discrete_color_go(center, county_location_json, data_value, 
         #  else:
         #      trace_template_columns.extend('Pct90Deficit')
 
-        trace_template = create_template(town_merged_df, trace_template_columns)
+        # trace_template = create_template(town_merged_df, trace_template_columns)
+
+        # Generate the assets plug-and-play style
+        custom_data, trace_template = pf.get_hover_assets(
+            df=trace_df,
+            hover_cols=trace_template_columns,
+            float_cols=['TotalMiles', 'ActualMiles'],
+            pct_cols=['ActualPct'],
+            date_time_cols=['detail_update_datetime'],
+            custom_titles={'detail_update_datetime': 'Last Updated'}
+        )
 
         fig.add_trace(go.Choroplethmap(geojson=trace_geojson,
                                        locations=trace_df['long_name'],
-                                       customdata=trace_df,
+                                       customdata=custom_data,
                                  z=trace_df['z_value'],
                                  featureidkey="properties.long_name",
                                  showlegend=True,

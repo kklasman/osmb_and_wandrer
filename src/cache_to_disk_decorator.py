@@ -30,9 +30,13 @@ class NumpyEncoder(json.JSONEncoder):
         if isinstance(obj, np.floating):
             return float(obj)
 
-        # 4. Delegate everything else to the parent JSONEncoder
-        return super().default(obj)
+        # 4. Convert numpy string/character scalars (e.g., np.str_) to Python strings
+        # This protects your newly formatted SQLite text datetime strings
+        if isinstance(obj, (np.character, np.str_)):
+            return str(obj)
 
+        # 5. Delegate everything else to the parent JSONEncoder
+        return super().default(obj)
 
 def _make_hashable(val):
     """Converts unhashable items (DataFrames, lists) into hashable strings/tuples."""
